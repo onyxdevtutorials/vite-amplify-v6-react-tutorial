@@ -35,6 +35,9 @@
     "categories": {
       "auth": {
         "authservices": {}
+      },
+      "api": {
+        "mytutorialv2": {}
       }
     }
   }
