@@ -12,9 +12,25 @@
       "AmplifyAppId": "d1orozue7xcs1n"
     },
     "categories": {
+      "auth": {
+        "MyAuthenticationAuthorizationServices": {}
+      },
       "api": {
-        "mytutorialv2": {}
+        "mytutorialv2api": {}
       }
+    }
+  },
+  "myenv": {
+    "awscloudformation": {
+      "AuthRoleName": "amplify-mytutorialv2-myenv-203201-authRole",
+      "UnauthRoleArn": "arn:aws:iam::909500381447:role/amplify-mytutorialv2-myenv-203201-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::909500381447:role/amplify-mytutorialv2-myenv-203201-authRole",
+      "Region": "us-east-1",
+      "DeploymentBucketName": "amplify-mytutorialv2-myenv-203201-deployment",
+      "UnauthRoleName": "amplify-mytutorialv2-myenv-203201-unauthRole",
+      "StackName": "amplify-mytutorialv2-myenv-203201",
+      "StackId": "arn:aws:cloudformation:us-east-1:909500381447:stack/amplify-mytutorialv2-myenv-203201/4000bf90-89b9-11ee-9f8c-0a239003dd67",
+      "AmplifyAppId": "d1orozue7xcs1n"
     }
   }
 }

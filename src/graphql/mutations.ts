@@ -19,6 +19,7 @@ export const createProduct = /* GraphQL */ `mutation CreateProduct(
     price
     createdAt
     updatedAt
+    owner
     __typename
   }
 }
@@ -37,6 +38,7 @@ export const updateProduct = /* GraphQL */ `mutation UpdateProduct(
     price
     createdAt
     updatedAt
+    owner
     __typename
   }
 }
@@ -55,6 +57,7 @@ export const deleteProduct = /* GraphQL */ `mutation DeleteProduct(
     price
     createdAt
     updatedAt
+    owner
     __typename
   }
 }

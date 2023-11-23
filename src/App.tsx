@@ -1,6 +1,8 @@
 import React from "react";
 import { RouterProvider, createBrowserRouter } from "react-router-dom";
-import { HomeLayout, Landing, AddProduct } from "./pages";
+import { HomeLayout, Landing, AddProduct, SignUp } from "./pages";
+import { Authenticator } from "@aws-amplify/ui-react";
+import "@aws-amplify/ui-react/styles.css";
 
 const router = createBrowserRouter([
   {
@@ -13,15 +15,26 @@ const router = createBrowserRouter([
       },
       {
         path: "add",
-        element: <AddProduct />,
+        element: (
+          <Authenticator>
+            <AddProduct />
+          </Authenticator>
+        ),
       },
     ],
+  },
+  {
+    path: "signup",
+    element: <SignUp />,
   },
 ]);
 
 const App = () => {
   return (
     <React.StrictMode>
+      <>
+        <h1>Hello</h1>
+      </>
       <RouterProvider router={router} />
     </React.StrictMode>
   );

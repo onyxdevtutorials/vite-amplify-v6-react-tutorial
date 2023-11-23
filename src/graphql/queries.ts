@@ -16,6 +16,7 @@ export const getProduct = /* GraphQL */ `query GetProduct($id: ID!) {
     price
     createdAt
     updatedAt
+    owner
     __typename
   }
 }
@@ -36,6 +37,7 @@ export const listProducts = /* GraphQL */ `query ListProducts(
       price
       createdAt
       updatedAt
+      owner
       __typename
     }
     nextToken

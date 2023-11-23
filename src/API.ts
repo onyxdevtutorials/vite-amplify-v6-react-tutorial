@@ -66,6 +66,7 @@ export type Product = {
   price?: string | null,
   createdAt: string,
   updatedAt: string,
+  owner?: string | null,
 };
 
 export type UpdateProductInput = {
@@ -164,6 +165,7 @@ export type CreateProductMutation = {
     price?: string | null,
     createdAt: string,
     updatedAt: string,
+    owner?: string | null,
   } | null,
 };
 
@@ -181,6 +183,7 @@ export type UpdateProductMutation = {
     price?: string | null,
     createdAt: string,
     updatedAt: string,
+    owner?: string | null,
   } | null,
 };
 
@@ -198,6 +201,7 @@ export type DeleteProductMutation = {
     price?: string | null,
     createdAt: string,
     updatedAt: string,
+    owner?: string | null,
   } | null,
 };
 
@@ -214,6 +218,7 @@ export type GetProductQuery = {
     price?: string | null,
     createdAt: string,
     updatedAt: string,
+    owner?: string | null,
   } | null,
 };
 
@@ -234,6 +239,7 @@ export type ListProductsQuery = {
       price?: string | null,
       createdAt: string,
       updatedAt: string,
+      owner?: string | null,
     } | null >,
     nextToken?: string | null,
   } | null,
@@ -241,6 +247,7 @@ export type ListProductsQuery = {
 
 export type OnCreateProductSubscriptionVariables = {
   filter?: ModelSubscriptionProductFilterInput | null,
+  owner?: string | null,
 };
 
 export type OnCreateProductSubscription = {
@@ -252,11 +259,13 @@ export type OnCreateProductSubscription = {
     price?: string | null,
     createdAt: string,
     updatedAt: string,
+    owner?: string | null,
   } | null,
 };
 
 export type OnUpdateProductSubscriptionVariables = {
   filter?: ModelSubscriptionProductFilterInput | null,
+  owner?: string | null,
 };
 
 export type OnUpdateProductSubscription = {
@@ -268,11 +277,13 @@ export type OnUpdateProductSubscription = {
     price?: string | null,
     createdAt: string,
     updatedAt: string,
+    owner?: string | null,
   } | null,
 };
 
 export type OnDeleteProductSubscriptionVariables = {
   filter?: ModelSubscriptionProductFilterInput | null,
+  owner?: string | null,
 };
 
 export type OnDeleteProductSubscription = {
@@ -284,5 +295,6 @@ export type OnDeleteProductSubscription = {
     price?: string | null,
     createdAt: string,
     updatedAt: string,
+    owner?: string | null,
   } | null,
 };
