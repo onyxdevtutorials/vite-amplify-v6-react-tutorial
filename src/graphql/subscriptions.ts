@@ -8,14 +8,18 @@ type GeneratedSubscription<InputType, OutputType> = string & {
   __generatedSubscriptionOutput: OutputType;
 };
 
-export const onCreateProduct = /* GraphQL */ `subscription OnCreateProduct($filter: ModelSubscriptionProductFilterInput) {
-  onCreateProduct(filter: $filter) {
+export const onCreateProduct = /* GraphQL */ `subscription OnCreateProduct(
+  $filter: ModelSubscriptionProductFilterInput
+  $owner: String
+) {
+  onCreateProduct(filter: $filter, owner: $owner) {
     id
     name
     description
     price
     createdAt
     updatedAt
+    owner
     __typename
   }
 }
@@ -23,14 +27,18 @@ export const onCreateProduct = /* GraphQL */ `subscription OnCreateProduct($filt
   APITypes.OnCreateProductSubscriptionVariables,
   APITypes.OnCreateProductSubscription
 >;
-export const onUpdateProduct = /* GraphQL */ `subscription OnUpdateProduct($filter: ModelSubscriptionProductFilterInput) {
-  onUpdateProduct(filter: $filter) {
+export const onUpdateProduct = /* GraphQL */ `subscription OnUpdateProduct(
+  $filter: ModelSubscriptionProductFilterInput
+  $owner: String
+) {
+  onUpdateProduct(filter: $filter, owner: $owner) {
     id
     name
     description
     price
     createdAt
     updatedAt
+    owner
     __typename
   }
 }
@@ -38,14 +46,18 @@ export const onUpdateProduct = /* GraphQL */ `subscription OnUpdateProduct($filt
   APITypes.OnUpdateProductSubscriptionVariables,
   APITypes.OnUpdateProductSubscription
 >;
-export const onDeleteProduct = /* GraphQL */ `subscription OnDeleteProduct($filter: ModelSubscriptionProductFilterInput) {
-  onDeleteProduct(filter: $filter) {
+export const onDeleteProduct = /* GraphQL */ `subscription OnDeleteProduct(
+  $filter: ModelSubscriptionProductFilterInput
+  $owner: String
+) {
+  onDeleteProduct(filter: $filter, owner: $owner) {
     id
     name
     description
     price
     createdAt
     updatedAt
+    owner
     __typename
   }
 }
