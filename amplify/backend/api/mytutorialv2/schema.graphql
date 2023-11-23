@@ -2,8 +2,9 @@ type Product
   @model
   @auth(
     rules: [
-      { allow: public, operations: [read], provider: apiKey }
       { allow: owner }
+      { allow: private, provider: userPools }
+      { allow: public, provider: iam }
     ]
   ) {
   id: ID!
