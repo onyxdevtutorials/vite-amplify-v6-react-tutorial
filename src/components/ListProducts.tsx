@@ -16,6 +16,7 @@ const ListProducts = () => {
     try {
       const productsData = await client.graphql({
         query: listProducts,
+        authMode: "iam",
       });
       setProducts(productsData.data.listProducts.items);
     } catch (error) {
