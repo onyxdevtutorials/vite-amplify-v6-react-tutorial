@@ -16,7 +16,7 @@ const Banner = () => {
       console.log("signInDetails", signInDetails);
       setIsAuthenticated(true);
     } catch (error) {
-      console.error("not signed in", error);
+      setIsAuthenticated(false);
     }
   };
 
@@ -28,6 +28,7 @@ const Banner = () => {
     try {
       await signOut();
       setIsAuthenticated(false);
+      navigate("/");
     } catch (error) {
       console.error("could not sign out", error);
     }
@@ -37,11 +38,15 @@ const Banner = () => {
     navigate("/signup");
   };
 
+  const handleSignIn = () => {
+    navigate("/signin");
+  };
+
   return (
     <div>
       {!isAuthenticated && (
         <span>
-          <button>Sign In</button>
+          <button onClick={handleSignIn}>Sign In</button>
           <button onClick={handleSignUp}>Sign Up</button>
         </span>
       )}
