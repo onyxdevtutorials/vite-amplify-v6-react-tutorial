@@ -2,7 +2,6 @@ import { generateClient } from "aws-amplify/api";
 import { listProducts } from "../graphql/queries";
 import { useEffect, useState } from "react";
 import { Product } from "../API";
-import { Auth } from "aws-amplify";
 
 const client = generateClient();
 
