@@ -2,8 +2,24 @@ import { generateClient } from "aws-amplify/api";
 import { listProducts } from "../graphql/queries";
 import { useEffect, useState } from "react";
 import { Product } from "../API";
+import { Auth } from "aws-amplify";
 
 const client = generateClient();
+
+import { getCurrentUser } from "aws-amplify/auth";
+
+async function checkForUser() {
+  try {
+    const { username, userId, signInDetails } = await getCurrentUser();
+    console.log(`The username: ${username}`);
+    console.log(`The userId: ${userId}`);
+    console.log(`The signInDetails: ${signInDetails}`);
+    return true;
+  } catch (err) {
+    console.log(err);
+    return false;
+  }
+}
 
 const ListProducts = () => {
   const [products, setProducts] = useState<Product[]>([]);
@@ -13,10 +29,11 @@ const ListProducts = () => {
   }, []);
 
   const fetchProducts = async () => {
+    const isLoggedIn = await checkForUser();
     try {
       const productsData = await client.graphql({
         query: listProducts,
-        authMode: "iam",
+        authMode: isLoggedIn ? "userPool" : "iam",
       });
       setProducts(productsData.data.listProducts.items);
     } catch (error) {
