@@ -2,6 +2,7 @@ import { generateClient } from "aws-amplify/api";
 import { listProducts } from "../graphql/queries";
 import { useEffect, useState } from "react";
 import { Product } from "../API";
+import Card from "react-bootstrap/Card";
 
 const client = generateClient();
 
@@ -44,11 +45,13 @@ const ListProducts = () => {
     <div>
       <h1>List Products</h1>
       {products.map((product, index) => (
-        <div key={product.id ? product.id : index}>
-          <p>{product.name}</p>
-          <p>{product.description}</p>
-          <p>{product.price}</p>
-        </div>
+        <Card key={product.id ? product.id : index}>
+          <Card.Body>
+            <Card.Title>{product.name}</Card.Title>
+            <Card.Text>{product.description}</Card.Text>
+            <Card.Text>{product.price}</Card.Text>
+          </Card.Body>
+        </Card>
       ))}
     </div>
   );

@@ -3,6 +3,7 @@ import { RouterProvider, createBrowserRouter } from "react-router-dom";
 import { HomeLayout, Landing, AddProduct, SignUp, SignIn } from "./pages";
 import { Authenticator } from "@aws-amplify/ui-react";
 import "@aws-amplify/ui-react/styles.css";
+import Container from "react-bootstrap/Container";
 
 const router = createBrowserRouter([
   {
@@ -36,10 +37,9 @@ const router = createBrowserRouter([
 const App = () => {
   return (
     <React.StrictMode>
-      <>
-        <h1>Hello</h1>
-      </>
-      <RouterProvider router={router} />
+      <Container className="p-3">
+        <RouterProvider router={router} />
+      </Container>
     </React.StrictMode>
   );
 };
