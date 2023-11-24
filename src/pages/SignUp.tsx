@@ -75,28 +75,36 @@ const SignUp = () => {
       <>
         <h1>Sign Up</h1>
         <form onSubmit={handleSubmit}>
-          <label htmlFor="username">Username</label>
-          <input
-            type="text"
-            name="username"
-            onChange={(e) => setInput("username", e.target.value)}
-            value={formState.username}
-          />
-          <label htmlFor="password">Password</label>
-          <input
-            type="password"
-            name="password"
-            onChange={(e) => setInput("password", e.target.value)}
-            value={formState.password}
-          />
-          <label htmlFor="email">Email</label>
-          <input
-            type="text"
-            name="email"
-            onChange={(e) => setInput("email", e.target.value)}
-            value={formState.email}
-          />
-          <button type="submit">Sign Up</button>
+          <div>
+            <label htmlFor="username">Username</label>
+            <input
+              type="text"
+              name="username"
+              onChange={(e) => setInput("username", e.target.value)}
+              value={formState.username}
+            />
+          </div>
+          <div>
+            <label htmlFor="password">Password</label>
+            <input
+              type="password"
+              name="password"
+              onChange={(e) => setInput("password", e.target.value)}
+              value={formState.password}
+            />
+          </div>
+          <div>
+            <label htmlFor="email">Email</label>
+            <input
+              type="text"
+              name="email"
+              onChange={(e) => setInput("email", e.target.value)}
+              value={formState.email}
+            />
+          </div>
+          <div>
+            <button type="submit">Sign Up</button>
+          </div>
         </form>
       </>
     );
@@ -107,14 +115,18 @@ const SignUp = () => {
       <>
         <h1>Confirm Sign Up</h1>
         <form onSubmit={handleSignUpConfirm}>
-          <label htmlFor="confirmationCode">Username</label>
-          <input
-            type="text"
-            name="confirmationCode"
-            onChange={(e) => setInput("confirmationCode", e.target.value)}
-            value={formState.confirmationCode}
-          />
-          <button type="submit">Submit</button>
+          <div>
+            <label htmlFor="confirmationCode">Confirmation Code</label>
+            <input
+              type="text"
+              name="confirmationCode"
+              onChange={(e) => setInput("confirmationCode", e.target.value)}
+              value={formState.confirmationCode}
+            />
+          </div>
+          <div>
+            <button type="submit">Submit</button>
+          </div>
         </form>
       </>
     );

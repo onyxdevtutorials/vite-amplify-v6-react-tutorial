@@ -1,6 +1,6 @@
 import React from "react";
 import { RouterProvider, createBrowserRouter } from "react-router-dom";
-import { HomeLayout, Landing, AddProduct, SignUp } from "./pages";
+import { HomeLayout, Landing, AddProduct, SignUp, SignIn } from "./pages";
 import { Authenticator } from "@aws-amplify/ui-react";
 import "@aws-amplify/ui-react/styles.css";
 
@@ -26,6 +26,10 @@ const router = createBrowserRouter([
   {
     path: "signup",
     element: <SignUp />,
+  },
+  {
+    path: "signin",
+    element: <SignIn />,
   },
 ]);
 
