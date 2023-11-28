@@ -1,14 +1,16 @@
 import { getCurrentUser } from "aws-amplify/auth";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { signOut } from "aws-amplify/auth";
 import { useNavigate } from "react-router-dom";
 import Navbar from "react-bootstrap/Navbar";
 import Container from "react-bootstrap/Container";
 import Nav from "react-bootstrap/Nav";
 import Button from "react-bootstrap/Button";
+import { Link } from "react-router-dom";
+import { useAuthContext } from "../context/AuthContext";
 
 const Banner = () => {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const { isLoggedIn, setIsLoggedIn } = useAuthContext();
 
   const navigate = useNavigate();
 
@@ -18,9 +20,9 @@ const Banner = () => {
       console.log("username", username);
       console.log("userId", userId);
       console.log("signInDetails", signInDetails);
-      setIsAuthenticated(true);
+      setIsLoggedIn(true);
     } catch (error) {
-      setIsAuthenticated(false);
+      setIsLoggedIn(false);
     }
   };
 
@@ -31,7 +33,7 @@ const Banner = () => {
   const handleSignOut = async () => {
     try {
       await signOut();
-      setIsAuthenticated(false);
+      setIsLoggedIn(false);
       navigate("/");
     } catch (error) {
       console.error("could not sign out", error);
@@ -52,8 +54,11 @@ const Banner = () => {
         <Navbar.Brand>Site Name</Navbar.Brand>
         <Navbar.Toggle aria-controls="basic-navbar-nav" />
         <Navbar.Collapse id="basic-navbar-nav" className="justify-content-end">
-          {!isAuthenticated && (
+          {!isLoggedIn && (
             <>
+              <span>
+                <Link to="/add">Add Product</Link>
+              </span>
               <Nav.Link>
                 <Button variant="dark" onClick={handleSignIn}>
                   Sign In
@@ -67,7 +72,7 @@ const Banner = () => {
             </>
           )}
 
-          {isAuthenticated && (
+          {isLoggedIn && (
             <>
               <Nav.Link>
                 <Button variant="dark" onClick={handleSignOut}>

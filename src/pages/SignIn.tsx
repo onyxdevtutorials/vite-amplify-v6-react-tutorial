@@ -1,19 +1,25 @@
 import { signIn, SignInInput } from "aws-amplify/auth";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useAuthContext } from "../context/AuthContext";
 
 const initialState = { username: "", password: "" };
 
 const SignIn = () => {
   const [formState, setFormState] = useState(initialState);
+  const { setIsLoggedIn } = useAuthContext();
 
   async function handleSignIn({ username, password }: SignInInput) {
     try {
       const { isSignedIn, nextStep } = await signIn({ username, password });
       console.log("isSignedIn", isSignedIn);
       console.log("nextStep", nextStep);
+      console.log("setting context value to true");
+      setIsLoggedIn(true);
+
       navigate("/");
     } catch (error) {
+      setIsLoggedIn(false);
       console.log("error signing in", error);
     }
   }
