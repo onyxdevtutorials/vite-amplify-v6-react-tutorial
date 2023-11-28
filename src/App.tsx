@@ -4,6 +4,7 @@ import { HomeLayout, Landing, AddProduct, SignUp, SignIn } from "./pages";
 import { Authenticator } from "@aws-amplify/ui-react";
 import "@aws-amplify/ui-react/styles.css";
 import Container from "react-bootstrap/Container";
+import { AuthContextProvider } from "./context/AuthContext";
 
 const router = createBrowserRouter([
   {
@@ -37,9 +38,11 @@ const router = createBrowserRouter([
 const App = () => {
   return (
     <React.StrictMode>
-      <Container className="p-3">
-        <RouterProvider router={router} />
-      </Container>
+      <AuthContextProvider>
+        <Container className="p-3">
+          <RouterProvider router={router} />
+        </Container>
+      </AuthContextProvider>
     </React.StrictMode>
   );
 };

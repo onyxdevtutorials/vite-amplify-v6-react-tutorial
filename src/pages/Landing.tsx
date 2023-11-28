@@ -1,15 +1,13 @@
-// import { AddProduct } from "./index";
 import { ListProducts } from "../components";
-import { Link } from "react-router-dom";
+import { useAuthContext } from "../context/AuthContext";
 
 const Landing = () => {
+  const { isLoggedIn } = useAuthContext();
+
   return (
     <div>
-      <div>
-        <Link to="/add">Add a Product</Link>
-      </div>
+      <p>Is logged in: {isLoggedIn ? "yes" : "no"}</p>
       <ListProducts />
-      {/* <AddProduct /> */}
     </div>
   );
 };
