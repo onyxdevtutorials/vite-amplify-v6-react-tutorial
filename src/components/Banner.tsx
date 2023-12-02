@@ -10,13 +10,17 @@ import { Link } from "react-router-dom";
 import { useAuthContext } from "../context/AuthContext";
 
 const Banner = () => {
-  const { isLoggedIn, setIsLoggedIn } = useAuthContext();
+  const { isLoggedIn, setIsLoggedIn, isAdmin } = useAuthContext();
 
   const navigate = useNavigate();
 
   const currentAuthenticatedUser = async () => {
     try {
-      const { username, userId, signInDetails } = await getCurrentUser();
+      const currentUser = await getCurrentUser();
+      console.log("currentUser", currentUser);
+      const { username } = currentUser;
+      const { userId } = currentUser;
+      const { signInDetails } = currentUser;
       console.log("username", username);
       console.log("userId", userId);
       console.log("signInDetails", signInDetails);
@@ -56,9 +60,6 @@ const Banner = () => {
         <Navbar.Collapse id="basic-navbar-nav" className="justify-content-end">
           {!isLoggedIn && (
             <>
-              <span>
-                <Link to="/add">Add Product</Link>
-              </span>
               <Nav.Link>
                 <Button variant="dark" onClick={handleSignIn}>
                   Sign In
@@ -74,6 +75,11 @@ const Banner = () => {
 
           {isLoggedIn && (
             <>
+              {isAdmin && (
+                <span>
+                  <Link to="/add">Add Product</Link>
+                </span>
+              )}
               <Nav.Link>
                 <Button variant="dark" onClick={handleSignOut}>
                   Sign Out
