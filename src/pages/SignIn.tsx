@@ -1,66 +1,23 @@
-import { signIn, SignInInput } from "aws-amplify/auth";
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { useAuthContext } from "../context/AuthContext";
-
-const initialState = { username: "", password: "" };
+import { SignIn as SignInForm } from "../components";
+import { ConfirmSignIn } from "../components";
 
 const SignIn = () => {
-  const [formState, setFormState] = useState(initialState);
-  const { setIsLoggedIn } = useAuthContext();
-
-  async function handleSignIn({ username, password }: SignInInput) {
-    try {
-      const { isSignedIn, nextStep } = await signIn({ username, password });
-      console.log("isSignedIn", isSignedIn);
-      console.log("nextStep", nextStep);
-      console.log("setting context value to true");
-      setIsLoggedIn(true);
-
-      navigate("/");
-    } catch (error) {
-      setIsLoggedIn(false);
-      console.log("error signing in", error);
-    }
-  }
-
-  const navigate = useNavigate();
-
-  const setInput = (key: string, value: string) => {
-    setFormState({ ...formState, [key]: value });
-  };
-
-  const handleSubmit: React.FormEventHandler<HTMLFormElement> = (e) => {
-    e.preventDefault();
-    handleSignIn(formState);
-  };
+  const { signInStep, isAdmin } = useAuthContext();
 
   return (
     <div>
       <h1>Sign In</h1>
-      <form onSubmit={handleSubmit}>
-        <div>
-          <label htmlFor="username">Username</label>
-          <input
-            type="text"
-            name="username"
-            value={formState.username}
-            onChange={(e) => setInput("username", e.target.value)}
-          />
-        </div>
-        <div>
-          <label htmlFor="username">Password</label>
-          <input
-            type="password"
-            name="password"
-            value={formState.password}
-            onChange={(e) => setInput("password", e.target.value)}
-          />
-        </div>
-        <div>
-          <button type="submit">Sign In</button>
-        </div>
-      </form>
+      <p>Sign In Step: {signInStep}</p>
+      <p>Are you an admin? {isAdmin ? "yes" : "no"}</p>
+
+      {!signInStep && <SignInForm />}
+
+      {signInStep === "CONFIRM_SIGN_IN_WITH_NEW_PASSWORD_REQUIRED" && (
+        <ConfirmSignIn />
+      )}
+
+      {signInStep === "DONE" && <p>You are signed in.</p>}
     </div>
   );
 };
