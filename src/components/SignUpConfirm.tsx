@@ -1,25 +1,18 @@
 import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
-import {
-  confirmSignUp,
-  fetchAuthSession,
-  signUp,
-  ConfirmSignUpInput,
-} from "aws-amplify/auth";
+import { confirmSignUp, ConfirmSignUpInput } from "aws-amplify/auth";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useFormik } from "formik";
 import * as yup from "yup";
 import { useSignUpContext } from "../context/SignUpContext";
-
-type Actions = {
-  resetForm: () => void;
-};
 
 const validationSchema = yup.object().shape({
   confirmationCode: yup.string().required("Required"),
 });
 
 const SignUpConfirm = () => {
+  const [signUpConfirmError, setSignUpConfirmError] = useState("");
   const { signUpStep, setSignUpStep, username } = useSignUpContext();
 
   const navigate = useNavigate();
@@ -29,35 +22,23 @@ const SignUpConfirm = () => {
     confirmationCode: "",
   };
 
-  const onSubmit = async (values: ConfirmSignUpInput, actions: Actions) => {
+  const onSubmit = async (values: ConfirmSignUpInput) => {
     try {
-      //   const authSession = await fetchAuthSession();
-      //   const tokens = authSession.tokens;
-      //   let username;
-      //   console.log("values", values);
-      //   if (tokens && Object.keys(tokens).length > 0) {
-      //     username = tokens.accessToken.payload.username;
-      //     console.log("username", username);
-      //   }
-
       const { isSignUpComplete, nextStep } = await confirmSignUp({
         username: username,
         confirmationCode: values.confirmationCode,
       });
-      console.log("isSignUpComplete", isSignUpComplete);
-      console.log("nextStep", nextStep);
 
       setSignUpStep(nextStep.signUpStep);
 
-      //   if (isSignUpComplete) {
-      //     // navigate("/");
-      //     const authSession = await fetchAuthSession();
-      //     console.log("authSession", authSession);
-      //   }
-
-      // COMPLETE_AUTO_SIGN_IN?
-      navigate("/signin");
+      // Use COMPLETE_AUTO_SIGN_IN instead?
+      // That would text or email a link to the user.
+      // https://docs.amplify.aws/javascript/build-a-backend/auth/enable-sign-up/#auto-sign-in
+      if (isSignUpComplete) {
+        navigate("/signin");
+      }
     } catch (error) {
+      setSignUpConfirmError("There was a problem confirming your sign up.");
       console.error("error confirming sign up", error);
     }
   };
@@ -78,8 +59,8 @@ const SignUpConfirm = () => {
 
   if (signUpStep === "CONFIRM_SIGN_UP") {
     return (
-      <div>
-        <h2>Sign Up Confirm</h2>
+      <>
+        <h2>Sign Up Confirmation</h2>
         <Form onSubmit={handleSubmit} noValidate>
           <Form.Group className="mb-3" controlId="confirmCode">
             <Form.Label>Confirmation Code</Form.Label>
@@ -103,14 +84,13 @@ const SignUpConfirm = () => {
             </Button>
           </div>
         </Form>
-      </div>
+        {signUpConfirmError && <p>{signUpConfirmError}</p>}
+      </>
     );
   }
 
   if (signUpStep === "DONE") {
-    return <p>sign up complete</p>;
+    return <p>Sign up complete.</p>;
   }
-
-  return <p>signUpStep: {signUpStep}</p>;
 };
 export default SignUpConfirm;

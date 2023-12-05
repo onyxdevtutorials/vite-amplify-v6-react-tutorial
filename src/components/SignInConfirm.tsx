@@ -5,39 +5,34 @@ import {
   ConfirmSignInInput,
   fetchAuthSession,
 } from "aws-amplify/auth";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { useFormik } from "formik";
 import * as yup from "yup";
 import { useAuthContext } from "../context/AuthContext";
 import { useSignInContext } from "../context/SignInContext";
 
-type Actions = {
-  resetForm: () => void;
-};
-
 const validationSchema = yup.object().shape({
   challengeResponse: yup.string().required("Required"),
 });
 
-const ConfirmSignIn = () => {
+const SignInConfirm = () => {
+  const [signInConfirmError, setSignInConfirmError] = useState("");
+  const navigate = useNavigate();
   const initialValues: ConfirmSignInInput = { challengeResponse: "" };
 
   const { setIsLoggedIn, setIsAdmin } = useAuthContext();
   const { setSignInStep, signInStep } = useSignInContext();
 
-  const onSubmit = async (values: ConfirmSignInInput, actions: Actions) => {
+  const onSubmit = async (values: ConfirmSignInInput) => {
     const { challengeResponse } = values;
-    console.log("values", values);
-    console.log("actions", actions);
 
     try {
-      const confirmSignInResult = await confirmSignIn({
+      const { isSignedIn, nextStep } = await confirmSignIn({
         challengeResponse: challengeResponse,
       });
-      console.log("confirmSignInResult", confirmSignInResult);
-      const { isSignedIn, nextStep } = confirmSignInResult;
-      const signInStep = nextStep.signInStep;
       setIsLoggedIn(isSignedIn);
-      setSignInStep(signInStep);
+      setSignInStep(nextStep.signInStep);
       const authSession = await fetchAuthSession();
       const tokens = authSession.tokens;
       if (tokens && Object.keys(tokens).length > 0) {
@@ -47,7 +42,11 @@ const ConfirmSignIn = () => {
           setIsAdmin(true);
         }
       }
+      if (nextStep.signInStep === "DONE") {
+        navigate("/");
+      }
     } catch (error) {
+      setSignInConfirmError("There was a problem confirming your sign in.");
       console.error("error", error);
     }
   };
@@ -68,7 +67,7 @@ const ConfirmSignIn = () => {
 
   if (signInStep === "CONFIRM_SIGN_IN_WITH_NEW_PASSWORD_REQUIRED") {
     return (
-      <div>
+      <>
         <h2>Please Set a New Password</h2>
         <Form onSubmit={handleSubmit} noValidate>
           <Form.Group className="mb-3" controlId="formBasicPassword">
@@ -95,7 +94,8 @@ const ConfirmSignIn = () => {
             </Button>
           </div>
         </Form>
-      </div>
+        {signInConfirmError && <p>{signInConfirmError}</p>}
+      </>
     );
   }
 
@@ -103,4 +103,4 @@ const ConfirmSignIn = () => {
     return <div>Successfully signed in.</div>;
   }
 };
-export default ConfirmSignIn;
+export default SignInConfirm;
