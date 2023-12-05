@@ -30,19 +30,20 @@ const router = createBrowserRouter([
           </Authenticator>
         ),
       },
+
+      {
+        path: "signup",
+        element: <SignUp />,
+      },
+      {
+        path: "signin",
+        element: <SignIn />,
+      },
+      {
+        path: "changepassword/:username",
+        element: <ChangePassword />,
+      },
     ],
-  },
-  {
-    path: "signup",
-    element: <SignUp />,
-  },
-  {
-    path: "signin",
-    element: <SignIn />,
-  },
-  {
-    path: "changepassword/:username",
-    element: <ChangePassword />,
   },
 ]);
 

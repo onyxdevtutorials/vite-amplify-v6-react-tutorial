@@ -1,23 +1,22 @@
 import { useAuthContext } from "../context/AuthContext";
+import { SignInContextProvider } from "../context/SignInContext";
 import { SignIn as SignInForm } from "../components";
 import { ConfirmSignIn } from "../components";
 
 const SignIn = () => {
-  const { signInStep, isAdmin } = useAuthContext();
+  const { isAdmin, isLoggedIn } = useAuthContext();
 
   return (
     <div>
       <h1>Sign In</h1>
-      <p>Sign In Step: {signInStep}</p>
       <p>Are you an admin? {isAdmin ? "yes" : "no"}</p>
+      <SignInContextProvider>
+        <SignInForm />
 
-      {!signInStep && <SignInForm />}
-
-      {signInStep === "CONFIRM_SIGN_IN_WITH_NEW_PASSWORD_REQUIRED" && (
         <ConfirmSignIn />
-      )}
+      </SignInContextProvider>
 
-      {signInStep === "DONE" && <p>You are signed in.</p>}
+      {/* {(signInStep === "DONE" || isLoggedIn) && <p>You are signed in.</p>} */}
     </div>
   );
 };

@@ -8,6 +8,7 @@ import {
 import { useFormik } from "formik";
 import * as yup from "yup";
 import { useAuthContext } from "../context/AuthContext";
+import { useSignInContext } from "../context/SignInContext";
 
 type Actions = {
   resetForm: () => void;
@@ -20,7 +21,8 @@ const validationSchema = yup.object().shape({
 const ConfirmSignIn = () => {
   const initialValues: ConfirmSignInInput = { challengeResponse: "" };
 
-  const { setIsLoggedIn, setSignInStep, setIsAdmin } = useAuthContext();
+  const { setIsLoggedIn, setIsAdmin } = useAuthContext();
+  const { setSignInStep, signInStep } = useSignInContext();
 
   const onSubmit = async (values: ConfirmSignInInput, actions: Actions) => {
     const { challengeResponse } = values;
@@ -64,33 +66,41 @@ const ConfirmSignIn = () => {
     onSubmit: onSubmit,
   });
 
-  return (
-    <div>
-      <h2>Please Set a New Password</h2>
-      <Form onSubmit={handleSubmit} noValidate>
-        <Form.Group className="mb-3" controlId="formBasicPassword">
-          <Form.Label>Password</Form.Label>
-          <Form.Control
-            type="password"
-            name="challengeResponse"
-            placeholder="Password"
-            value={values.challengeResponse}
-            onChange={handleChange}
-            onBlur={handleBlur}
-            isInvalid={touched.challengeResponse && !!errors.challengeResponse}
-            required
-          />
-          <Form.Control.Feedback type="invalid">
-            {errors.challengeResponse}
-          </Form.Control.Feedback>
-        </Form.Group>
-        <div>
-          <Button type="submit" variant="primary" disabled={isSubmitting}>
-            Change Password
-          </Button>
-        </div>
-      </Form>
-    </div>
-  );
+  if (signInStep === "CONFIRM_SIGN_IN_WITH_NEW_PASSWORD_REQUIRED") {
+    return (
+      <div>
+        <h2>Please Set a New Password</h2>
+        <Form onSubmit={handleSubmit} noValidate>
+          <Form.Group className="mb-3" controlId="formBasicPassword">
+            <Form.Label>Password</Form.Label>
+            <Form.Control
+              type="password"
+              name="challengeResponse"
+              placeholder="Password"
+              value={values.challengeResponse}
+              onChange={handleChange}
+              onBlur={handleBlur}
+              isInvalid={
+                touched.challengeResponse && !!errors.challengeResponse
+              }
+              required
+            />
+            <Form.Control.Feedback type="invalid">
+              {errors.challengeResponse}
+            </Form.Control.Feedback>
+          </Form.Group>
+          <div>
+            <Button type="submit" variant="primary" disabled={isSubmitting}>
+              Change Password
+            </Button>
+          </div>
+        </Form>
+      </div>
+    );
+  }
+
+  if (signInStep === "DONE") {
+    return <div>Successfully signed in.</div>;
+  }
 };
 export default ConfirmSignIn;
