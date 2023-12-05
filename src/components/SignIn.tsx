@@ -4,6 +4,7 @@ import { signIn, SignInInput, fetchAuthSession } from "aws-amplify/auth";
 import { useFormik } from "formik";
 import * as yup from "yup";
 import { useAuthContext } from "../context/AuthContext";
+import { useSignInContext } from "../context/SignInContext";
 
 /*
 CONFIRM_SIGN_UP, RESET_PASSWORD, DONE, CONFIRM_SIGN_IN_WITH_NEW_PASSWORD_REQUIRED
@@ -18,7 +19,8 @@ const initialState = { username: "", password: "" };
 const SignIn = () => {
   const initialValues: SignInInput = initialState;
 
-  const { setIsLoggedIn, setSignInStep, setIsAdmin } = useAuthContext();
+  const { setIsLoggedIn, setIsAdmin } = useAuthContext();
+  const { signInStep, setSignInStep } = useSignInContext();
 
   const validationSchema = yup.object().shape({
     username: yup.string().required("Required"),
@@ -76,46 +78,51 @@ const SignIn = () => {
     onSubmit: onSubmit,
   });
 
-  return (
-    <Form onSubmit={handleSubmit} noValidate>
-      <Form.Group className="mb-3" controlId="formBasicUsername">
-        <Form.Label>Username</Form.Label>
-        <Form.Control
-          type="text"
-          name="username"
-          placeholder="Enter username"
-          value={values.username}
-          onChange={handleChange}
-          onBlur={handleBlur}
-          isInvalid={touched.username && !!errors.username}
-          required
-        />
-        <Form.Control.Feedback type="invalid">
-          {errors.username}
-        </Form.Control.Feedback>
-      </Form.Group>
-      <Form.Group className="mb-3" controlId="formBasicPassword">
-        <Form.Label>Password</Form.Label>
-        <Form.Control
-          type="password"
-          name="password"
-          placeholder="Password"
-          value={values.password}
-          onChange={handleChange}
-          onBlur={handleBlur}
-          isInvalid={touched.password && !!errors.password}
-          required
-        />
-        <Form.Control.Feedback type="invalid">
-          {errors.password}
-        </Form.Control.Feedback>
-      </Form.Group>
-      <div>
-        <Button type="submit" variant="primary" disabled={isSubmitting}>
-          Sign In
-        </Button>
-      </div>
-    </Form>
-  );
+  if (signInStep === "")
+    return (
+      <Form onSubmit={handleSubmit} noValidate>
+        <Form.Group className="mb-3" controlId="formBasicUsername">
+          <Form.Label>Username</Form.Label>
+          <Form.Control
+            type="text"
+            name="username"
+            placeholder="Enter username"
+            value={values.username}
+            onChange={handleChange}
+            onBlur={handleBlur}
+            isInvalid={touched.username && !!errors.username}
+            required
+          />
+          <Form.Control.Feedback type="invalid">
+            {errors.username}
+          </Form.Control.Feedback>
+        </Form.Group>
+        <Form.Group className="mb-3" controlId="formBasicPassword">
+          <Form.Label>Password</Form.Label>
+          <Form.Control
+            type="password"
+            name="password"
+            placeholder="Password"
+            value={values.password}
+            onChange={handleChange}
+            onBlur={handleBlur}
+            isInvalid={touched.password && !!errors.password}
+            required
+          />
+          <Form.Control.Feedback type="invalid">
+            {errors.password}
+          </Form.Control.Feedback>
+        </Form.Group>
+        <div>
+          <Button type="submit" variant="primary" disabled={isSubmitting}>
+            Sign In
+          </Button>
+        </div>
+      </Form>
+    );
+
+  if (signInStep === "DONE") {
+    return <div>Successfully signed in.</div>;
+  }
 };
 export default SignIn;
