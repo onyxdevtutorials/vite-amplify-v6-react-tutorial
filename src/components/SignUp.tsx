@@ -13,26 +13,26 @@ type SignUpType = {
   email: string;
 };
 
+const initialValues: SignUpType = {
+  username: "",
+  password: "",
+  confirmPassword: "",
+  email: "",
+};
+
+const validationSchema = yup.object().shape({
+  username: yup.string().required("Required"),
+  password: yup.string().required("Required"),
+  email: yup.string().email("Not a proper email").required("Required"),
+  confirmPassword: yup
+    .string()
+    .oneOf([yup.ref("password")], "Passwords don't match!")
+    .required("Required"),
+});
+
 const SignUp = () => {
   const [signUpError, setSignUpError] = useState("");
   const { signUpStep, setSignUpStep, setUsername } = useSignUpContext();
-
-  const initialValues: SignUpType = {
-    username: "",
-    password: "",
-    confirmPassword: "",
-    email: "",
-  };
-
-  const validationSchema = yup.object().shape({
-    username: yup.string().required("Required"),
-    password: yup.string().required("Required"),
-    email: yup.string().email("Not a proper email").required("Required"),
-    confirmPassword: yup
-      .string()
-      .oneOf([yup.ref("password")], "Passwords don't match!")
-      .required("Required"),
-  });
 
   const onSubmit = async (values: SignUpType) => {
     const { username, password, email } = values;
@@ -91,7 +91,7 @@ const SignUp = () => {
               {errors.username}
             </Form.Control.Feedback>
           </Form.Group>
-          <Form.Group>
+          <Form.Group controlId="password">
             <Form.Label>Password</Form.Label>
             <Form.Control
               type="password"
@@ -107,7 +107,7 @@ const SignUp = () => {
               {errors.password}
             </Form.Control.Feedback>
           </Form.Group>
-          <Form.Group>
+          <Form.Group controlId="confirmPassword">
             <Form.Label>Confirm Password</Form.Label>
             <Form.Control
               type="password"
@@ -123,7 +123,7 @@ const SignUp = () => {
               {errors.confirmPassword}
             </Form.Control.Feedback>
           </Form.Group>
-          <Form.Group>
+          <Form.Group controlId="email">
             <Form.Label>Email</Form.Label>
             <Form.Control
               type="email"
