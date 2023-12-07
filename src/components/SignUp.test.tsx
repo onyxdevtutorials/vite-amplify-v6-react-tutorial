@@ -1,3 +1,4 @@
+import Auth, { SignUpInput, SignUpOutput } from "aws-amplify/auth";
 import { vi, it, expect } from "vitest";
 import userEvent from "@testing-library/user-event";
 import { render, screen } from "@testing-library/react";
@@ -28,6 +29,21 @@ it("renders sign up form", () => {
 
 it("submits the sign up form", async () => {
   const user = userEvent.setup();
+
+  vi.spyOn(Auth, "signUp").mockImplementation(
+    ({ username, password, options }: SignUpInput) => {
+      return new Promise((resolve, reject) => {
+        const response: SignUpOutput = {
+          isSignUpComplete: true,
+          nextStep: {
+            codeDeliveryDetails: ,
+            signUpStep: "CONFIRM_SIGN_UP",
+          },
+        };
+        return resolve(response);
+      });
+    }
+  );
 
   const mocks = vi.hoisted(() => {
     return {
