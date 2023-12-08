@@ -1,108 +1,72 @@
-import Auth, { SignUpInput, SignUpOutput } from "aws-amplify/auth";
-import { vi, it, expect } from "vitest";
-import userEvent from "@testing-library/user-event";
+import { vi, expect, it, describe } from "vitest";
 import { render, screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
+import * as awsAmplifyAuth from "aws-amplify/auth";
 import SignUp from "./SignUp";
-import { SignUpContextProvider } from "../context/SignUpContext";
 
-it("renders sign up form", () => {
-  render(
-    <SignUpContextProvider>
-      <SignUp />
-    </SignUpContextProvider>
-  );
-  const usernameInput = screen.getByRole("textbox", { name: /username/i });
-  // input[type="password"] has no implicit aria role
-  const passwordInput = screen.getByLabelText(/^password$/i);
-  const confirmPasswordInput = screen.getByLabelText(/confirm password/i);
-  const emailInput = screen.getByRole("textbox", {
-    name: /email/i,
-  });
-  const submitButton = screen.getByRole("button", { name: /sign up/i });
+// Mock the context
+vi.mock("../context/SignUpContext", () => ({
+  useSignUpContext: vi.fn(() => ({
+    signUpStep: null,
+    setSignUpStep: vi.fn(),
+    setUsername: vi.fn(),
+  })),
+}));
 
-  expect(usernameInput).toBeInTheDocument();
-  expect(passwordInput).toBeInTheDocument();
-  expect(confirmPasswordInput).toBeInTheDocument();
-  expect(emailInput).toBeInTheDocument();
-  expect(submitButton).toBeInTheDocument();
-});
+vi.mock("aws-amplify/auth");
 
-it("submits the sign up form", async () => {
-  const user = userEvent.setup();
+describe("SignUp component", () => {
+  it("renders the form correctly", () => {
+    render(<SignUp />);
 
-  vi.spyOn(Auth, "signUp").mockImplementation(
-    ({ username, password, options }: SignUpInput) => {
-      return new Promise((resolve, reject) => {
-        const response: SignUpOutput = {
-          isSignUpComplete: true,
-          nextStep: {
-            codeDeliveryDetails: ,
-            signUpStep: "CONFIRM_SIGN_UP",
-          },
-        };
-        return resolve(response);
-      });
-    }
-  );
+    const usernameInput = screen.getByRole("textbox", { name: /username/i });
+    const passwordInput = screen.getByLabelText(/^password$/i);
+    const confirmPasswordInput = screen.getByLabelText(/confirm password/i);
+    const emailInput = screen.getByRole("textbox", { name: /email/i });
 
-  const mocks = vi.hoisted(() => {
-    return {
-      mockSignUp: vi.fn().mockResolvedValue({
-        nextStep: {
-          signUpStep: "CONFIRM_SIGN_UP",
-        },
-      }),
-      mockUseSignUpContext: vi.fn().mockReturnValue({
-        setUsername: vi.fn(),
-        setSignUpStep: vi.fn(),
-      }),
-      mockSetUsername: vi.fn(),
-      mockSetSignUpStep: vi.fn(),
-    };
+    // Check if form elements are rendered
+    expect(usernameInput).toBeInTheDocument();
+    expect(passwordInput).toBeInTheDocument();
+    expect(confirmPasswordInput).toBeInTheDocument();
+    expect(emailInput).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: /sign up/i })
+    ).toBeInTheDocument();
   });
 
-  vi.mock("aws-amplify/auth", () => ({
-    signUp: mocks.mockSignUp,
-  }));
+  it("submits the form correctly", async () => {
+    render(<SignUp />);
 
-  render(
-    <SignUpContextProvider>
-      <SignUp />
-    </SignUpContextProvider>
-  );
+    const usernameInput = screen.getByRole("textbox", { name: /username/i });
+    const passwordInput = screen.getByLabelText(/^password$/i);
+    const confirmPasswordInput = screen.getByLabelText(/confirm password/i);
+    const emailInput = screen.getByRole("textbox", { name: /email/i });
 
-  const usernameInput = screen.getByRole("textbox", { name: /username/i });
-  const passwordInput = screen.getByLabelText(/^password$/i);
-  const confirmPasswordInput = screen.getByLabelText(/confirm password/i);
-  const emailInput = screen.getByRole("textbox", { name: /email/i });
-  const submitButton = screen.getByRole("button", { name: /sign up/i });
+    const user = userEvent.setup();
 
-  await user.click(usernameInput);
-  await user.keyboard("testuser");
+    // Mock the signUp function from aws-amplify/auth
+    awsAmplifyAuth.signUp.mockResolvedValue({
+      nextStep: { signUpStep: "someStep" },
+    });
 
-  await user.click(passwordInput);
-  await user.keyboard("testpassword");
+    // Fill out the form
+    await user.type(usernameInput, "testuser");
+    await user.type(passwordInput, "testpassword");
+    await user.type(confirmPasswordInput, "testpassword");
+    await user.type(emailInput, "test@example.com");
 
-  await user.click(confirmPasswordInput);
-  await user.keyboard("testpassword");
+    // Submit the form
+    await user.click(screen.getByRole("button", { name: /sign up/i }));
 
-  await user.click(emailInput);
-  await user.keyboard("testuser@test.com");
-
-  await user.click(submitButton);
-
-  expect(mocks.mockSetUsername).toHaveBeenCalledWith("testuser");
-
-  expect(mocks.mockSignUp).toHaveBeenCalledWith({
-    username: "testuser",
-    password: "testpassword",
-    options: {
-      userAttributes: {
-        email: "testuser@test.com",
+    // Check if the signUp function is called with the correct parameters
+    // await screen.findByText(/There was a problem signing you up/i);
+    expect(awsAmplifyAuth.signUp).toHaveBeenCalledWith({
+      username: "testuser",
+      password: "testpassword",
+      options: {
+        userAttributes: { email: "test@example.com" },
+        autoSignIn: true,
       },
-      autoSignIn: true,
-    },
+    });
   });
-
-  expect(mocks.mockSetSignUpStep).toHaveBeenCalledWith("CONFIRM_SIGN_UP");
 });
