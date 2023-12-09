@@ -45,8 +45,12 @@ describe("SignUp component", () => {
     const user = userEvent.setup();
 
     // Mock the signUp function from aws-amplify/auth
-    awsAmplifyAuth.signUp.mockResolvedValue({
-      nextStep: { signUpStep: "someStep" },
+    vi.mocked(awsAmplifyAuth.signUp).mockResolvedValue({
+      nextStep: {
+        signUpStep: "CONFIRM_SIGN_UP",
+        codeDeliveryDetails: {},
+      },
+      isSignUpComplete: true,
     });
 
     // Fill out the form
