@@ -3,6 +3,7 @@ import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import * as awsAmplifyAuth from "aws-amplify/auth";
 import SignUp from "./SignUp";
+import { useSignUpContext } from "../context/SignUpContext";
 
 // Mock the context
 vi.mock("../context/SignUpContext", () => ({
@@ -44,6 +45,13 @@ describe("SignUp component", () => {
 
     const user = userEvent.setup();
 
+    vi.mocked(useSignUpContext).mockReturnValue({
+      username: "",
+      signUpStep: "",
+      setSignUpStep: vi.fn(),
+      setUsername: vi.fn(),
+    });
+
     // Mock the signUp function from aws-amplify/auth
     vi.mocked(awsAmplifyAuth.signUp).mockResolvedValue({
       nextStep: {
@@ -72,5 +80,11 @@ describe("SignUp component", () => {
         autoSignIn: true,
       },
     });
+
+    expect(useSignUpContext().setSignUpStep).toHaveBeenCalledWith(
+      "CONFIRM_SIGN_UP"
+    );
+
+    expect(useSignUpContext().setUsername).toHaveBeenCalledWith("testuser");
   });
 });
