@@ -3,7 +3,7 @@ import Form from "react-bootstrap/Form";
 import { useState } from "react";
 import { useFormik } from "formik";
 import * as yup from "yup";
-import { signUp } from "aws-amplify/auth";
+import { signUp, AuthError } from "aws-amplify/auth";
 import { useSignUpContext } from "../context/SignUpContext";
 
 type SignUpType = {
@@ -53,7 +53,11 @@ const SignUp = () => {
       setSignUpStep(nextStep.signUpStep);
     } catch (error) {
       console.error("could not sign up", error);
-      setSignUpError(`There was a problem signing you up.`);
+      if (error instanceof AuthError) {
+        setSignUpError(`There was a problem signing you up: ${error.message}`);
+      } else {
+        setSignUpError("There was a problem signing you up: Unknown error.");
+      }
     }
   };
 
