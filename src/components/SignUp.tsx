@@ -1,5 +1,6 @@
 import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
+import Alert from "react-bootstrap/Alert";
 import { useState } from "react";
 import { useFormik } from "formik";
 import * as yup from "yup";
@@ -149,7 +150,7 @@ const SignUp = () => {
             </Button>
           </div>
         </Form>
-        {signUpError && <p>{signUpError}</p>}
+        {signUpError && <Alert variant="warning">{signUpError}</Alert>}
       </>
     );
   }
