@@ -1,4 +1,4 @@
-import { vi, expect, it, describe } from "vitest";
+import { vi, expect, it, describe, beforeEach } from "vitest";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import * as awsAmplifyAuth from "aws-amplify/auth";
@@ -17,6 +17,10 @@ vi.mock("../context/SignUpContext", () => ({
 vi.mock("aws-amplify/auth");
 
 describe("SignUp component", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
   it("renders the form correctly", () => {
     render(<SignUp />);
 
