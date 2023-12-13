@@ -7,6 +7,10 @@ import * as yup from "yup";
 import { signUp, AuthError } from "aws-amplify/auth";
 import { useSignUpContext } from "../context/SignUpContext";
 
+type ChildComponentProps = {
+  onStateUpdate: (value: boolean) => void;
+};
+
 type SignUpType = {
   username: string;
   password: string;
@@ -31,7 +35,7 @@ const validationSchema = yup.object().shape({
     .required("Required"),
 });
 
-const SignUp = () => {
+const SignUp: React.FC<ChildComponentProps> = ({ onStateUpdate }) => {
   const [signUpError, setSignUpError] = useState("");
   const { signUpStep, setSignUpStep, setUsername } = useSignUpContext();
 
@@ -50,8 +54,8 @@ const SignUp = () => {
           autoSignIn: true,
         },
       });
-
       setSignUpStep(nextStep.signUpStep);
+      onStateUpdate(true);
     } catch (error) {
       console.error("could not sign up", error);
       if (error instanceof AuthError) {

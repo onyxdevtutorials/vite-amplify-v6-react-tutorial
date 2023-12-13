@@ -1,9 +1,15 @@
 import { SignUpContextProvider } from "../context/SignUpContext";
-import { SignUp as SignUpForm, ConfirmSignUp } from "../components";
+import { SignUp as SignUpForm, SignUpConfirm } from "../components";
 import { useAuthContext } from "../context/AuthContext";
+import { useState } from "react";
 
 const SignUp = () => {
   const { isLoggedIn } = useAuthContext();
+  const [parentState, setParentState] = useState(false);
+
+  const updateParentState = (value: boolean) => {
+    setParentState(value);
+  };
 
   if (isLoggedIn) {
     return (
@@ -17,8 +23,8 @@ const SignUp = () => {
   return (
     <div>
       <SignUpContextProvider>
-        <SignUpForm />
-        <ConfirmSignUp />
+        {!parentState && <SignUpForm onStateUpdate={updateParentState} />}
+        {parentState && <SignUpConfirm />}
       </SignUpContextProvider>
     </div>
   );

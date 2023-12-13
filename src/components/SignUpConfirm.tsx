@@ -1,8 +1,9 @@
 import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
-import { confirmSignUp, ConfirmSignUpInput } from "aws-amplify/auth";
+import { Alert } from "react-bootstrap";
+import { confirmSignUp, ConfirmSignUpInput, AuthError } from "aws-amplify/auth";
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { useFormik } from "formik";
 import * as yup from "yup";
 import { useSignUpContext } from "../context/SignUpContext";
@@ -13,9 +14,8 @@ const validationSchema = yup.object().shape({
 
 const SignUpConfirm = () => {
   const [signUpConfirmError, setSignUpConfirmError] = useState("");
-  const { signUpStep, setSignUpStep, username } = useSignUpContext();
-
-  const navigate = useNavigate();
+  const [isSignUpConfirmed, setIsSignUpConfirmed] = useState(false);
+  const { setSignUpStep, username } = useSignUpContext();
 
   const initialValues: ConfirmSignUpInput = {
     username: username,
@@ -30,15 +30,15 @@ const SignUpConfirm = () => {
       });
 
       setSignUpStep(nextStep.signUpStep);
-
-      // Use COMPLETE_AUTO_SIGN_IN instead?
-      // That would text or email a link to the user.
-      // https://docs.amplify.aws/javascript/build-a-backend/auth/enable-sign-up/#auto-sign-in
-      if (isSignUpComplete) {
-        navigate("/signin");
-      }
+      setIsSignUpConfirmed(isSignUpComplete);
     } catch (error) {
-      setSignUpConfirmError("There was a problem confirming your sign up.");
+      if (error instanceof AuthError) {
+        setSignUpConfirmError(
+          `There was a problem confirming your sign up: ${error.message}`
+        );
+      } else {
+        setSignUpConfirmError("There was a problem confirming your sign up.");
+      }
       console.error("error confirming sign up", error);
     }
   };
@@ -57,7 +57,7 @@ const SignUpConfirm = () => {
     onSubmit: onSubmit,
   });
 
-  if (signUpStep === "CONFIRM_SIGN_UP") {
+  if (!isSignUpConfirmed) {
     return (
       <>
         <h2>Sign Up Confirmation</h2>
@@ -84,13 +84,19 @@ const SignUpConfirm = () => {
             </Button>
           </div>
         </Form>
-        {signUpConfirmError && <p>{signUpConfirmError}</p>}
+        {signUpConfirmError && (
+          <Alert variant="warning">{signUpConfirmError}</Alert>
+        )}
       </>
     );
-  }
-
-  if (signUpStep === "DONE") {
-    return <p>Sign up complete.</p>;
+  } else {
+    return (
+      <Alert variant="success">
+        <p>
+          Sign up complete. Please <Link to="/signin">sign in</Link>.
+        </p>
+      </Alert>
+    );
   }
 };
 export default SignUpConfirm;
