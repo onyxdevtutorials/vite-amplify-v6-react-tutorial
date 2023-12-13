@@ -16,13 +16,15 @@ vi.mock("../context/SignUpContext", () => ({
 
 vi.mock("aws-amplify/auth");
 
+const mockOnStateUpdate = vi.fn();
+
 describe("SignUp component", () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
   it("renders the form correctly", () => {
-    render(<SignUp />);
+    render(<SignUp onStateUpdate={mockOnStateUpdate} />);
 
     const usernameInput = screen.getByRole("textbox", { name: /username/i });
     const passwordInput = screen.getByLabelText(/^password$/i);
@@ -40,7 +42,7 @@ describe("SignUp component", () => {
   });
 
   it("submits the form correctly", async () => {
-    render(<SignUp />);
+    render(<SignUp onStateUpdate={mockOnStateUpdate} />);
 
     const usernameInput = screen.getByRole("textbox", { name: /username/i });
     const passwordInput = screen.getByLabelText(/^password$/i);
