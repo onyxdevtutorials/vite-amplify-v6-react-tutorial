@@ -4,7 +4,7 @@ type AuthContextProviderProps = {
   children: React.ReactNode;
 };
 
-type AuthContext = {
+export type AuthContextType = {
   isLoggedIn: boolean;
   setIsLoggedIn: React.Dispatch<React.SetStateAction<boolean>>;
   signInStep: string;
@@ -13,7 +13,7 @@ type AuthContext = {
   setIsAdmin: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
-const AuthContext = createContext<AuthContext | null>(null);
+const AuthContext = createContext<AuthContextType | null>(null);
 
 export const AuthContextProvider: React.FC<AuthContextProviderProps> = ({
   children,
