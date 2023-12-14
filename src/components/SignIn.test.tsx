@@ -1,13 +1,9 @@
 import { vi, describe, test, expect, beforeEach } from "vitest";
-import { render, screen, fireEvent } from "@testing-library/react";
+import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import * as awsAmplifyAuth from "aws-amplify/auth";
 import SignIn from "./SignIn";
-import {
-  AuthContextProvider,
-  useAuthContext,
-  AuthContextType,
-} from "../context/AuthContext";
+import { AuthContextProvider } from "../context/AuthContext";
 import { useSignInContext } from "../context/SignInContext";
 import { MemoryRouter } from "react-router-dom";
 import { ReactNode } from "react";
@@ -36,13 +32,26 @@ vi.mock("../context/AuthContext", async () => {
 
 vi.mock("aws-amplify/auth");
 
+const renderWithAuthContext = (component: ReactNode) => {
+  return render(
+    <MemoryRouter>
+      <AuthContextProvider>{component}</AuthContextProvider>
+    </MemoryRouter>
+  );
+};
+
 describe("SignIn component", () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
   test("renders sign in form", () => {
-    render(<SignIn />);
+    vi.mocked(useSignInContext).mockReturnValue({
+      signInStep: "",
+      setSignInStep: vi.fn(),
+    });
+
+    renderWithAuthContext(<SignIn />);
 
     // Assert that the sign in form is rendered
     expect(
@@ -54,7 +63,7 @@ describe("SignIn component", () => {
     ).toBeInTheDocument();
   });
 
-  test.only("submits form with valid input", async () => {
+  test("submits form with valid input", async () => {
     const user = userEvent.setup();
 
     vi.mocked(awsAmplifyAuth.signIn).mockResolvedValue({
@@ -73,25 +82,6 @@ describe("SignIn component", () => {
         },
       },
     });
-
-    const renderWithAuthContext = (component: ReactNode) => {
-      const mockAuthValue = {
-        setIsLoggedIn: vi.fn(),
-        setIsAdmin: vi.fn(),
-        isLoggedIn: false,
-        signInStep: "",
-        setSignInStep: vi.fn(),
-        isAdmin: false,
-      };
-
-      return render(
-        <MemoryRouter>
-          <AuthContextProvider value={mockAuthValue}>
-            {component}
-          </AuthContextProvider>
-        </MemoryRouter>
-      );
-    };
 
     vi.mocked(useSignInContext).mockReturnValue({
       signInStep: "",
@@ -125,21 +115,27 @@ describe("SignIn component", () => {
     expect(awsAmplifyAuth.signIn).toHaveBeenCalledTimes(1);
   });
 
-  test("displays error message with invalid input", () => {
-    render(<SignIn />);
+  test("displays error message with invalid input", async () => {
+    vi.mocked(useSignInContext).mockReturnValue({
+      signInStep: "",
+      setSignInStep: vi.fn(),
+    });
 
-    // Fill in the form fields with invalid input
-    fireEvent.change(screen.getByLabelText("Username"), {
-      target: { value: "" },
-    });
-    fireEvent.change(screen.getByLabelText("Password"), {
-      target: { value: "" },
-    });
+    const user = userEvent.setup();
+
+    renderWithAuthContext(<SignIn />);
+
+    const usernameInput = screen.getByRole("textbox", { name: /^username$/i });
+    const passwordInput = screen.getByLabelText(/^password$/i);
+    const usernameInputFeedback = usernameInput.nextSibling;
+    const passwordInputFeedback = passwordInput.nextSibling;
+
+    // Fill in the form fields with invalid input: empty strings
 
     // Submit the form
-    fireEvent.click(screen.getByRole("button", { name: "Sign In" }));
+    await user.click(screen.getByRole("button", { name: /sign in/i }));
 
-    // Assert that the error message is displayed
-    // Add your assertions here
+    expect(usernameInputFeedback).toHaveTextContent("Required");
+    expect(passwordInputFeedback).toHaveTextContent("Required");
   });
 });
