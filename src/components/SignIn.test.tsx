@@ -3,7 +3,7 @@ import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import * as awsAmplifyAuth from "aws-amplify/auth";
 import SignIn from "./SignIn";
-import { AuthContextProvider } from "../context/AuthContext";
+import { AuthContextProvider, useAuthContext } from "../context/AuthContext";
 import { useSignInContext } from "../context/SignInContext";
 import { MemoryRouter } from "react-router-dom";
 import { ReactNode } from "react";
@@ -88,6 +88,15 @@ describe("SignIn component", () => {
       setSignInStep: vi.fn(),
     });
 
+    vi.mocked(useAuthContext).mockReturnValue({
+      setIsLoggedIn: vi.fn(),
+      setIsAdmin: vi.fn(),
+      isLoggedIn: false,
+      signInStep: "",
+      setSignInStep: vi.fn(),
+      isAdmin: false,
+    });
+
     renderWithAuthContext(<SignIn />);
 
     const usernameInput = screen.getByRole("textbox", { name: /^username$/i });
@@ -113,6 +122,9 @@ describe("SignIn component", () => {
       password: "testpassword",
     });
     expect(awsAmplifyAuth.signIn).toHaveBeenCalledTimes(1);
+
+    expect(useSignInContext().setSignInStep).toHaveBeenCalledWith("DONE");
+    expect(useAuthContext().setIsLoggedIn).toHaveBeenCalledWith(true);
   });
 
   test("displays error message with invalid input", async () => {
