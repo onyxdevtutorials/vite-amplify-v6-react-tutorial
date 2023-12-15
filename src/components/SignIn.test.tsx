@@ -63,7 +63,7 @@ describe("SignIn component", () => {
     ).toBeInTheDocument();
   });
 
-  test("submits form with valid input", async () => {
+  test("user (not an admin) submits form with valid input", async () => {
     const user = userEvent.setup();
 
     vi.mocked(awsAmplifyAuth.signIn).mockResolvedValue({
@@ -76,9 +76,7 @@ describe("SignIn component", () => {
     vi.mocked(awsAmplifyAuth.fetchAuthSession).mockResolvedValue({
       tokens: {
         accessToken: {
-          payload: {
-            "cognito:groups": ["admin"],
-          },
+          payload: {},
         },
       },
     });
@@ -125,6 +123,7 @@ describe("SignIn component", () => {
 
     expect(useSignInContext().setSignInStep).toHaveBeenCalledWith("DONE");
     expect(useAuthContext().setIsLoggedIn).toHaveBeenCalledWith(true);
+    expect(useAuthContext().setIsAdmin).not.toHaveBeenCalled();
   });
 
   test("displays error message with invalid input", async () => {
@@ -149,5 +148,55 @@ describe("SignIn component", () => {
 
     expect(usernameInputFeedback).toHaveTextContent("Required");
     expect(passwordInputFeedback).toHaveTextContent("Required");
+  });
+
+  test("user signs in and is an admin", async () => {
+    const user = userEvent.setup();
+
+    vi.mocked(awsAmplifyAuth.signIn).mockResolvedValue({
+      nextStep: {
+        signInStep: "DONE",
+      },
+      isSignedIn: true,
+    });
+
+    vi.mocked(awsAmplifyAuth.fetchAuthSession).mockResolvedValue({
+      tokens: {
+        accessToken: {
+          payload: {
+            "cognito:groups": ["admin"],
+          },
+        },
+      },
+    });
+
+    vi.mocked(useSignInContext).mockReturnValue({
+      signInStep: "",
+      setSignInStep: vi.fn(),
+    });
+
+    vi.mocked(useAuthContext).mockReturnValue({
+      setIsLoggedIn: vi.fn(),
+      setIsAdmin: vi.fn(),
+      isLoggedIn: false,
+      signInStep: "",
+      setSignInStep: vi.fn(),
+      isAdmin: false,
+    });
+
+    renderWithAuthContext(<SignIn />);
+
+    const usernameInput = screen.getByRole("textbox", { name: /^username$/i });
+    const passwordInput = screen.getByLabelText(/^password$/i);
+
+    // Fill in the form fields
+    await user.type(usernameInput, "testuser");
+
+    await user.type(passwordInput, "testpassword");
+
+    // Submit the form
+    await user.click(screen.getByRole("button", { name: /sign in/i }));
+
+    expect(useAuthContext().setIsAdmin).toHaveBeenCalledWith(true);
   });
 });
