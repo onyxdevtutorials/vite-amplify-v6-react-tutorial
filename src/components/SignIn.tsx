@@ -1,7 +1,12 @@
 import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
 import { Alert } from "react-bootstrap";
-import { signIn, SignInInput, fetchAuthSession } from "aws-amplify/auth";
+import {
+  signIn,
+  SignInInput,
+  fetchAuthSession,
+  AuthError,
+} from "aws-amplify/auth";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useFormik } from "formik";
@@ -46,7 +51,7 @@ const SignIn = () => {
       }
     } catch (error) {
       // NotAuthorizedException: Incorrect username or password.
-      const authError = error as Error;
+      const authError = error as AuthError;
       setIsLoggedIn(false);
       setSignInError(
         `There was a problem signing you in: ${authError.message}`

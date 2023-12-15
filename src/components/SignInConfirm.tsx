@@ -1,6 +1,8 @@
 import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
+import { Alert } from "react-bootstrap";
 import {
+  AuthError,
   confirmSignIn,
   ConfirmSignInInput,
   fetchAuthSession,
@@ -46,7 +48,10 @@ const SignInConfirm = () => {
         navigate("/");
       }
     } catch (error) {
-      setSignInConfirmError("There was a problem confirming your sign in.");
+      const authError = error as AuthError;
+      setSignInConfirmError(
+        `There was a problem confirming your sign in: ${authError.message}`
+      );
       console.error("error", error);
     }
   };
@@ -94,13 +99,15 @@ const SignInConfirm = () => {
             </Button>
           </div>
         </Form>
-        {signInConfirmError && <p>{signInConfirmError}</p>}
+        {signInConfirmError && (
+          <Alert variant="warning">{signInConfirmError}</Alert>
+        )}
       </>
     );
   }
 
   if (signInStep === "DONE") {
-    return <div>Successfully signed in.</div>;
+    return <Alert variant="success">Successfully signed in.</Alert>;
   }
 };
 export default SignInConfirm;
