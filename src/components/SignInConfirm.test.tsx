@@ -60,7 +60,80 @@ describe("SignInConfirm", () => {
     expect(screen.getByLabelText(/^password$/i)).toBeInTheDocument();
   });
 
-  test("fills out and successfully submits the confirm sign in form", async () => {
+  test("user (not an admin) fills out and successfully submits the confirm sign in form", async () => {
+    const user = userEvent.setup();
+
+    vi.mocked(awsAmplifyAuth.confirmSignIn).mockResolvedValue({
+      isSignedIn: true,
+      nextStep: {
+        signInStep: "DONE",
+      },
+    });
+
+    vi.mocked(awsAmplifyAuth.fetchAuthSession).mockResolvedValue({
+      tokens: {
+        accessToken: {
+          payload: {},
+        },
+      },
+    });
+
+    vi.mocked(useSignInContext).mockReturnValue({
+      signInStep: "CONFIRM_SIGN_IN_WITH_NEW_PASSWORD_REQUIRED",
+      setSignInStep: vi.fn(),
+    });
+
+    vi.mocked(useAuthContext).mockReturnValue({
+      setIsLoggedIn: vi.fn(),
+      setIsAdmin: vi.fn(),
+      isLoggedIn: false,
+      signInStep: "",
+      setSignInStep: vi.fn(),
+      isAdmin: false,
+    });
+
+    renderWithAuthContext(<SignInConfirm />);
+
+    const passwordInput = screen.getByLabelText(/^password$/i);
+    const submitButton = screen.getByRole("button", {
+      name: /change password/i,
+    });
+
+    await user.type(passwordInput, "newpassword");
+
+    await user.click(submitButton);
+
+    expect(awsAmplifyAuth.confirmSignIn).toHaveBeenCalledWith({
+      challengeResponse: "newpassword",
+    });
+
+    expect(useAuthContext().setIsLoggedIn).toHaveBeenCalledWith(true);
+
+    expect(useSignInContext().setSignInStep).toHaveBeenCalledWith("DONE");
+  });
+
+  test("submits the form without filling in a new password", async () => {
+    const user = userEvent.setup();
+
+    vi.mocked(useSignInContext).mockReturnValue({
+      signInStep: "CONFIRM_SIGN_IN_WITH_NEW_PASSWORD_REQUIRED",
+      setSignInStep: vi.fn(),
+    });
+
+    renderWithAuthContext(<SignInConfirm />);
+
+    const passwordInput = screen.getByLabelText(/^password$/i);
+    const passwordInputFeedback = passwordInput.nextSibling;
+    const submitButton = screen.getByRole("button", {
+      name: /change password/i,
+    });
+
+    await user.click(submitButton);
+    expect(passwordInput).toHaveClass("is-invalid");
+    expect(passwordInputFeedback).toHaveTextContent("Required");
+  });
+
+  test("user (an admin) fills out and successfully submits the confirm sign in form", async () => {
     const user = userEvent.setup();
 
     vi.mocked(awsAmplifyAuth.confirmSignIn).mockResolvedValue({
@@ -85,6 +158,15 @@ describe("SignInConfirm", () => {
       setSignInStep: vi.fn(),
     });
 
+    vi.mocked(useAuthContext).mockReturnValue({
+      setIsLoggedIn: vi.fn(),
+      setIsAdmin: vi.fn(),
+      isLoggedIn: false,
+      signInStep: "",
+      setSignInStep: vi.fn(),
+      isAdmin: false,
+    });
+
     renderWithAuthContext(<SignInConfirm />);
 
     const passwordInput = screen.getByLabelText(/^password$/i);
@@ -99,26 +181,11 @@ describe("SignInConfirm", () => {
     expect(awsAmplifyAuth.confirmSignIn).toHaveBeenCalledWith({
       challengeResponse: "newpassword",
     });
-  });
 
-  test("submits the form without filling in a new password", async () => {
-    const user = userEvent.setup();
+    expect(useAuthContext().setIsLoggedIn).toHaveBeenCalledWith(true);
 
-    vi.mocked(useSignInContext).mockReturnValue({
-      signInStep: "CONFIRM_SIGN_IN_WITH_NEW_PASSWORD_REQUIRED",
-      setSignInStep: vi.fn(),
-    });
+    expect(useSignInContext().setSignInStep).toHaveBeenCalledWith("DONE");
 
-    renderWithAuthContext(<SignInConfirm />);
-
-    const passwordInput = screen.getByLabelText(/^password$/i);
-    const passwordInputFeedback = passwordInput.nextSibling;
-    const submitButton = screen.getByRole("button", {
-      name: /change password/i,
-    });
-
-    await user.click(submitButton);
-    expect(passwordInput).toHaveClass("is-invalid");
-    expect(passwordInputFeedback).toHaveTextContent("Required");
+    expect(useAuthContext().setIsAdmin).toHaveBeenCalledWith(true);
   });
 });
