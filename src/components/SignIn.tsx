@@ -1,5 +1,6 @@
 import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
+import { Alert } from "react-bootstrap";
 import { signIn, SignInInput, fetchAuthSession } from "aws-amplify/auth";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -45,8 +46,11 @@ const SignIn = () => {
       }
     } catch (error) {
       // NotAuthorizedException: Incorrect username or password.
+      const authError = error as Error;
       setIsLoggedIn(false);
-      setSignInError("There was a problem signing you in.");
+      setSignInError(
+        `There was a problem signing you in: ${authError.message}`
+      );
       console.error("error signing in", error);
     }
   };
@@ -108,13 +112,21 @@ const SignIn = () => {
           </div>
         </Form>
 
-        {signInError && <p>{signInError}</p>}
+        {signInError && (
+          <Alert variant="warning">
+            <p>{signInError}</p>
+          </Alert>
+        )}
       </>
     );
   }
 
   if (signInStep === "DONE") {
-    return <div>Successfully signed in.</div>;
+    return (
+      <Alert variant="success">
+        <p>Successfully signed in.</p>
+      </Alert>
+    );
   }
 };
 export default SignIn;
