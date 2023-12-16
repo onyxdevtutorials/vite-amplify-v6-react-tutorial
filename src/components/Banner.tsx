@@ -72,9 +72,9 @@ const Banner = () => {
           {isLoggedIn && (
             <>
               {isAdmin && (
-                <span>
-                  <Link to="/add">Add Product</Link>
-                </span>
+                <Nav.Link as={Link} to="/add">
+                  Add Product
+                </Nav.Link>
               )}
               <Button variant="dark" onClick={handleSignOut}>
                 Sign Out
