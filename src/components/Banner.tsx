@@ -60,16 +60,12 @@ const Banner = () => {
         <Navbar.Collapse id="basic-navbar-nav" className="justify-content-end">
           {!isLoggedIn && (
             <>
-              <Nav.Link>
-                <Button variant="dark" onClick={handleSignIn}>
-                  Sign In
-                </Button>
-              </Nav.Link>
-              <Nav.Link>
-                <Button variant="dark" onClick={handleSignUp}>
-                  Sign Up
-                </Button>
-              </Nav.Link>
+              <Button variant="dark" onClick={handleSignIn}>
+                Sign In
+              </Button>
+              <Button variant="dark" onClick={handleSignUp}>
+                Sign Up
+              </Button>
             </>
           )}
 
@@ -80,11 +76,9 @@ const Banner = () => {
                   <Link to="/add">Add Product</Link>
                 </span>
               )}
-              <Nav.Link>
-                <Button variant="dark" onClick={handleSignOut}>
-                  Sign Out
-                </Button>
-              </Nav.Link>
+              <Button variant="dark" onClick={handleSignOut}>
+                Sign Out
+              </Button>
             </>
           )}
         </Navbar.Collapse>
