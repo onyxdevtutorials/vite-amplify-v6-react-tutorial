@@ -1,6 +1,7 @@
 import { describe, expect, test, vi, beforeEach } from "vitest";
 import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import * as awsAmplifyAuth from "aws-amplify/auth";
 import { AuthContextProvider, useAuthContext } from "../context/AuthContext";
 import { MemoryRouter } from "react-router-dom";
 import Banner from "./Banner";
@@ -34,6 +35,8 @@ vi.mock("../context/AuthContext", async () => {
     })),
   };
 });
+
+vi.mock("aws-amplify/auth");
 
 const renderWithAuthContext = (component: ReactNode) => {
   return render(
@@ -122,7 +125,7 @@ describe("Banner", () => {
     expect(signUpButton).not.toBeInTheDocument();
   });
 
-  test.only("navigates to /signin when Sign In button is clicked", async () => {
+  test("navigates to /signin when Sign In button is clicked", async () => {
     const user = userEvent.setup();
 
     vi.mocked(useAuthContext).mockReturnValue({
@@ -143,54 +146,46 @@ describe("Banner", () => {
     expect(mockNavigate).toHaveBeenCalledWith("/signin");
   });
 
-  test("calls handleSignIn when Sign In button is clicked", () => {
-    const handleSignIn = jest.fn();
+  test("navigates to /signup when Sign Up button is clicked", async () => {
+    const user = userEvent.setup();
 
-    render(
-      <AuthContextProvider>
-        <Router>
-          <Banner handleSignIn={handleSignIn} />
-        </Router>
-      </AuthContextProvider>
-    );
+    vi.mocked(useAuthContext).mockReturnValue({
+      setIsLoggedIn: vi.fn(),
+      setIsAdmin: vi.fn(),
+      isLoggedIn: false,
+      signInStep: "",
+      setSignInStep: vi.fn(),
+      isAdmin: false,
+    });
 
-    const signInButton = screen.getByText("Sign In");
-    fireEvent.click(signInButton);
+    renderWithAuthContext(<Banner />);
 
-    expect(handleSignIn).toHaveBeenCalledTimes(1);
+    const signUpButton = screen.getByRole("button", { name: /sign up/i });
+    await user.click(signUpButton);
+
+    expect(mockNavigate).toHaveBeenCalledTimes(1);
+    expect(mockNavigate).toHaveBeenCalledWith("/signup");
   });
 
-  test("calls handleSignUp when Sign Up button is clicked", () => {
-    const handleSignUp = jest.fn();
+  test("calls signOut when Sign Out button is clicked", async () => {
+    vi.mocked(useAuthContext).mockReturnValue({
+      setIsLoggedIn: vi.fn(),
+      setIsAdmin: vi.fn(),
+      isLoggedIn: true,
+      signInStep: "",
+      setSignInStep: vi.fn(),
+      isAdmin: false,
+    });
 
-    render(
-      <AuthContextProvider>
-        <Router>
-          <Banner handleSignUp={handleSignUp} />
-        </Router>
-      </AuthContextProvider>
-    );
+    const user = userEvent.setup();
 
-    const signUpButton = screen.getByText("Sign Up");
-    fireEvent.click(signUpButton);
+    vi.mocked(awsAmplifyAuth.signOut);
 
-    expect(handleSignUp).toHaveBeenCalledTimes(1);
-  });
+    renderWithAuthContext(<Banner />);
 
-  test("calls handleSignOut when Sign Out button is clicked", () => {
-    const handleSignOut = jest.fn();
+    const signOutButton = screen.getByRole("button", { name: /sign out/i });
+    await user.click(signOutButton);
 
-    render(
-      <AuthContextProvider value={{ isLoggedIn: true }}>
-        <Router>
-          <Banner handleSignOut={handleSignOut} />
-        </Router>
-      </AuthContextProvider>
-    );
-
-    const signOutButton = screen.getByText("Sign Out");
-    fireEvent.click(signOutButton);
-
-    expect(handleSignOut).toHaveBeenCalledTimes(1);
+    expect(awsAmplifyAuth.signOut).toHaveBeenCalledTimes(1);
   });
 });
