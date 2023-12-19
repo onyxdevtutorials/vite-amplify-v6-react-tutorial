@@ -30,6 +30,7 @@ const ListProducts = () => {
 
   const fetchProducts = async () => {
     const isLoggedIn = await checkForUser();
+    // "iam" is for public access
     try {
       const productsData = await client.graphql({
         query: listProducts,
@@ -47,7 +48,9 @@ const ListProducts = () => {
       {products.map((product, index) => (
         <Card key={product.id ? product.id : index}>
           <Card.Body>
-            <Card.Title>{product.name}</Card.Title>
+            <Card.Title aria-label="product name" className="product-name">
+              {product.name}
+            </Card.Title>
             <Card.Text>{product.description}</Card.Text>
             <Card.Text>{product.price}</Card.Text>
           </Card.Body>
