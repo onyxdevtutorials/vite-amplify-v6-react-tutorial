@@ -48,11 +48,31 @@ describe("ListProducts", () => {
     vi.clearAllMocks();
   });
 
-  test.only("renders products for a signed-in user", async () => {
+  test("renders products for a signed-in user", async () => {
     vi.mocked(awsAmplifyAuth.getCurrentUser).mockResolvedValue({
       username: "mockUser",
       userId: "111",
     });
+
+    renderWithAuthContext(<ListProducts />);
+
+    const headings = await screen.findAllByRole("generic", {
+      name: (content, element) => element?.classList.contains("product-name"),
+    });
+
+    expect(headings).toHaveLength(2);
+
+    const productName = await screen.findByText("Product 1");
+    const productDescription = await screen.findByText("Description 1");
+    const productPrice = await screen.findByText("10");
+
+    expect(productName).toBeInTheDocument();
+    expect(productDescription).toBeInTheDocument();
+    expect(productPrice).toBeInTheDocument();
+  });
+
+  test.only("renders products for a signed-out user", async () => {
+    vi.mocked(awsAmplifyAuth.getCurrentUser).mockRejectedValue({});
 
     renderWithAuthContext(<ListProducts />);
 
