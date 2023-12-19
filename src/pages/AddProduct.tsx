@@ -78,7 +78,7 @@ const AddProduct = () => {
             {errors.name}
           </Form.Control.Feedback>
         </Form.Group>
-        <Form.Group>
+        <Form.Group controlId="productDescription">
           <Form.Label>Description</Form.Label>
           <Form.Control
             as="textarea"
@@ -93,7 +93,7 @@ const AddProduct = () => {
             {errors.description}
           </Form.Control.Feedback>
         </Form.Group>
-        <Form.Group>
+        <Form.Group controlId="productPrice">
           <Form.Label>Price</Form.Label>
           <Form.Control
             type="text"
