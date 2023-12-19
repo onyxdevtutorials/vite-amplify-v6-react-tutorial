@@ -1,5 +1,8 @@
 import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
+import { ToastContainer } from "react-bootstrap";
+import Toast from "react-bootstrap/Toast";
+import { useState } from "react";
 import { useFormik } from "formik";
 import * as yup from "yup";
 import { Link } from "react-router-dom";
@@ -27,6 +30,8 @@ type Product = {
 const client = generateClient();
 
 const AddProduct = () => {
+  const [showToast, setShowToast] = useState(false);
+
   const onSubmit = async (values: Product) => {
     const { name, description, price } = values;
     const product = { name, description, price };
@@ -37,8 +42,9 @@ const AddProduct = () => {
           input: product,
         },
       });
+      setShowToast(true);
     } catch (err) {
-      console.log("error creating todo:", err);
+      console.log("error creating product:", err);
     }
   };
 
@@ -106,6 +112,22 @@ const AddProduct = () => {
           Add
         </Button>
       </Form>
+      <ToastContainer position="top-center" style={{ zIndex: 1 }}>
+        <Toast
+          onClose={() => setShowToast(false)}
+          show={showToast}
+          delay={3000}
+          autohide
+          bg="success"
+        >
+          <Toast.Header style={{ justifyContent: "space-between" }}>
+            <strong>Success</strong>
+          </Toast.Header>
+          <Toast.Body style={{ color: "white" }}>
+            Product added successfully
+          </Toast.Body>
+        </Toast>
+      </ToastContainer>
     </div>
   );
 };
