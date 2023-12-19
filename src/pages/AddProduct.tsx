@@ -1,25 +1,36 @@
+import Button from "react-bootstrap/Button";
+import Form from "react-bootstrap/Form";
+import { useFormik } from "formik";
+import * as yup from "yup";
 import { Link } from "react-router-dom";
-import { useState } from "react";
 import { generateClient } from "aws-amplify/api";
-
 import { createProduct } from "../graphql/mutations";
+
+const validationSchema = yup.object().shape({
+  name: yup.string().required("Required"),
+  description: yup.string().required("Required"),
+  price: yup.string().required("Required"),
+});
+
+const initialValues = {
+  name: "",
+  description: "",
+  price: "",
+};
+
+type Product = {
+  name: string;
+  description: string;
+  price: string;
+};
 
 const client = generateClient();
 
-const initialState = { name: "", description: "", price: "" };
-
 const AddProduct = () => {
-  const [formState, setFormState] = useState(initialState);
-
-  const setInput = (key: string, value: string) => {
-    setFormState({ ...formState, [key]: value });
-  };
-
-  async function addProduct() {
+  const onSubmit = async (values: Product) => {
+    const { name, description, price } = values;
+    const product = { name, description, price };
     try {
-      if (!formState.name || !formState.description || !formState.price) return;
-      const product = { ...formState };
-      setFormState(initialState);
       await client.graphql({
         query: createProduct,
         variables: {
@@ -29,46 +40,72 @@ const AddProduct = () => {
     } catch (err) {
       console.log("error creating todo:", err);
     }
-  }
-
-  const handleSubmit: React.FormEventHandler<HTMLFormElement> = (e) => {
-    e.preventDefault();
-    addProduct();
   };
+
+  const {
+    values,
+    errors,
+    touched,
+    isSubmitting,
+    handleBlur,
+    handleChange,
+    handleSubmit,
+  } = useFormik({ initialValues, validationSchema, onSubmit });
 
   return (
     <div>
       <Link to="/">List Products</Link>
       <h1>Add Product</h1>
-      <form onSubmit={handleSubmit}>
-        <div>
-          <label htmlFor="name">Name</label>
-          <input
+      <Form onSubmit={handleSubmit} noValidate>
+        <Form.Group controlId="productName">
+          <Form.Label>Product Name</Form.Label>
+          <Form.Control
             type="text"
             name="name"
-            value={formState.name}
-            onChange={(e) => setInput("name", e.target.value)}
+            value={values.name}
+            onChange={handleChange}
+            onBlur={handleBlur}
+            isInvalid={!!errors.name && touched.name}
+            required
           />
-        </div>
-        <div>
-          <label htmlFor="description">Description</label>
-          <textarea
+          <Form.Control.Feedback type="invalid">
+            {errors.name}
+          </Form.Control.Feedback>
+        </Form.Group>
+        <Form.Group>
+          <Form.Label>Description</Form.Label>
+          <Form.Control
+            as="textarea"
             name="description"
-            value={formState.description}
-            onChange={(e) => setInput("description", e.target.value)}
+            value={values.description}
+            onChange={handleChange}
+            onBlur={handleBlur}
+            isInvalid={!!errors.description && touched.description}
+            required
           />
-        </div>
-        <div>
-          <label htmlFor="price">Price</label>
-          <input
+          <Form.Control.Feedback type="invalid">
+            {errors.description}
+          </Form.Control.Feedback>
+        </Form.Group>
+        <Form.Group>
+          <Form.Label>Price</Form.Label>
+          <Form.Control
             type="text"
             name="price"
-            value={formState.price}
-            onChange={(e) => setInput("price", e.target.value)}
+            value={values.price}
+            onChange={handleChange}
+            onBlur={handleBlur}
+            isInvalid={!!errors.price && touched.price}
+            required
           />
-        </div>
-        <button type="submit">Add</button>
-      </form>
+          <Form.Control.Feedback type="invalid">
+            {errors.price}
+          </Form.Control.Feedback>
+        </Form.Group>
+        <Button type="submit" variant="primary" disabled={isSubmitting}>
+          Add
+        </Button>
+      </Form>
     </div>
   );
 };
