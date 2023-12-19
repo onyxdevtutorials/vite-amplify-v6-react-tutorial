@@ -71,7 +71,7 @@ describe("ListProducts", () => {
     expect(productPrice).toBeInTheDocument();
   });
 
-  test.only("renders products for a signed-out user", async () => {
+  test("renders products for a signed-out user", async () => {
     vi.mocked(awsAmplifyAuth.getCurrentUser).mockRejectedValue({});
 
     renderWithAuthContext(<ListProducts />);
