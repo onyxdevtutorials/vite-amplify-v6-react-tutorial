@@ -45,17 +45,19 @@ const ListProducts = () => {
   return (
     <div>
       <h1>List Products</h1>
-      {products.map((product, index) => (
-        <Card key={product.id ? product.id : index}>
-          <Card.Body>
-            <Card.Title aria-label="product name" className="product-name">
-              {product.name}
-            </Card.Title>
-            <Card.Text>{product.description}</Card.Text>
-            <Card.Text>{product.price}</Card.Text>
-          </Card.Body>
-        </Card>
-      ))}
+      <div role="list">
+        {products.map((product, index) => (
+          <Card key={product.id ? product.id : index} role="listitem">
+            <Card.Body>
+              <Card.Title aria-label="product name" className="product-name">
+                {product.name}
+              </Card.Title>
+              <Card.Text>{product.description}</Card.Text>
+              <Card.Text>{product.price}</Card.Text>
+            </Card.Body>
+          </Card>
+        ))}
+      </div>
     </div>
   );
 };
