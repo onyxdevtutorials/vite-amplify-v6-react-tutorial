@@ -1,6 +1,5 @@
 import { describe, expect, test, vi, beforeEach } from "vitest";
-import { render, screen, fireEvent, waitFor } from "@testing-library/react";
-import { act } from "react-dom/test-utils";
+import { render, screen } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import ChangePassword from "./ChangePassword";
 import userEvent from "@testing-library/user-event";
@@ -71,7 +70,7 @@ describe("ChangePassword", () => {
     ).toBeInTheDocument();
   });
 
-  test.only("displays error message when password update fails because user entered incorrect old password", async () => {
+  test("displays error message when password update fails because user entered incorrect old password", async () => {
     const user = userEvent.setup();
     const errorMessage = "Incorrect username or password.";
 
@@ -104,5 +103,36 @@ describe("ChangePassword", () => {
     expect(
       await screen.findByText(`Problem updating password: ${errorMessage}`)
     ).toBeInTheDocument();
+  });
+
+  test("displays feedback if user tries to submit form without entering old and new passwords", async () => {
+    const user = userEvent.setup();
+
+    vi.mocked(awsAmplifyAuth.getCurrentUser).mockResolvedValue({
+      username: "testuser",
+      userId: "123",
+    });
+
+    render(
+      <MemoryRouter>
+        <ChangePassword />
+      </MemoryRouter>
+    );
+
+    const oldPasswordInput = screen.getByLabelText(/old password/i);
+    const newPasswordInput = screen.getByLabelText(/new password/i);
+    const oldPasswordInputFeedback = oldPasswordInput.nextElementSibling;
+    const newPasswordInputFeedback = newPasswordInput.nextElementSibling;
+
+    const changePasswordButton = screen.getByRole("button", {
+      name: /change password/i,
+    });
+
+    await user.click(changePasswordButton);
+
+    expect(oldPasswordInput).toHaveClass("is-invalid");
+    expect(newPasswordInput).toHaveClass("is-invalid");
+    expect(oldPasswordInputFeedback).toHaveTextContent(/required/i);
+    expect(newPasswordInputFeedback).toHaveTextContent(/required/i);
   });
 });
