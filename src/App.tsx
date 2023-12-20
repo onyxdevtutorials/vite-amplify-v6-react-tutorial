@@ -40,7 +40,7 @@ const router = createBrowserRouter([
         element: <SignIn />,
       },
       {
-        path: "changepassword/:username",
+        path: "changepassword",
         element: <ChangePassword />,
       },
     ],
