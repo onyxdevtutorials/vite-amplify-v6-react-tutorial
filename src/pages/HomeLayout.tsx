@@ -5,7 +5,9 @@ const HomeLayout = () => {
   return (
     <>
       <Banner />
-      <Outlet />
+      <main>
+        <Outlet />
+      </main>
     </>
   );
 };
