@@ -18,7 +18,13 @@ const initialValues: UpdatePasswordInput = { oldPassword: "", newPassword: "" };
 
 const validationSchema = yup.object().shape({
   oldPassword: yup.string().required("Required"),
-  newPassword: yup.string().required("Required"),
+  newPassword: yup
+    .string()
+    .required("Required")
+    .notOneOf(
+      [yup.ref("oldPassword")],
+      "New password may not match old password."
+    ),
 });
 
 const ChangePassword = () => {
