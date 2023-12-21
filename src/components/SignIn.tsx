@@ -77,7 +77,7 @@ const SignIn = () => {
   if (signInStep === "") {
     return (
       <>
-        <Form onSubmit={handleSubmit} noValidate>
+        <Form onSubmit={handleSubmit} noValidate className="sign-in-form">
           <Form.Group className="mb-3" controlId="username">
             <Form.Label>Username</Form.Label>
             <Form.Control
