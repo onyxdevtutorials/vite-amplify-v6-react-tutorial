@@ -74,7 +74,11 @@ const SignInConfirm = () => {
     return (
       <>
         <h2>Please Set a New Password</h2>
-        <Form onSubmit={handleSubmit} noValidate>
+        <Form
+          onSubmit={handleSubmit}
+          noValidate
+          className="sign-in-confirm-form"
+        >
           <Form.Group className="mb-3" controlId="formBasicPassword">
             <Form.Label>Password</Form.Label>
             <Form.Control
