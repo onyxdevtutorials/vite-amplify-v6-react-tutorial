@@ -18,13 +18,10 @@ const validationSchema = yup.object().shape({
 
 const checkForUser = async () => {
   try {
-    const { username, userId, signInDetails } = await getCurrentUser();
-    console.log(`The username: ${username}`);
-    console.log(`The userId: ${userId}`);
-    console.log(`The signInDetails: ${signInDetails}`);
+    await getCurrentUser();
     return true;
   } catch (err) {
-    console.log(err);
+    // console.log(err);
     return false;
   }
 };
@@ -46,7 +43,7 @@ const SignUpConfirm = () => {
 
   const onSubmit = async (values: ConfirmSignUpInput) => {
     try {
-      const { isSignUpComplete, nextStep } = await confirmSignUp({
+      const { isSignUpComplete } = await confirmSignUp({
         username: username,
         confirmationCode: values.confirmationCode,
       });
@@ -60,7 +57,7 @@ const SignUpConfirm = () => {
       } else {
         setSignUpConfirmError("There was a problem confirming your sign up.");
       }
-      console.error("error confirming sign up", error);
+      // console.error("error confirming sign up", error);
     }
   };
 
@@ -144,15 +141,5 @@ const SignUpConfirm = () => {
     </>
   );
 };
-
-//   if (signUpStep === "DONE") {
-//     return (
-//       <Alert variant="success">
-//         <p>
-//           Sign up complete. Please <Link to="/signin">sign in</Link>.
-//         </p>
-//       </Alert>
-//     );
-//   }
 
 export default SignUpConfirm;
