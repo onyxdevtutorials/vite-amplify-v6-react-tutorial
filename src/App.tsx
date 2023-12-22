@@ -4,6 +4,7 @@ import {
   HomeLayout,
   Landing,
   AddProduct,
+  EditProduct,
   SignUp,
   SignUpConfirm,
   SignIn,
@@ -31,7 +32,14 @@ const router = createBrowserRouter([
           </Authenticator>
         ),
       },
-
+      {
+        path: "edit/:id",
+        element: (
+          <Authenticator>
+            <EditProduct />
+          </Authenticator>
+        ),
+      },
       {
         path: "signup",
         element: <SignUp />,
