@@ -15,7 +15,7 @@ const validationSchema = yup.object().shape({
 const SignUpConfirm = () => {
   const [signUpConfirmError, setSignUpConfirmError] = useState("");
   const [isSignUpConfirmed, setIsSignUpConfirmed] = useState(false);
-  const { setSignUpStep, username } = useSignUpContext();
+  const { setSignUpStep, username, signUpStep } = useSignUpContext();
 
   const initialValues: ConfirmSignUpInput = {
     username: username,
@@ -57,11 +57,15 @@ const SignUpConfirm = () => {
     onSubmit: onSubmit,
   });
 
-  if (!isSignUpConfirmed) {
+  if (signUpStep === "CONFIRM_SIGN_UP") {
     return (
       <>
         <h2>Sign Up Confirmation</h2>
-        <Form onSubmit={handleSubmit} noValidate>
+        <Form
+          onSubmit={handleSubmit}
+          noValidate
+          className="sign-up-confirm-form"
+        >
           <Form.Group className="mb-3" controlId="confirmCode">
             <Form.Label>Confirmation Code</Form.Label>
             <Form.Control
@@ -89,7 +93,9 @@ const SignUpConfirm = () => {
         )}
       </>
     );
-  } else {
+  }
+
+  if (signUpStep === "DONE") {
     return (
       <Alert variant="success">
         <p>

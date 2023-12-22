@@ -5,6 +5,7 @@ import {
   Landing,
   AddProduct,
   SignUp,
+  SignUpConfirm,
   SignIn,
   ChangePassword,
 } from "./pages";
@@ -42,6 +43,10 @@ const router = createBrowserRouter([
       {
         path: "changepassword",
         element: <ChangePassword />,
+      },
+      {
+        path: "signupconfirm/:username?",
+        element: <SignUpConfirm />,
       },
     ],
   },
