@@ -1,5 +1,6 @@
 import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
+import Alert from "react-bootstrap/Alert";
 import { ToastContainer } from "react-bootstrap";
 import Toast from "react-bootstrap/Toast";
 import { useState, useEffect } from "react";
@@ -26,19 +27,18 @@ type Product = {
 const client = generateClient();
 
 const EditProduct = () => {
+  const [errorMessage, setErrorMessage] = useState("");
   const [loading, setLoading] = useState(true);
   const [showToast, setShowToast] = useState(false);
   const { id } = useParams<{ id: string }>();
-  const [initialFormValues, setInitialFormValues] = useState({
+  const initialFormValues = {
     name: "",
     description: "",
     price: "",
     id: "",
-  });
+  };
 
   const onSubmit = async (values: Product) => {
-    console.log("id", id, "values", values);
-    // return;
     if (!id) return;
     const { name, description, price } = values;
     const product = { name, description, price, id };
@@ -51,7 +51,8 @@ const EditProduct = () => {
       });
       setShowToast(true);
     } catch (err) {
-      console.log("error creating product:", err);
+      console.error("error updating product: ", err);
+      setErrorMessage("Error updating product id: " + id);
     }
   };
 
@@ -71,49 +72,44 @@ const EditProduct = () => {
   });
 
   useEffect(() => {
-    const getProduct = async () => {
-      if (!id) return;
-      const productData = (await client.graphql({
-        query: /* GraphQL */ `
-          query GetProduct($id: ID!) {
-            getProduct(id: $id) {
-              id
-              name
-              description
-              price
-            }
-          }
-        `,
-        variables: { id },
-      })) as GraphQLResult<{ getProduct: Product }>;
-
-      if (!productData) return;
-      const whatIWant = productData.data?.getProduct;
-
-      //   const { getProduct: product } = productData;
-      //   initialValues.name = product.name;
-      //   initialValues.description = product.description;
-      //   initialValues.price = product.price;
-      console.log("whatIWant", whatIWant);
-      setInitialFormValues(whatIWant);
-      resetForm({ values: whatIWant });
-      setLoading(false);
+    const fetchProduct = async () => {
+      try {
+        if (!id) return;
+        const result = (await client.graphql({
+          query: getProduct,
+          variables: { id },
+        })) as GraphQLResult<{ getProduct: Product }>;
+        const productData = result.data?.getProduct;
+        if (!productData) {
+          setErrorMessage("Error getting product");
+          return;
+        }
+        resetForm({ values: productData });
+      } catch (err) {
+        console.error("error getting product:", err);
+        setErrorMessage("Error getting product");
+      } finally {
+        setLoading(false);
+      }
     };
-
-    try {
-      getProduct();
-    } catch (err) {
-      console.error("error getting product:", err);
-    }
+    fetchProduct();
   }, [id, resetForm]);
 
-  if (loading) return <div>Loading...</div>;
+  if (loading) {
+    return (
+      <>
+        <Link to="/">List Products</Link>
+        <h1>Edit Product</h1>
+        <div>Loading...</div>
+      </>
+    );
+  }
 
   return (
-    <div>
+    <>
       <Link to="/">List Products</Link>
       <h1>Edit Product</h1>
-      <Form onSubmit={handleSubmit} noValidate>
+      <Form onSubmit={handleSubmit} noValidate aria-label="edit product form">
         <Form.Group controlId="productName">
           <Form.Label>Product Name</Form.Label>
           <Form.Control
@@ -160,9 +156,12 @@ const EditProduct = () => {
           </Form.Control.Feedback>
         </Form.Group>
         <Button type="submit" variant="primary" disabled={isSubmitting}>
-          Add
+          Update
         </Button>
       </Form>
+      <Alert variant="danger" show={!!errorMessage}>
+        {errorMessage}
+      </Alert>
       <ToastContainer position="top-center" style={{ zIndex: 1 }}>
         <Toast
           onClose={() => setShowToast(false)}
@@ -175,11 +174,11 @@ const EditProduct = () => {
             <strong>Success</strong>
           </Toast.Header>
           <Toast.Body style={{ color: "white" }}>
-            Product added successfully
+            Product updated successfully
           </Toast.Body>
         </Toast>
       </ToastContainer>
-    </div>
+    </>
   );
 };
 export default EditProduct;
