@@ -17,6 +17,10 @@ export const onCreateProduct = /* GraphQL */ `subscription OnCreateProduct(
     name
     description
     price
+    reviews {
+      nextToken
+      __typename
+    }
     createdAt
     updatedAt
     owner
@@ -36,6 +40,10 @@ export const onUpdateProduct = /* GraphQL */ `subscription OnUpdateProduct(
     name
     description
     price
+    reviews {
+      nextToken
+      __typename
+    }
     createdAt
     updatedAt
     owner
@@ -55,6 +63,10 @@ export const onDeleteProduct = /* GraphQL */ `subscription OnDeleteProduct(
     name
     description
     price
+    reviews {
+      nextToken
+      __typename
+    }
     createdAt
     updatedAt
     owner
@@ -64,4 +76,181 @@ export const onDeleteProduct = /* GraphQL */ `subscription OnDeleteProduct(
 ` as GeneratedSubscription<
   APITypes.OnDeleteProductSubscriptionVariables,
   APITypes.OnDeleteProductSubscription
+>;
+export const onCreateReview = /* GraphQL */ `subscription OnCreateReview(
+  $filter: ModelSubscriptionReviewFilterInput
+  $owner: String
+) {
+  onCreateReview(filter: $filter, owner: $owner) {
+    id
+    product {
+      id
+      name
+      description
+      price
+      createdAt
+      updatedAt
+      owner
+      __typename
+    }
+    rating
+    content
+    user {
+      id
+      username
+      createdAt
+      updatedAt
+      owner
+      __typename
+    }
+    createdAt
+    updatedAt
+    productReviewsId
+    userReviewsId
+    owner
+    __typename
+  }
+}
+` as GeneratedSubscription<
+  APITypes.OnCreateReviewSubscriptionVariables,
+  APITypes.OnCreateReviewSubscription
+>;
+export const onUpdateReview = /* GraphQL */ `subscription OnUpdateReview(
+  $filter: ModelSubscriptionReviewFilterInput
+  $owner: String
+) {
+  onUpdateReview(filter: $filter, owner: $owner) {
+    id
+    product {
+      id
+      name
+      description
+      price
+      createdAt
+      updatedAt
+      owner
+      __typename
+    }
+    rating
+    content
+    user {
+      id
+      username
+      createdAt
+      updatedAt
+      owner
+      __typename
+    }
+    createdAt
+    updatedAt
+    productReviewsId
+    userReviewsId
+    owner
+    __typename
+  }
+}
+` as GeneratedSubscription<
+  APITypes.OnUpdateReviewSubscriptionVariables,
+  APITypes.OnUpdateReviewSubscription
+>;
+export const onDeleteReview = /* GraphQL */ `subscription OnDeleteReview(
+  $filter: ModelSubscriptionReviewFilterInput
+  $owner: String
+) {
+  onDeleteReview(filter: $filter, owner: $owner) {
+    id
+    product {
+      id
+      name
+      description
+      price
+      createdAt
+      updatedAt
+      owner
+      __typename
+    }
+    rating
+    content
+    user {
+      id
+      username
+      createdAt
+      updatedAt
+      owner
+      __typename
+    }
+    createdAt
+    updatedAt
+    productReviewsId
+    userReviewsId
+    owner
+    __typename
+  }
+}
+` as GeneratedSubscription<
+  APITypes.OnDeleteReviewSubscriptionVariables,
+  APITypes.OnDeleteReviewSubscription
+>;
+export const onCreateUser = /* GraphQL */ `subscription OnCreateUser(
+  $filter: ModelSubscriptionUserFilterInput
+  $owner: String
+) {
+  onCreateUser(filter: $filter, owner: $owner) {
+    id
+    username
+    reviews {
+      nextToken
+      __typename
+    }
+    createdAt
+    updatedAt
+    owner
+    __typename
+  }
+}
+` as GeneratedSubscription<
+  APITypes.OnCreateUserSubscriptionVariables,
+  APITypes.OnCreateUserSubscription
+>;
+export const onUpdateUser = /* GraphQL */ `subscription OnUpdateUser(
+  $filter: ModelSubscriptionUserFilterInput
+  $owner: String
+) {
+  onUpdateUser(filter: $filter, owner: $owner) {
+    id
+    username
+    reviews {
+      nextToken
+      __typename
+    }
+    createdAt
+    updatedAt
+    owner
+    __typename
+  }
+}
+` as GeneratedSubscription<
+  APITypes.OnUpdateUserSubscriptionVariables,
+  APITypes.OnUpdateUserSubscription
+>;
+export const onDeleteUser = /* GraphQL */ `subscription OnDeleteUser(
+  $filter: ModelSubscriptionUserFilterInput
+  $owner: String
+) {
+  onDeleteUser(filter: $filter, owner: $owner) {
+    id
+    username
+    reviews {
+      nextToken
+      __typename
+    }
+    createdAt
+    updatedAt
+    owner
+    __typename
+  }
+}
+` as GeneratedSubscription<
+  APITypes.OnDeleteUserSubscriptionVariables,
+  APITypes.OnDeleteUserSubscription
 >;

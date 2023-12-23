@@ -64,6 +64,37 @@ export type Product = {
   name: string,
   description?: string | null,
   price?: string | null,
+  reviews?: ModelReviewConnection | null,
+  createdAt: string,
+  updatedAt: string,
+  owner?: string | null,
+};
+
+export type ModelReviewConnection = {
+  __typename: "ModelReviewConnection",
+  items:  Array<Review | null >,
+  nextToken?: string | null,
+};
+
+export type Review = {
+  __typename: "Review",
+  id: string,
+  product?: Product | null,
+  rating?: number | null,
+  content?: string | null,
+  user?: User | null,
+  createdAt: string,
+  updatedAt: string,
+  productReviewsId?: string | null,
+  userReviewsId?: string | null,
+  owner?: string | null,
+};
+
+export type User = {
+  __typename: "User",
+  id: string,
+  username: string,
+  reviews?: ModelReviewConnection | null,
   createdAt: string,
   updatedAt: string,
   owner?: string | null,
@@ -80,14 +111,34 @@ export type DeleteProductInput = {
   id: string,
 };
 
-export type ModelProductFilterInput = {
-  id?: ModelIDInput | null,
-  name?: ModelStringInput | null,
-  description?: ModelStringInput | null,
-  price?: ModelStringInput | null,
-  and?: Array< ModelProductFilterInput | null > | null,
-  or?: Array< ModelProductFilterInput | null > | null,
-  not?: ModelProductFilterInput | null,
+export type CreateReviewInput = {
+  id?: string | null,
+  rating?: number | null,
+  content?: string | null,
+  productReviewsId?: string | null,
+  userReviewsId?: string | null,
+};
+
+export type ModelReviewConditionInput = {
+  rating?: ModelIntInput | null,
+  content?: ModelStringInput | null,
+  and?: Array< ModelReviewConditionInput | null > | null,
+  or?: Array< ModelReviewConditionInput | null > | null,
+  not?: ModelReviewConditionInput | null,
+  productReviewsId?: ModelIDInput | null,
+  userReviewsId?: ModelIDInput | null,
+};
+
+export type ModelIntInput = {
+  ne?: number | null,
+  eq?: number | null,
+  le?: number | null,
+  lt?: number | null,
+  ge?: number | null,
+  gt?: number | null,
+  between?: Array< number | null > | null,
+  attributeExists?: boolean | null,
+  attributeType?: ModelAttributeTypes | null,
 };
 
 export type ModelIDInput = {
@@ -106,9 +157,77 @@ export type ModelIDInput = {
   size?: ModelSizeInput | null,
 };
 
+export type UpdateReviewInput = {
+  id: string,
+  rating?: number | null,
+  content?: string | null,
+  productReviewsId?: string | null,
+  userReviewsId?: string | null,
+};
+
+export type DeleteReviewInput = {
+  id: string,
+};
+
+export type CreateUserInput = {
+  id?: string | null,
+  username: string,
+};
+
+export type ModelUserConditionInput = {
+  username?: ModelStringInput | null,
+  and?: Array< ModelUserConditionInput | null > | null,
+  or?: Array< ModelUserConditionInput | null > | null,
+  not?: ModelUserConditionInput | null,
+};
+
+export type UpdateUserInput = {
+  id: string,
+  username?: string | null,
+};
+
+export type DeleteUserInput = {
+  id: string,
+};
+
+export type ModelProductFilterInput = {
+  id?: ModelIDInput | null,
+  name?: ModelStringInput | null,
+  description?: ModelStringInput | null,
+  price?: ModelStringInput | null,
+  and?: Array< ModelProductFilterInput | null > | null,
+  or?: Array< ModelProductFilterInput | null > | null,
+  not?: ModelProductFilterInput | null,
+};
+
 export type ModelProductConnection = {
   __typename: "ModelProductConnection",
   items:  Array<Product | null >,
+  nextToken?: string | null,
+};
+
+export type ModelReviewFilterInput = {
+  id?: ModelIDInput | null,
+  rating?: ModelIntInput | null,
+  content?: ModelStringInput | null,
+  and?: Array< ModelReviewFilterInput | null > | null,
+  or?: Array< ModelReviewFilterInput | null > | null,
+  not?: ModelReviewFilterInput | null,
+  productReviewsId?: ModelIDInput | null,
+  userReviewsId?: ModelIDInput | null,
+};
+
+export type ModelUserFilterInput = {
+  id?: ModelIDInput | null,
+  username?: ModelStringInput | null,
+  and?: Array< ModelUserFilterInput | null > | null,
+  or?: Array< ModelUserFilterInput | null > | null,
+  not?: ModelUserFilterInput | null,
+};
+
+export type ModelUserConnection = {
+  __typename: "ModelUserConnection",
+  items:  Array<User | null >,
   nextToken?: string | null,
 };
 
@@ -151,6 +270,33 @@ export type ModelSubscriptionStringInput = {
   notIn?: Array< string | null > | null,
 };
 
+export type ModelSubscriptionReviewFilterInput = {
+  id?: ModelSubscriptionIDInput | null,
+  rating?: ModelSubscriptionIntInput | null,
+  content?: ModelSubscriptionStringInput | null,
+  and?: Array< ModelSubscriptionReviewFilterInput | null > | null,
+  or?: Array< ModelSubscriptionReviewFilterInput | null > | null,
+};
+
+export type ModelSubscriptionIntInput = {
+  ne?: number | null,
+  eq?: number | null,
+  le?: number | null,
+  lt?: number | null,
+  ge?: number | null,
+  gt?: number | null,
+  between?: Array< number | null > | null,
+  in?: Array< number | null > | null,
+  notIn?: Array< number | null > | null,
+};
+
+export type ModelSubscriptionUserFilterInput = {
+  id?: ModelSubscriptionIDInput | null,
+  username?: ModelSubscriptionStringInput | null,
+  and?: Array< ModelSubscriptionUserFilterInput | null > | null,
+  or?: Array< ModelSubscriptionUserFilterInput | null > | null,
+};
+
 export type CreateProductMutationVariables = {
   input: CreateProductInput,
   condition?: ModelProductConditionInput | null,
@@ -163,6 +309,10 @@ export type CreateProductMutation = {
     name: string,
     description?: string | null,
     price?: string | null,
+    reviews?:  {
+      __typename: "ModelReviewConnection",
+      nextToken?: string | null,
+    } | null,
     createdAt: string,
     updatedAt: string,
     owner?: string | null,
@@ -181,6 +331,10 @@ export type UpdateProductMutation = {
     name: string,
     description?: string | null,
     price?: string | null,
+    reviews?:  {
+      __typename: "ModelReviewConnection",
+      nextToken?: string | null,
+    } | null,
     createdAt: string,
     updatedAt: string,
     owner?: string | null,
@@ -199,6 +353,181 @@ export type DeleteProductMutation = {
     name: string,
     description?: string | null,
     price?: string | null,
+    reviews?:  {
+      __typename: "ModelReviewConnection",
+      nextToken?: string | null,
+    } | null,
+    createdAt: string,
+    updatedAt: string,
+    owner?: string | null,
+  } | null,
+};
+
+export type CreateReviewMutationVariables = {
+  input: CreateReviewInput,
+  condition?: ModelReviewConditionInput | null,
+};
+
+export type CreateReviewMutation = {
+  createReview?:  {
+    __typename: "Review",
+    id: string,
+    product?:  {
+      __typename: "Product",
+      id: string,
+      name: string,
+      description?: string | null,
+      price?: string | null,
+      createdAt: string,
+      updatedAt: string,
+      owner?: string | null,
+    } | null,
+    rating?: number | null,
+    content?: string | null,
+    user?:  {
+      __typename: "User",
+      id: string,
+      username: string,
+      createdAt: string,
+      updatedAt: string,
+      owner?: string | null,
+    } | null,
+    createdAt: string,
+    updatedAt: string,
+    productReviewsId?: string | null,
+    userReviewsId?: string | null,
+    owner?: string | null,
+  } | null,
+};
+
+export type UpdateReviewMutationVariables = {
+  input: UpdateReviewInput,
+  condition?: ModelReviewConditionInput | null,
+};
+
+export type UpdateReviewMutation = {
+  updateReview?:  {
+    __typename: "Review",
+    id: string,
+    product?:  {
+      __typename: "Product",
+      id: string,
+      name: string,
+      description?: string | null,
+      price?: string | null,
+      createdAt: string,
+      updatedAt: string,
+      owner?: string | null,
+    } | null,
+    rating?: number | null,
+    content?: string | null,
+    user?:  {
+      __typename: "User",
+      id: string,
+      username: string,
+      createdAt: string,
+      updatedAt: string,
+      owner?: string | null,
+    } | null,
+    createdAt: string,
+    updatedAt: string,
+    productReviewsId?: string | null,
+    userReviewsId?: string | null,
+    owner?: string | null,
+  } | null,
+};
+
+export type DeleteReviewMutationVariables = {
+  input: DeleteReviewInput,
+  condition?: ModelReviewConditionInput | null,
+};
+
+export type DeleteReviewMutation = {
+  deleteReview?:  {
+    __typename: "Review",
+    id: string,
+    product?:  {
+      __typename: "Product",
+      id: string,
+      name: string,
+      description?: string | null,
+      price?: string | null,
+      createdAt: string,
+      updatedAt: string,
+      owner?: string | null,
+    } | null,
+    rating?: number | null,
+    content?: string | null,
+    user?:  {
+      __typename: "User",
+      id: string,
+      username: string,
+      createdAt: string,
+      updatedAt: string,
+      owner?: string | null,
+    } | null,
+    createdAt: string,
+    updatedAt: string,
+    productReviewsId?: string | null,
+    userReviewsId?: string | null,
+    owner?: string | null,
+  } | null,
+};
+
+export type CreateUserMutationVariables = {
+  input: CreateUserInput,
+  condition?: ModelUserConditionInput | null,
+};
+
+export type CreateUserMutation = {
+  createUser?:  {
+    __typename: "User",
+    id: string,
+    username: string,
+    reviews?:  {
+      __typename: "ModelReviewConnection",
+      nextToken?: string | null,
+    } | null,
+    createdAt: string,
+    updatedAt: string,
+    owner?: string | null,
+  } | null,
+};
+
+export type UpdateUserMutationVariables = {
+  input: UpdateUserInput,
+  condition?: ModelUserConditionInput | null,
+};
+
+export type UpdateUserMutation = {
+  updateUser?:  {
+    __typename: "User",
+    id: string,
+    username: string,
+    reviews?:  {
+      __typename: "ModelReviewConnection",
+      nextToken?: string | null,
+    } | null,
+    createdAt: string,
+    updatedAt: string,
+    owner?: string | null,
+  } | null,
+};
+
+export type DeleteUserMutationVariables = {
+  input: DeleteUserInput,
+  condition?: ModelUserConditionInput | null,
+};
+
+export type DeleteUserMutation = {
+  deleteUser?:  {
+    __typename: "User",
+    id: string,
+    username: string,
+    reviews?:  {
+      __typename: "ModelReviewConnection",
+      nextToken?: string | null,
+    } | null,
     createdAt: string,
     updatedAt: string,
     owner?: string | null,
@@ -216,6 +545,10 @@ export type GetProductQuery = {
     name: string,
     description?: string | null,
     price?: string | null,
+    reviews?:  {
+      __typename: "ModelReviewConnection",
+      nextToken?: string | null,
+    } | null,
     createdAt: string,
     updatedAt: string,
     owner?: string | null,
@@ -245,6 +578,106 @@ export type ListProductsQuery = {
   } | null,
 };
 
+export type GetReviewQueryVariables = {
+  id: string,
+};
+
+export type GetReviewQuery = {
+  getReview?:  {
+    __typename: "Review",
+    id: string,
+    product?:  {
+      __typename: "Product",
+      id: string,
+      name: string,
+      description?: string | null,
+      price?: string | null,
+      createdAt: string,
+      updatedAt: string,
+      owner?: string | null,
+    } | null,
+    rating?: number | null,
+    content?: string | null,
+    user?:  {
+      __typename: "User",
+      id: string,
+      username: string,
+      createdAt: string,
+      updatedAt: string,
+      owner?: string | null,
+    } | null,
+    createdAt: string,
+    updatedAt: string,
+    productReviewsId?: string | null,
+    userReviewsId?: string | null,
+    owner?: string | null,
+  } | null,
+};
+
+export type ListReviewsQueryVariables = {
+  filter?: ModelReviewFilterInput | null,
+  limit?: number | null,
+  nextToken?: string | null,
+};
+
+export type ListReviewsQuery = {
+  listReviews?:  {
+    __typename: "ModelReviewConnection",
+    items:  Array< {
+      __typename: "Review",
+      id: string,
+      rating?: number | null,
+      content?: string | null,
+      createdAt: string,
+      updatedAt: string,
+      productReviewsId?: string | null,
+      userReviewsId?: string | null,
+      owner?: string | null,
+    } | null >,
+    nextToken?: string | null,
+  } | null,
+};
+
+export type GetUserQueryVariables = {
+  id: string,
+};
+
+export type GetUserQuery = {
+  getUser?:  {
+    __typename: "User",
+    id: string,
+    username: string,
+    reviews?:  {
+      __typename: "ModelReviewConnection",
+      nextToken?: string | null,
+    } | null,
+    createdAt: string,
+    updatedAt: string,
+    owner?: string | null,
+  } | null,
+};
+
+export type ListUsersQueryVariables = {
+  filter?: ModelUserFilterInput | null,
+  limit?: number | null,
+  nextToken?: string | null,
+};
+
+export type ListUsersQuery = {
+  listUsers?:  {
+    __typename: "ModelUserConnection",
+    items:  Array< {
+      __typename: "User",
+      id: string,
+      username: string,
+      createdAt: string,
+      updatedAt: string,
+      owner?: string | null,
+    } | null >,
+    nextToken?: string | null,
+  } | null,
+};
+
 export type OnCreateProductSubscriptionVariables = {
   filter?: ModelSubscriptionProductFilterInput | null,
   owner?: string | null,
@@ -257,6 +690,10 @@ export type OnCreateProductSubscription = {
     name: string,
     description?: string | null,
     price?: string | null,
+    reviews?:  {
+      __typename: "ModelReviewConnection",
+      nextToken?: string | null,
+    } | null,
     createdAt: string,
     updatedAt: string,
     owner?: string | null,
@@ -275,6 +712,10 @@ export type OnUpdateProductSubscription = {
     name: string,
     description?: string | null,
     price?: string | null,
+    reviews?:  {
+      __typename: "ModelReviewConnection",
+      nextToken?: string | null,
+    } | null,
     createdAt: string,
     updatedAt: string,
     owner?: string | null,
@@ -293,6 +734,181 @@ export type OnDeleteProductSubscription = {
     name: string,
     description?: string | null,
     price?: string | null,
+    reviews?:  {
+      __typename: "ModelReviewConnection",
+      nextToken?: string | null,
+    } | null,
+    createdAt: string,
+    updatedAt: string,
+    owner?: string | null,
+  } | null,
+};
+
+export type OnCreateReviewSubscriptionVariables = {
+  filter?: ModelSubscriptionReviewFilterInput | null,
+  owner?: string | null,
+};
+
+export type OnCreateReviewSubscription = {
+  onCreateReview?:  {
+    __typename: "Review",
+    id: string,
+    product?:  {
+      __typename: "Product",
+      id: string,
+      name: string,
+      description?: string | null,
+      price?: string | null,
+      createdAt: string,
+      updatedAt: string,
+      owner?: string | null,
+    } | null,
+    rating?: number | null,
+    content?: string | null,
+    user?:  {
+      __typename: "User",
+      id: string,
+      username: string,
+      createdAt: string,
+      updatedAt: string,
+      owner?: string | null,
+    } | null,
+    createdAt: string,
+    updatedAt: string,
+    productReviewsId?: string | null,
+    userReviewsId?: string | null,
+    owner?: string | null,
+  } | null,
+};
+
+export type OnUpdateReviewSubscriptionVariables = {
+  filter?: ModelSubscriptionReviewFilterInput | null,
+  owner?: string | null,
+};
+
+export type OnUpdateReviewSubscription = {
+  onUpdateReview?:  {
+    __typename: "Review",
+    id: string,
+    product?:  {
+      __typename: "Product",
+      id: string,
+      name: string,
+      description?: string | null,
+      price?: string | null,
+      createdAt: string,
+      updatedAt: string,
+      owner?: string | null,
+    } | null,
+    rating?: number | null,
+    content?: string | null,
+    user?:  {
+      __typename: "User",
+      id: string,
+      username: string,
+      createdAt: string,
+      updatedAt: string,
+      owner?: string | null,
+    } | null,
+    createdAt: string,
+    updatedAt: string,
+    productReviewsId?: string | null,
+    userReviewsId?: string | null,
+    owner?: string | null,
+  } | null,
+};
+
+export type OnDeleteReviewSubscriptionVariables = {
+  filter?: ModelSubscriptionReviewFilterInput | null,
+  owner?: string | null,
+};
+
+export type OnDeleteReviewSubscription = {
+  onDeleteReview?:  {
+    __typename: "Review",
+    id: string,
+    product?:  {
+      __typename: "Product",
+      id: string,
+      name: string,
+      description?: string | null,
+      price?: string | null,
+      createdAt: string,
+      updatedAt: string,
+      owner?: string | null,
+    } | null,
+    rating?: number | null,
+    content?: string | null,
+    user?:  {
+      __typename: "User",
+      id: string,
+      username: string,
+      createdAt: string,
+      updatedAt: string,
+      owner?: string | null,
+    } | null,
+    createdAt: string,
+    updatedAt: string,
+    productReviewsId?: string | null,
+    userReviewsId?: string | null,
+    owner?: string | null,
+  } | null,
+};
+
+export type OnCreateUserSubscriptionVariables = {
+  filter?: ModelSubscriptionUserFilterInput | null,
+  owner?: string | null,
+};
+
+export type OnCreateUserSubscription = {
+  onCreateUser?:  {
+    __typename: "User",
+    id: string,
+    username: string,
+    reviews?:  {
+      __typename: "ModelReviewConnection",
+      nextToken?: string | null,
+    } | null,
+    createdAt: string,
+    updatedAt: string,
+    owner?: string | null,
+  } | null,
+};
+
+export type OnUpdateUserSubscriptionVariables = {
+  filter?: ModelSubscriptionUserFilterInput | null,
+  owner?: string | null,
+};
+
+export type OnUpdateUserSubscription = {
+  onUpdateUser?:  {
+    __typename: "User",
+    id: string,
+    username: string,
+    reviews?:  {
+      __typename: "ModelReviewConnection",
+      nextToken?: string | null,
+    } | null,
+    createdAt: string,
+    updatedAt: string,
+    owner?: string | null,
+  } | null,
+};
+
+export type OnDeleteUserSubscriptionVariables = {
+  filter?: ModelSubscriptionUserFilterInput | null,
+  owner?: string | null,
+};
+
+export type OnDeleteUserSubscription = {
+  onDeleteUser?:  {
+    __typename: "User",
+    id: string,
+    username: string,
+    reviews?:  {
+      __typename: "ModelReviewConnection",
+      nextToken?: string | null,
+    } | null,
     createdAt: string,
     updatedAt: string,
     owner?: string | null,
