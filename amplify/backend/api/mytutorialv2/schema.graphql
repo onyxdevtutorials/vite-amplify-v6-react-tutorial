@@ -3,8 +3,8 @@ type Product
   @auth(
     rules: [
       { allow: owner }
-      { allow: private, provider: userPools }
-      { allow: public, provider: iam }
+      { allow: private, provider: userPools, operations: [read] }
+      { allow: public, provider: iam, operations: [read] }
     ]
   ) {
   id: ID!
