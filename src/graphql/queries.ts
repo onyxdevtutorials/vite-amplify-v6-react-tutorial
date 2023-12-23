@@ -14,6 +14,10 @@ export const getProduct = /* GraphQL */ `query GetProduct($id: ID!) {
     name
     description
     price
+    reviews {
+      nextToken
+      __typename
+    }
     createdAt
     updatedAt
     owner
@@ -48,3 +52,94 @@ export const listProducts = /* GraphQL */ `query ListProducts(
   APITypes.ListProductsQueryVariables,
   APITypes.ListProductsQuery
 >;
+export const getReview = /* GraphQL */ `query GetReview($id: ID!) {
+  getReview(id: $id) {
+    id
+    product {
+      id
+      name
+      description
+      price
+      createdAt
+      updatedAt
+      owner
+      __typename
+    }
+    rating
+    content
+    user {
+      id
+      username
+      createdAt
+      updatedAt
+      owner
+      __typename
+    }
+    createdAt
+    updatedAt
+    productReviewsId
+    userReviewsId
+    owner
+    __typename
+  }
+}
+` as GeneratedQuery<APITypes.GetReviewQueryVariables, APITypes.GetReviewQuery>;
+export const listReviews = /* GraphQL */ `query ListReviews(
+  $filter: ModelReviewFilterInput
+  $limit: Int
+  $nextToken: String
+) {
+  listReviews(filter: $filter, limit: $limit, nextToken: $nextToken) {
+    items {
+      id
+      rating
+      content
+      createdAt
+      updatedAt
+      productReviewsId
+      userReviewsId
+      owner
+      __typename
+    }
+    nextToken
+    __typename
+  }
+}
+` as GeneratedQuery<
+  APITypes.ListReviewsQueryVariables,
+  APITypes.ListReviewsQuery
+>;
+export const getUser = /* GraphQL */ `query GetUser($id: ID!) {
+  getUser(id: $id) {
+    id
+    username
+    reviews {
+      nextToken
+      __typename
+    }
+    createdAt
+    updatedAt
+    owner
+    __typename
+  }
+}
+` as GeneratedQuery<APITypes.GetUserQueryVariables, APITypes.GetUserQuery>;
+export const listUsers = /* GraphQL */ `query ListUsers(
+  $filter: ModelUserFilterInput
+  $limit: Int
+  $nextToken: String
+) {
+  listUsers(filter: $filter, limit: $limit, nextToken: $nextToken) {
+    items {
+      id
+      username
+      createdAt
+      updatedAt
+      owner
+      __typename
+    }
+    nextToken
+    __typename
+  }
+}
+` as GeneratedQuery<APITypes.ListUsersQueryVariables, APITypes.ListUsersQuery>;

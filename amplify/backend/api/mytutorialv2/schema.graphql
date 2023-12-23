@@ -11,4 +11,35 @@ type Product
   name: String!
   description: String
   price: String
+  reviews: [Review] @hasMany
+}
+
+type Review
+  @model
+  @auth(
+    rules: [
+      { allow: owner }
+      { allow: private, provider: userPools, operations: [read] }
+      { allow: public, provider: iam, operations: [read] }
+    ]
+  ) {
+  id: ID!
+  product: Product @belongsTo
+  rating: Int
+  content: String
+  user: User @belongsTo
+}
+
+type User
+  @model
+  @auth(
+    rules: [
+      { allow: owner }
+      { allow: private, provider: userPools, operations: [read] }
+      { allow: public, provider: iam, operations: [read] }
+    ]
+  ) {
+  id: ID!
+  username: String!
+  reviews: [Review] @hasMany
 }
