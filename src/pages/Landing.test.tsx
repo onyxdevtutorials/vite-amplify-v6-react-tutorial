@@ -78,7 +78,7 @@ describe("Landing", () => {
       isAdmin: false,
     });
 
-    render(<Landing />);
+    renderWithAuthContext(<Landing />);
 
     const isLoggedInText = await screen.findByText(/Is logged in: yes/i);
     expect(isLoggedInText).toBeInTheDocument();
@@ -102,7 +102,7 @@ describe("Landing", () => {
     expect(isLoggedInText).toBeInTheDocument();
   });
 
-  test("renders the ListProducts component when user is logged in", () => {
+  test("renders the ListProducts component when user is logged in", async () => {
     vi.mocked(awsAmplifyAuth.getCurrentUser).mockResolvedValue({
       username: "mockUser",
       userId: "111",
@@ -120,13 +120,13 @@ describe("Landing", () => {
     renderWithAuthContext(<Landing />);
 
     expect(
-      screen.getByRole("heading", { level: 1, name: /list products/i })
+      await screen.findByRole("heading", { level: 1, name: /list products/i })
     ).toBeInTheDocument();
     const listProductsElement = screen.getByRole("list");
     expect(listProductsElement).toBeInTheDocument();
   });
 
-  test("renders the ListProducts component when user is not logged in", () => {
+  test("renders the ListProducts component when user is not logged in", async () => {
     vi.mocked(awsAmplifyAuth.getCurrentUser).mockRejectedValue({});
 
     vi.mocked(useAuthContext).mockReturnValue({
@@ -141,7 +141,7 @@ describe("Landing", () => {
     renderWithAuthContext(<Landing />);
 
     expect(
-      screen.getByRole("heading", { level: 1, name: /list products/i })
+      await screen.findByRole("heading", { level: 1, name: /list products/i })
     ).toBeInTheDocument();
     const listProductsElement = screen.getByRole("list");
     expect(listProductsElement).toBeInTheDocument();

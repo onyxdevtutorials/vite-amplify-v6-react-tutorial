@@ -1,20 +1,21 @@
 import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
 import { Alert } from "react-bootstrap";
-import {
-  signIn,
-  SignInInput,
-  fetchAuthSession,
-  AuthError,
-} from "aws-amplify/auth";
-import { useState } from "react";
+import { signIn, SignInInput, AuthError } from "aws-amplify/auth";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useFormik } from "formik";
 import * as yup from "yup";
 import { useAuthContext } from "../context/AuthContext";
 import { useSignInContext } from "../context/SignInContext";
+import useIsAdmin from "../hooks/useIsAdmin";
 
 const initialState = { username: "", password: "" };
+
+const validationSchema = yup.object().shape({
+  username: yup.string().required("Required"),
+  password: yup.string().required("Required"),
+});
 
 const SignIn = () => {
   const [signInError, setSignInError] = useState("");
@@ -24,28 +25,27 @@ const SignIn = () => {
   const { setIsLoggedIn, setIsAdmin } = useAuthContext();
   const { signInStep, setSignInStep } = useSignInContext();
 
-  const validationSchema = yup.object().shape({
-    username: yup.string().required("Required"),
-    password: yup.string().required("Required"),
-  });
+  const { isAdmin } = useIsAdmin();
+
+  useEffect(() => {
+    const checkIsAdmin = async () => {
+      setIsAdmin(isAdmin);
+    };
+
+    checkIsAdmin();
+  }, [setIsAdmin, isAdmin]);
 
   const onSubmit = async (values: SignInInput) => {
     const { username, password } = values;
 
     try {
       const { isSignedIn, nextStep } = await signIn({ username, password });
-      const authSession = await fetchAuthSession();
-      const tokens = authSession.tokens;
-      if (tokens && Object.keys(tokens).length > 0) {
-        const groups = tokens.accessToken.payload["cognito:groups"];
-        // groups is undefined if user belongs to no groups.
-        if (groups && Array.isArray(groups) && groups.includes("admin")) {
-          setIsAdmin(true);
-        }
-      }
 
       setSignInStep(nextStep.signInStep);
       setIsLoggedIn(isSignedIn);
+      if (isSignedIn) {
+        localStorage.setItem("isLoggedIn", "true");
+      }
       if (nextStep.signInStep === "DONE") {
         navigate("/");
       }
