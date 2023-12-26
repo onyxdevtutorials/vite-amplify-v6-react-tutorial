@@ -8,6 +8,7 @@ import Nav from "react-bootstrap/Nav";
 import Button from "react-bootstrap/Button";
 import { Link } from "react-router-dom";
 import { useAuthContext } from "../context/AuthContext";
+import { SignOut } from "../components/";
 
 const Banner = () => {
   const { isLoggedIn, setIsLoggedIn, isAdmin } = useAuthContext();
@@ -76,9 +77,7 @@ const Banner = () => {
                   Add Product
                 </Nav.Link>
               )}
-              <Button variant="dark" onClick={handleSignOut}>
-                Sign Out
-              </Button>
+              <SignOut />
             </>
           )}
         </Navbar.Collapse>

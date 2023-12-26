@@ -1,65 +1,64 @@
 import { generateClient } from "aws-amplify/api";
 import { listProducts } from "../graphql/queries";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { Product } from "../API";
-// import Card from "react-bootstrap/Card";
 import { Product as ProductComponent } from "./index";
+import useIsAdmin from "../hooks/useIsAdmin";
+import useCheckForUser from "../hooks/useCheckForUser";
 
 const client = generateClient();
 
-import { getCurrentUser } from "aws-amplify/auth";
-
-async function checkForUser() {
-  try {
-    const { username, userId, signInDetails } = await getCurrentUser();
-    console.log(`The username: ${username}`);
-    console.log(`The userId: ${userId}`);
-    console.log(`The signInDetails: ${signInDetails}`);
-    return true;
-  } catch (err) {
-    console.log(err);
-    return false;
-  }
-}
-
 const ListProducts = () => {
   const [products, setProducts] = useState<Product[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const { isAdmin, checkIsAdmin } = useIsAdmin();
+  const { isLoggedIn, checkUser } = useCheckForUser();
 
-  useEffect(() => {
-    fetchProducts();
-  }, []);
-
-  const fetchProducts = async () => {
-    const isLoggedIn = await checkForUser();
+  // memoize the function so it doesn't get recreated on every render
+  const fetchProducts = useCallback(async () => {
     // "iam" is for public access
     try {
       const productsData = await client.graphql({
         query: listProducts,
         authMode: isLoggedIn ? "userPool" : "iam",
       });
-      setProducts(productsData.data.listProducts.items);
+      setProducts(productsData.data.listProducts.items || []);
     } catch (error) {
       console.error("error fetching products", error);
+    } finally {
+      setIsLoading(false);
     }
-  };
+  }, [isLoggedIn]);
+
+  useEffect(() => {
+    fetchProducts();
+  }, [fetchProducts]);
+
+  useEffect(() => {
+    checkUser();
+    if (isLoggedIn) {
+      checkIsAdmin();
+    }
+  }, [checkUser, isLoggedIn, checkIsAdmin]);
+
+  if (isLoading) return <p>Loading...</p>;
 
   return (
     <div>
       <h1>List Products</h1>
-      <div role="list">
-        {products.map((product, index) => (
-          <ProductComponent key={index} product={product} />
-          // <Card key={product.id ? product.id : index} role="listitem">
-          //   <Card.Body>
-          //     <Card.Title aria-label="product name" className="product-name">
-          //       {product.name}
-          //     </Card.Title>
-          //     <Card.Text>{product.description}</Card.Text>
-          //     <Card.Text>{product.price}</Card.Text>
-          //   </Card.Body>
-          // </Card>
-        ))}
-      </div>
+      {products.length > 0 ? (
+        <div role="list">
+          {products.map((product) => (
+            <ProductComponent
+              key={product.id}
+              product={product}
+              isAdmin={isAdmin}
+            />
+          ))}
+        </div>
+      ) : (
+        <p>No products to display</p>
+      )}
     </div>
   );
 };

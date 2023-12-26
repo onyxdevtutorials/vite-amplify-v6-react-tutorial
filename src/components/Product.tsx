@@ -1,21 +1,23 @@
 import React from "react";
 import Card from "react-bootstrap/Card";
-import { useAuthContext } from "../context/AuthContext";
 import { Product as ProductType } from "../API";
+import { useNavigate } from "react-router-dom";
+
 interface ProductProps {
   product: ProductType;
+  isAdmin: boolean;
 }
 
-const Product: React.FC<ProductProps> = ({ product }) => {
+const Product: React.FC<ProductProps> = ({ product, isAdmin }) => {
+  const navigate = useNavigate();
+
   const handleEdit = () => {
-    // Handle edit logic here
+    navigate(`/edit/${product.id}`);
   };
 
   const handleDelete = () => {
     // Handle delete logic here
   };
-
-  const isAdmin = useAuthContext().isAdmin;
 
   return (
     <div>
@@ -26,14 +28,14 @@ const Product: React.FC<ProductProps> = ({ product }) => {
           </Card.Title>
           <Card.Text>{product.description}</Card.Text>
           <Card.Text>{product.price}</Card.Text>
-          <Card.Text>
+          <div>
             {isAdmin && (
               <div>
                 <button onClick={handleEdit}>Edit</button>
                 <button onClick={handleDelete}>Delete</button>
               </div>
             )}
-          </Card.Text>
+          </div>
         </Card.Body>
       </Card>
     </div>
