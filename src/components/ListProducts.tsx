@@ -1,15 +1,15 @@
 import { generateClient } from "aws-amplify/api";
-import { listProducts } from "../graphql/queries";
+import { listProducts } from "../graphql/customQueries";
 import { useEffect, useState, useCallback } from "react";
-import { Product } from "../API";
 import { Product as ProductComponent } from "./index";
 import useIsAdmin from "../hooks/useIsAdmin";
 import useCheckForUser from "../hooks/useCheckForUser";
+import { ProductWithReviews, ListProductsQueryWithReviews } from "../types";
 
 const client = generateClient();
 
 const ListProducts = () => {
-  const [products, setProducts] = useState<Product[]>([]);
+  const [products, setProducts] = useState<ProductWithReviews[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const { isAdmin, checkIsAdmin } = useIsAdmin();
   const { isLoggedIn, checkUser } = useCheckForUser();
@@ -18,11 +18,28 @@ const ListProducts = () => {
   const fetchProducts = useCallback(async () => {
     // "iam" is for public access
     try {
-      const productsData = await client.graphql({
+      const productsData = (await client.graphql({
         query: listProducts,
         authMode: isLoggedIn ? "userPool" : "iam",
-      });
-      setProducts(productsData.data.listProducts.items || []);
+        // Fetch the reviews for each product
+        variables: { limit: 1000 },
+      })) as { data: ListProductsQueryWithReviews };
+
+      if (productsData.data?.listProducts?.items) {
+        const productsWithReviewCount = productsData.data.listProducts.items
+          .filter(
+            (product): product is NonNullable<typeof product> =>
+              product !== null
+          )
+          .map((product) => {
+            const reviewCount = product.reviews?.items.length || 0;
+            return {
+              ...product,
+              reviewCount,
+            };
+          });
+        setProducts(productsWithReviewCount || []);
+      }
     } catch (error) {
       console.error("error fetching products", error);
     } finally {
