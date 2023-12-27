@@ -1,5 +1,5 @@
 import { generateClient } from "aws-amplify/api";
-import { listProducts } from "../graphql/customQueries";
+import { listProductsWithReviews } from "../graphql/customQueries";
 import { useEffect, useState, useCallback } from "react";
 import { Product as ProductComponent } from "./index";
 import useIsAdmin from "../hooks/useIsAdmin";
@@ -19,7 +19,7 @@ const ListProducts = () => {
     // "iam" is for public access
     try {
       const productsData = (await client.graphql({
-        query: listProducts,
+        query: listProductsWithReviews,
         authMode: isLoggedIn ? "userPool" : "iam",
         // Fetch the reviews for each product
         variables: { limit: 1000 },
