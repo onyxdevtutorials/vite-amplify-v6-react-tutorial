@@ -1,4 +1,4 @@
-export const listProducts = /* GraphQL */ `
+export const listProductsWithReviews = /* GraphQL */ `
   query ListProducts(
     $filter: ModelProductFilterInput
     $limit: Int
