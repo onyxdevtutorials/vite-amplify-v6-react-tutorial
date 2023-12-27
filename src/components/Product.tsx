@@ -1,10 +1,10 @@
 import React from "react";
 import Card from "react-bootstrap/Card";
-import { Product as ProductType } from "../API";
 import { useNavigate } from "react-router-dom";
+import { ProductWithReviews } from "../types";
 
 interface ProductProps {
-  product: ProductType;
+  product: ProductWithReviews;
   isAdmin: boolean;
 }
 
@@ -28,6 +28,7 @@ const Product: React.FC<ProductProps> = ({ product, isAdmin }) => {
           </Card.Title>
           <Card.Text>{product.description}</Card.Text>
           <Card.Text>{product.price}</Card.Text>
+          <Card.Text>{product.reviews?.items?.length || 0} reviews</Card.Text>
           <div>
             {isAdmin && (
               <div>

@@ -5,6 +5,11 @@ import { MemoryRouter } from "react-router-dom";
 import { AuthContextProvider } from "../context/AuthContext";
 import { ReactNode } from "react";
 import * as awsAmplifyAuth from "aws-amplify/auth";
+import {
+  ProductWithReviews,
+  ListProductsQueryWithReviews,
+  Review,
+} from "../types";
 
 const renderWithAuthContext = (component: ReactNode) => {
   return render(
@@ -15,27 +20,30 @@ const renderWithAuthContext = (component: ReactNode) => {
 };
 
 vi.mock("aws-amplify/api", () => {
+  const mockData: ListProductsQueryWithReviews = {
+    listProducts: {
+      items: [
+        {
+          id: "1",
+          name: "Product 1",
+          description: "Description 1",
+          price: "10",
+          reviews: { items: Array(5).fill({} as Review) },
+        },
+        {
+          id: "2",
+          name: "Product 2",
+          description: "Description 2",
+          price: "20",
+          reviews: { items: Array(3).fill({} as Review) },
+        },
+      ] as ProductWithReviews[],
+    },
+  };
   return {
     generateClient: () => ({
       graphql: vi.fn().mockResolvedValue({
-        data: {
-          listProducts: {
-            items: [
-              {
-                id: 1,
-                name: "Product 1",
-                description: "Description 1",
-                price: 10,
-              },
-              {
-                id: 2,
-                name: "Product 2",
-                description: "Description 2",
-                price: 20,
-              },
-            ],
-          },
-        },
+        data: mockData,
       }),
     }),
   };
@@ -65,10 +73,12 @@ describe("ListProducts", () => {
     const productName = await screen.findByText("Product 1");
     const productDescription = await screen.findByText("Description 1");
     const productPrice = await screen.findByText("10");
+    const reviewCount = await screen.findByText(/5 reviews/i);
 
     expect(productName).toBeInTheDocument();
     expect(productDescription).toBeInTheDocument();
     expect(productPrice).toBeInTheDocument();
+    expect(reviewCount).toBeInTheDocument();
   });
 
   test("renders products for a signed-out user", async () => {
@@ -85,9 +95,11 @@ describe("ListProducts", () => {
     const productName = await screen.findByText("Product 1");
     const productDescription = await screen.findByText("Description 1");
     const productPrice = await screen.findByText("10");
+    const reviewCount = await screen.findByText(/5 reviews/i);
 
     expect(productName).toBeInTheDocument();
     expect(productDescription).toBeInTheDocument();
     expect(productPrice).toBeInTheDocument();
+    expect(reviewCount).toBeInTheDocument();
   });
 });
