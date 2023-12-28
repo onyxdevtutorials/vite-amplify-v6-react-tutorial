@@ -14,6 +14,7 @@ export const getProduct = /* GraphQL */ `query GetProduct($id: ID!) {
     name
     description
     price
+    isArchived
     reviews {
       nextToken
       __typename
@@ -39,6 +40,7 @@ export const listProducts = /* GraphQL */ `query ListProducts(
       name
       description
       price
+      isArchived
       createdAt
       updatedAt
       owner
@@ -60,6 +62,7 @@ export const getReview = /* GraphQL */ `query GetReview($id: ID!) {
       name
       description
       price
+      isArchived
       createdAt
       updatedAt
       owner
@@ -67,9 +70,11 @@ export const getReview = /* GraphQL */ `query GetReview($id: ID!) {
     }
     rating
     content
+    isArchived
     user {
       id
       username
+      isArchived
       createdAt
       updatedAt
       owner
@@ -94,6 +99,7 @@ export const listReviews = /* GraphQL */ `query ListReviews(
       id
       rating
       content
+      isArchived
       createdAt
       updatedAt
       productReviewsId
@@ -113,6 +119,7 @@ export const getUser = /* GraphQL */ `query GetUser($id: ID!) {
   getUser(id: $id) {
     id
     username
+    isArchived
     reviews {
       nextToken
       __typename
@@ -133,6 +140,7 @@ export const listUsers = /* GraphQL */ `query ListUsers(
     items {
       id
       username
+      isArchived
       createdAt
       updatedAt
       owner

@@ -5,7 +5,7 @@
  **************************************************************************/
 
 import * as React from "react";
-import { GridProps, TextFieldProps } from "@aws-amplify/ui-react";
+import { GridProps, SwitchFieldProps, TextFieldProps } from "@aws-amplify/ui-react";
 export declare type EscapeHatchProps = {
     [elementHierarchy: string]: Record<string, unknown>;
 } | null;
@@ -24,16 +24,19 @@ export declare type ValidationFunction<T> = (value: T, validationResponse: Valid
 export declare type ReviewCreateFormInputValues = {
     rating?: number;
     content?: string;
+    isArchived?: boolean;
 };
 export declare type ReviewCreateFormValidationValues = {
     rating?: ValidationFunction<number>;
     content?: ValidationFunction<string>;
+    isArchived?: ValidationFunction<boolean>;
 };
 export declare type PrimitiveOverrideProps<T> = Partial<T> & React.DOMAttributes<HTMLDivElement>;
 export declare type ReviewCreateFormOverridesProps = {
     ReviewCreateFormGrid?: PrimitiveOverrideProps<GridProps>;
     rating?: PrimitiveOverrideProps<TextFieldProps>;
     content?: PrimitiveOverrideProps<TextFieldProps>;
+    isArchived?: PrimitiveOverrideProps<SwitchFieldProps>;
 } & EscapeHatchProps;
 export declare type ReviewCreateFormProps = React.PropsWithChildren<{
     overrides?: ReviewCreateFormOverridesProps | undefined | null;

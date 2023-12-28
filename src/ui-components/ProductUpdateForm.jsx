@@ -6,7 +6,13 @@
 
 /* eslint-disable */
 import * as React from "react";
-import { Button, Flex, Grid, TextField } from "@aws-amplify/ui-react";
+import {
+  Button,
+  Flex,
+  Grid,
+  SwitchField,
+  TextField,
+} from "@aws-amplify/ui-react";
 import { fetchByPath, getOverrideProps, validateField } from "./utils";
 import { generateClient } from "aws-amplify/api";
 import { getProduct } from "../graphql/queries";
@@ -28,12 +34,14 @@ export default function ProductUpdateForm(props) {
     name: "",
     description: "",
     price: "",
+    isArchived: false,
   };
   const [name, setName] = React.useState(initialValues.name);
   const [description, setDescription] = React.useState(
     initialValues.description
   );
   const [price, setPrice] = React.useState(initialValues.price);
+  const [isArchived, setIsArchived] = React.useState(initialValues.isArchived);
   const [errors, setErrors] = React.useState({});
   const resetStateValues = () => {
     const cleanValues = productRecord
@@ -42,6 +50,7 @@ export default function ProductUpdateForm(props) {
     setName(cleanValues.name);
     setDescription(cleanValues.description);
     setPrice(cleanValues.price);
+    setIsArchived(cleanValues.isArchived);
     setErrors({});
   };
   const [productRecord, setProductRecord] = React.useState(productModelProp);
@@ -64,6 +73,7 @@ export default function ProductUpdateForm(props) {
     name: [{ type: "Required" }],
     description: [],
     price: [],
+    isArchived: [],
   };
   const runValidationTasks = async (
     fieldName,
@@ -94,6 +104,7 @@ export default function ProductUpdateForm(props) {
           name,
           description: description ?? null,
           price: price ?? null,
+          isArchived: isArchived ?? null,
         };
         const validationResponses = await Promise.all(
           Object.keys(validations).reduce((promises, fieldName) => {
@@ -157,6 +168,7 @@ export default function ProductUpdateForm(props) {
               name: value,
               description,
               price,
+              isArchived,
             };
             const result = onChange(modelFields);
             value = result?.name ?? value;
@@ -183,6 +195,7 @@ export default function ProductUpdateForm(props) {
               name,
               description: value,
               price,
+              isArchived,
             };
             const result = onChange(modelFields);
             value = result?.description ?? value;
@@ -209,6 +222,7 @@ export default function ProductUpdateForm(props) {
               name,
               description,
               price: value,
+              isArchived,
             };
             const result = onChange(modelFields);
             value = result?.price ?? value;
@@ -223,6 +237,33 @@ export default function ProductUpdateForm(props) {
         hasError={errors.price?.hasError}
         {...getOverrideProps(overrides, "price")}
       ></TextField>
+      <SwitchField
+        label="Is archived"
+        defaultChecked={false}
+        isDisabled={false}
+        isChecked={isArchived}
+        onChange={(e) => {
+          let value = e.target.checked;
+          if (onChange) {
+            const modelFields = {
+              name,
+              description,
+              price,
+              isArchived: value,
+            };
+            const result = onChange(modelFields);
+            value = result?.isArchived ?? value;
+          }
+          if (errors.isArchived?.hasError) {
+            runValidationTasks("isArchived", value);
+          }
+          setIsArchived(value);
+        }}
+        onBlur={() => runValidationTasks("isArchived", isArchived)}
+        errorMessage={errors.isArchived?.errorMessage}
+        hasError={errors.isArchived?.hasError}
+        {...getOverrideProps(overrides, "isArchived")}
+      ></SwitchField>
       <Flex
         justifyContent="space-between"
         {...getOverrideProps(overrides, "CTAFlex")}
