@@ -1,15 +1,14 @@
-import React from "react";
 import { expect, test, beforeEach, vi, describe } from "vitest";
-import { render, screen, fireEvent } from "@testing-library/react";
+import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { useNavigate, MemoryRouter } from "react-router-dom";
+import { MemoryRouter } from "react-router-dom";
 import Product from "./Product";
 import { ProductWithReviews, Review } from "../types";
 
 const mockProduct: ProductWithReviews = {
   __typename: "Product",
-  createdAt: "2022-01-01T00:00:00Z", // Replace with a suitable date string
-  updatedAt: "2022-01-01T00:00:00Z", // Replace with a suitable date string
+  createdAt: "2022-01-01T00:00:00Z",
+  updatedAt: "2022-01-01T00:00:00Z",
   id: "1",
   name: "Test Product",
   description: "This is a test product",
@@ -55,8 +54,12 @@ describe("Product", () => {
     expect(screen.getByText("This is a test product")).toBeInTheDocument();
     expect(screen.getByText("9.99")).toBeInTheDocument();
     expect(screen.getByText("2 reviews")).toBeInTheDocument();
-    expect(screen.queryByText("Edit")).not.toBeInTheDocument();
-    expect(screen.queryByText("Delete")).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole("button", { name: /Edit/i })
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole("button", { name: /Delete/i })
+    ).not.toBeInTheDocument();
   });
 
   test("renders edit and delete buttons for admin", () => {
