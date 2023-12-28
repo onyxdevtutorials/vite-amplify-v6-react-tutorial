@@ -25,15 +25,13 @@ const SignIn = () => {
   const { setIsLoggedIn, setIsAdmin } = useAuthContext();
   const { signInStep, setSignInStep } = useSignInContext();
 
-  const { isAdmin } = useIsAdmin();
+  const { isAdmin: isAdminFromHook } = useIsAdmin();
+  const [isAdmin, setIsAdminFromHook] = useState(isAdminFromHook);
 
   useEffect(() => {
-    const checkIsAdmin = async () => {
-      setIsAdmin(isAdmin);
-    };
-
-    checkIsAdmin();
-  }, [setIsAdmin, isAdmin]);
+    setIsAdminFromHook(isAdminFromHook);
+    setIsAdmin(isAdminFromHook);
+  }, [isAdminFromHook]);
 
   const onSubmit = async (values: SignInInput) => {
     const { username, password } = values;
