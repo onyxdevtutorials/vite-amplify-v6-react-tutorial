@@ -6,7 +6,13 @@
 
 /* eslint-disable */
 import * as React from "react";
-import { Button, Flex, Grid, TextField } from "@aws-amplify/ui-react";
+import {
+  Button,
+  Flex,
+  Grid,
+  SwitchField,
+  TextField,
+} from "@aws-amplify/ui-react";
 import { fetchByPath, getOverrideProps, validateField } from "./utils";
 import { generateClient } from "aws-amplify/api";
 import { createUser } from "../graphql/mutations";
@@ -24,15 +30,19 @@ export default function UserCreateForm(props) {
   } = props;
   const initialValues = {
     username: "",
+    isArchived: false,
   };
   const [username, setUsername] = React.useState(initialValues.username);
+  const [isArchived, setIsArchived] = React.useState(initialValues.isArchived);
   const [errors, setErrors] = React.useState({});
   const resetStateValues = () => {
     setUsername(initialValues.username);
+    setIsArchived(initialValues.isArchived);
     setErrors({});
   };
   const validations = {
     username: [{ type: "Required" }],
+    isArchived: [],
   };
   const runValidationTasks = async (
     fieldName,
@@ -61,6 +71,7 @@ export default function UserCreateForm(props) {
         event.preventDefault();
         let modelFields = {
           username,
+          isArchived,
         };
         const validationResponses = await Promise.all(
           Object.keys(validations).reduce((promises, fieldName) => {
@@ -124,6 +135,7 @@ export default function UserCreateForm(props) {
           if (onChange) {
             const modelFields = {
               username: value,
+              isArchived,
             };
             const result = onChange(modelFields);
             value = result?.username ?? value;
@@ -138,6 +150,31 @@ export default function UserCreateForm(props) {
         hasError={errors.username?.hasError}
         {...getOverrideProps(overrides, "username")}
       ></TextField>
+      <SwitchField
+        label="Is archived"
+        defaultChecked={false}
+        isDisabled={false}
+        isChecked={isArchived}
+        onChange={(e) => {
+          let value = e.target.checked;
+          if (onChange) {
+            const modelFields = {
+              username,
+              isArchived: value,
+            };
+            const result = onChange(modelFields);
+            value = result?.isArchived ?? value;
+          }
+          if (errors.isArchived?.hasError) {
+            runValidationTasks("isArchived", value);
+          }
+          setIsArchived(value);
+        }}
+        onBlur={() => runValidationTasks("isArchived", isArchived)}
+        errorMessage={errors.isArchived?.errorMessage}
+        hasError={errors.isArchived?.hasError}
+        {...getOverrideProps(overrides, "isArchived")}
+      ></SwitchField>
       <Flex
         justifyContent="space-between"
         {...getOverrideProps(overrides, "CTAFlex")}

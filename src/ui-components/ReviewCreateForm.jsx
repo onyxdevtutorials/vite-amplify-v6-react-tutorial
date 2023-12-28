@@ -6,7 +6,13 @@
 
 /* eslint-disable */
 import * as React from "react";
-import { Button, Flex, Grid, TextField } from "@aws-amplify/ui-react";
+import {
+  Button,
+  Flex,
+  Grid,
+  SwitchField,
+  TextField,
+} from "@aws-amplify/ui-react";
 import { fetchByPath, getOverrideProps, validateField } from "./utils";
 import { generateClient } from "aws-amplify/api";
 import { createReview } from "../graphql/mutations";
@@ -25,18 +31,22 @@ export default function ReviewCreateForm(props) {
   const initialValues = {
     rating: "",
     content: "",
+    isArchived: false,
   };
   const [rating, setRating] = React.useState(initialValues.rating);
   const [content, setContent] = React.useState(initialValues.content);
+  const [isArchived, setIsArchived] = React.useState(initialValues.isArchived);
   const [errors, setErrors] = React.useState({});
   const resetStateValues = () => {
     setRating(initialValues.rating);
     setContent(initialValues.content);
+    setIsArchived(initialValues.isArchived);
     setErrors({});
   };
   const validations = {
     rating: [],
     content: [],
+    isArchived: [],
   };
   const runValidationTasks = async (
     fieldName,
@@ -66,6 +76,7 @@ export default function ReviewCreateForm(props) {
         let modelFields = {
           rating,
           content,
+          isArchived,
         };
         const validationResponses = await Promise.all(
           Object.keys(validations).reduce((promises, fieldName) => {
@@ -134,6 +145,7 @@ export default function ReviewCreateForm(props) {
             const modelFields = {
               rating: value,
               content,
+              isArchived,
             };
             const result = onChange(modelFields);
             value = result?.rating ?? value;
@@ -159,6 +171,7 @@ export default function ReviewCreateForm(props) {
             const modelFields = {
               rating,
               content: value,
+              isArchived,
             };
             const result = onChange(modelFields);
             value = result?.content ?? value;
@@ -173,6 +186,32 @@ export default function ReviewCreateForm(props) {
         hasError={errors.content?.hasError}
         {...getOverrideProps(overrides, "content")}
       ></TextField>
+      <SwitchField
+        label="Is archived"
+        defaultChecked={false}
+        isDisabled={false}
+        isChecked={isArchived}
+        onChange={(e) => {
+          let value = e.target.checked;
+          if (onChange) {
+            const modelFields = {
+              rating,
+              content,
+              isArchived: value,
+            };
+            const result = onChange(modelFields);
+            value = result?.isArchived ?? value;
+          }
+          if (errors.isArchived?.hasError) {
+            runValidationTasks("isArchived", value);
+          }
+          setIsArchived(value);
+        }}
+        onBlur={() => runValidationTasks("isArchived", isArchived)}
+        errorMessage={errors.isArchived?.errorMessage}
+        hasError={errors.isArchived?.hasError}
+        {...getOverrideProps(overrides, "isArchived")}
+      ></SwitchField>
       <Flex
         justifyContent="space-between"
         {...getOverrideProps(overrides, "CTAFlex")}

@@ -17,6 +17,7 @@ export const createProduct = /* GraphQL */ `mutation CreateProduct(
     name
     description
     price
+    isArchived
     reviews {
       nextToken
       __typename
@@ -40,6 +41,7 @@ export const updateProduct = /* GraphQL */ `mutation UpdateProduct(
     name
     description
     price
+    isArchived
     reviews {
       nextToken
       __typename
@@ -63,6 +65,7 @@ export const deleteProduct = /* GraphQL */ `mutation DeleteProduct(
     name
     description
     price
+    isArchived
     reviews {
       nextToken
       __typename
@@ -88,6 +91,7 @@ export const createReview = /* GraphQL */ `mutation CreateReview(
       name
       description
       price
+      isArchived
       createdAt
       updatedAt
       owner
@@ -95,9 +99,11 @@ export const createReview = /* GraphQL */ `mutation CreateReview(
     }
     rating
     content
+    isArchived
     user {
       id
       username
+      isArchived
       createdAt
       updatedAt
       owner
@@ -126,6 +132,7 @@ export const updateReview = /* GraphQL */ `mutation UpdateReview(
       name
       description
       price
+      isArchived
       createdAt
       updatedAt
       owner
@@ -133,9 +140,11 @@ export const updateReview = /* GraphQL */ `mutation UpdateReview(
     }
     rating
     content
+    isArchived
     user {
       id
       username
+      isArchived
       createdAt
       updatedAt
       owner
@@ -164,6 +173,7 @@ export const deleteReview = /* GraphQL */ `mutation DeleteReview(
       name
       description
       price
+      isArchived
       createdAt
       updatedAt
       owner
@@ -171,9 +181,11 @@ export const deleteReview = /* GraphQL */ `mutation DeleteReview(
     }
     rating
     content
+    isArchived
     user {
       id
       username
+      isArchived
       createdAt
       updatedAt
       owner
@@ -198,6 +210,7 @@ export const createUser = /* GraphQL */ `mutation CreateUser(
   createUser(input: $input, condition: $condition) {
     id
     username
+    isArchived
     reviews {
       nextToken
       __typename
@@ -219,6 +232,7 @@ export const updateUser = /* GraphQL */ `mutation UpdateUser(
   updateUser(input: $input, condition: $condition) {
     id
     username
+    isArchived
     reviews {
       nextToken
       __typename
@@ -240,6 +254,7 @@ export const deleteUser = /* GraphQL */ `mutation DeleteUser(
   deleteUser(input: $input, condition: $condition) {
     id
     username
+    isArchived
     reviews {
       nextToken
       __typename

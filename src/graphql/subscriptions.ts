@@ -17,6 +17,7 @@ export const onCreateProduct = /* GraphQL */ `subscription OnCreateProduct(
     name
     description
     price
+    isArchived
     reviews {
       nextToken
       __typename
@@ -40,6 +41,7 @@ export const onUpdateProduct = /* GraphQL */ `subscription OnUpdateProduct(
     name
     description
     price
+    isArchived
     reviews {
       nextToken
       __typename
@@ -63,6 +65,7 @@ export const onDeleteProduct = /* GraphQL */ `subscription OnDeleteProduct(
     name
     description
     price
+    isArchived
     reviews {
       nextToken
       __typename
@@ -88,6 +91,7 @@ export const onCreateReview = /* GraphQL */ `subscription OnCreateReview(
       name
       description
       price
+      isArchived
       createdAt
       updatedAt
       owner
@@ -95,9 +99,11 @@ export const onCreateReview = /* GraphQL */ `subscription OnCreateReview(
     }
     rating
     content
+    isArchived
     user {
       id
       username
+      isArchived
       createdAt
       updatedAt
       owner
@@ -126,6 +132,7 @@ export const onUpdateReview = /* GraphQL */ `subscription OnUpdateReview(
       name
       description
       price
+      isArchived
       createdAt
       updatedAt
       owner
@@ -133,9 +140,11 @@ export const onUpdateReview = /* GraphQL */ `subscription OnUpdateReview(
     }
     rating
     content
+    isArchived
     user {
       id
       username
+      isArchived
       createdAt
       updatedAt
       owner
@@ -164,6 +173,7 @@ export const onDeleteReview = /* GraphQL */ `subscription OnDeleteReview(
       name
       description
       price
+      isArchived
       createdAt
       updatedAt
       owner
@@ -171,9 +181,11 @@ export const onDeleteReview = /* GraphQL */ `subscription OnDeleteReview(
     }
     rating
     content
+    isArchived
     user {
       id
       username
+      isArchived
       createdAt
       updatedAt
       owner
@@ -198,6 +210,7 @@ export const onCreateUser = /* GraphQL */ `subscription OnCreateUser(
   onCreateUser(filter: $filter, owner: $owner) {
     id
     username
+    isArchived
     reviews {
       nextToken
       __typename
@@ -219,6 +232,7 @@ export const onUpdateUser = /* GraphQL */ `subscription OnUpdateUser(
   onUpdateUser(filter: $filter, owner: $owner) {
     id
     username
+    isArchived
     reviews {
       nextToken
       __typename
@@ -240,6 +254,7 @@ export const onDeleteUser = /* GraphQL */ `subscription OnDeleteUser(
   onDeleteUser(filter: $filter, owner: $owner) {
     id
     username
+    isArchived
     reviews {
       nextToken
       __typename
