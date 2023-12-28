@@ -4,6 +4,7 @@ import { render, screen, waitFor } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import { updateProduct } from "../graphql/mutations";
 import EditProduct from "./EditProduct";
+import { getProduct } from "../graphql/queries";
 
 vi.mock("react-router-dom", async () => {
   const router = await vi.importActual<typeof import("react-router-dom")>(
@@ -158,9 +159,11 @@ describe("EditProduct", () => {
   });
 
   test("displays an alert message if getting the product fails, e.g., the product doesn't exist", async () => {
-    vi.mocked(graphqlMock).mockRejectedValueOnce(
-      new Error("Error getting product")
-    );
+    vi.mocked(graphqlMock).mockImplementation(({ query, variables }) => {
+      if (query === getProduct) {
+        return Promise.reject(new Error("Error getting product"));
+      }
+    });
 
     render(
       <MemoryRouter>
@@ -174,19 +177,20 @@ describe("EditProduct", () => {
     expect(alert).toHaveTextContent("Error getting product");
   });
 
-  test.only("displays an alert message if updating the product fails", async () => {
+  test("displays an alert message if updating the product fails", async () => {
     const user = userEvent.setup();
     // Mock successful fetch
-    vi.mocked(graphqlMock).mockResolvedValueOnce({
-      data: {
-        getProduct: mockProduct,
-      },
+    vi.mocked(graphqlMock).mockImplementation(({ query, variables }) => {
+      if (query === updateProduct) {
+        return Promise.reject(new Error("Error updating product"));
+      } else if (query === getProduct) {
+        return Promise.resolve({
+          data: {
+            getProduct: mockProduct,
+          },
+        });
+      }
     });
-
-    // Mock failed update
-    vi.mocked(graphqlMock).mockRejectedValueOnce(
-      new Error("Error updating product")
-    );
 
     render(
       <MemoryRouter>

@@ -97,7 +97,7 @@ describe("SignUpConfirm page", () => {
     expect(confirmationCodeInputFeedback).toHaveTextContent(/required/i);
   });
 
-  test.only("displays error message when user enters invalid confirmation code", async () => {
+  test("displays error message when user enters invalid confirmation code", async () => {
     const user = userEvent.setup();
     vi.mocked(awsAmplifyAuth.getCurrentUser).mockRejectedValue({});
     vi.mocked(awsAmplifyAuth.confirmSignUp).mockRejectedValue({});

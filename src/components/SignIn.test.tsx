@@ -1,5 +1,5 @@
 import { vi, describe, test, expect, beforeEach } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import * as awsAmplifyAuth from "aws-amplify/auth";
 import SignIn from "./SignIn";
@@ -123,7 +123,7 @@ describe("SignIn component", () => {
 
     expect(useSignInContext().setSignInStep).toHaveBeenCalledWith("DONE");
     expect(useAuthContext().setIsLoggedIn).toHaveBeenCalledWith(true);
-    expect(useAuthContext().setIsAdmin).not.toHaveBeenCalled();
+    expect(useAuthContext().setIsAdmin).toHaveBeenCalledWith(false);
   });
 
   test("displays error message with invalid input", async () => {
@@ -178,10 +178,10 @@ describe("SignIn component", () => {
     vi.mocked(useAuthContext).mockReturnValue({
       setIsLoggedIn: vi.fn(),
       setIsAdmin: vi.fn(),
-      isLoggedIn: false,
+      isLoggedIn: true,
       signInStep: "",
       setSignInStep: vi.fn(),
-      isAdmin: false,
+      isAdmin: true,
     });
 
     renderWithAuthContext(<SignIn />);
@@ -197,6 +197,19 @@ describe("SignIn component", () => {
     // Submit the form
     await user.click(screen.getByRole("button", { name: /sign in/i }));
 
-    expect(useAuthContext().setIsAdmin).toHaveBeenCalledWith(true);
+    await waitFor(() => {
+      expect(awsAmplifyAuth.signIn).toHaveBeenCalledWith({
+        username: "testuser",
+        password: "testpassword",
+      });
+      expect(awsAmplifyAuth.signIn).toHaveBeenCalledTimes(1);
+    });
+
+    // screen.debug();
+
+    // Wait for setIsAdmin to be called
+    await waitFor(() => {
+      expect(useAuthContext().setIsAdmin).toHaveBeenCalledWith(true);
+    });
   });
 });
