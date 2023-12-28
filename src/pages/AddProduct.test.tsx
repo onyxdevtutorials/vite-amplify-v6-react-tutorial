@@ -55,7 +55,7 @@ describe("AddProduct", () => {
     expect(requiredInputs).toHaveLength(3);
   });
 
-  test.only("submits the form with valid data and calls graphql()", async () => {
+  test("submits the form with valid data and calls graphql()", async () => {
     const user = userEvent.setup();
 
     render(

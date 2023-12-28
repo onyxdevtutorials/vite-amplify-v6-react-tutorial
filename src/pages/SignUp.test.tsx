@@ -120,7 +120,7 @@ describe("SignUp page", () => {
     expect(mockNavigate).toHaveBeenCalledWith("/signupconfirm/testuser");
   });
 
-  test.only("shows error feedback if user fails to fill out required fields", async () => {
+  test("shows error feedback if user fails to fill out required fields", async () => {
     const user = userEvent.setup();
 
     vi.mocked(awsAmplifyAuth.getCurrentUser).mockRejectedValue({});
