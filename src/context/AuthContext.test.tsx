@@ -32,7 +32,7 @@ const TestComponent: React.FC = () => {
   );
 };
 describe("AuthContext", () => {
-  test.only("should provide the AuthContext values correctly", async () => {
+  test("should provide the AuthContext values correctly", async () => {
     const user = userEvent.setup();
 
     render(
