@@ -39,7 +39,7 @@ const SignInConfirm = () => {
       const tokens = authSession.tokens;
       if (tokens && Object.keys(tokens).length > 0) {
         const groups = tokens.accessToken.payload["cognito:groups"];
-        console.log("groups", groups);
+        // console.log("groups", groups);
         if (groups && Array.isArray(groups) && groups.includes("admin")) {
           setIsAdmin(true);
         }

@@ -69,8 +69,10 @@ describe("Product", () => {
       </MemoryRouter>
     );
 
-    expect(screen.getByText("Edit")).toBeInTheDocument();
-    expect(screen.getByText("Delete")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /Edit/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: /archive/i })
+    ).toBeInTheDocument();
   });
 
   test("navigates to edit page when edit button is clicked", async () => {

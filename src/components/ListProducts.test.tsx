@@ -1,5 +1,5 @@
 import { describe, test, vi, expect, beforeEach } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
 import ListProducts from "./ListProducts";
 import { MemoryRouter } from "react-router-dom";
 import { AuthContextProvider } from "../context/AuthContext";
@@ -20,30 +20,39 @@ const renderWithAuthContext = (component: ReactNode) => {
 };
 
 vi.mock("aws-amplify/api", () => {
-  const mockData: ListProductsQueryWithReviews = {
-    listProducts: {
-      items: [
-        {
-          id: "1",
-          name: "Product 1",
-          description: "Description 1",
-          price: "10",
-          reviews: { items: Array(5).fill({} as Review) },
-        },
-        {
-          id: "2",
-          name: "Product 2",
-          description: "Description 2",
-          price: "20",
-          reviews: { items: Array(3).fill({} as Review) },
-        },
-      ] as ProductWithReviews[],
-    },
-  };
   return {
     generateClient: () => ({
       graphql: vi.fn().mockResolvedValue({
-        data: mockData,
+        data: {
+          listProducts: {
+            items: [
+              {
+                id: "1",
+                name: "Product 1",
+                description: "Description 1",
+                price: "10",
+                reviews: {
+                  items: Array(5).fill({
+                    id: "1",
+                    content: "Review 1",
+                  } as Review),
+                },
+              },
+              {
+                id: "2",
+                name: "Product 2",
+                description: "Description 2",
+                price: "20",
+                reviews: {
+                  items: Array(3).fill({
+                    id: "2",
+                    content: "Review 2",
+                  } as Review),
+                },
+              },
+            ] as ProductWithReviews[],
+          },
+        } as ListProductsQueryWithReviews,
       }),
     }),
   };
@@ -64,6 +73,12 @@ describe("ListProducts", () => {
 
     renderWithAuthContext(<ListProducts />);
 
+    await waitFor(async () => {
+      const productName = await screen.findByText("Product 1");
+      expect(productName).toBeInTheDocument();
+    });
+
+    screen.debug();
     const headings = await screen.findAllByRole("generic", {
       name: (content, element) => element?.classList.contains("product-name"),
     });

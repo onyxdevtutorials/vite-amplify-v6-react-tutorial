@@ -4,7 +4,11 @@ import { useEffect, useState, useCallback } from "react";
 import { Product as ProductComponent } from "./index";
 import useIsAdmin from "../hooks/useIsAdmin";
 import useCheckForUser from "../hooks/useCheckForUser";
-import { ProductWithReviews, ListProductsQueryWithReviews } from "../types";
+import {
+  ProductWithReviews,
+  ListProductsQueryWithReviews,
+  Product as ProductType,
+} from "../types";
 
 const client = generateClient();
 
@@ -28,16 +32,17 @@ const ListProducts = () => {
       if (productsData.data?.listProducts?.items) {
         const productsWithReviewCount = productsData.data.listProducts.items
           .filter(
-            (product): product is NonNullable<typeof product> =>
+            (product: ProductType): product is NonNullable<typeof product> =>
               product !== null
           )
-          .map((product) => {
+          .map((product: ProductType) => {
             const reviewCount = product.reviews?.items.length || 0;
             return {
               ...product,
               reviewCount,
             };
           });
+
         setProducts(productsWithReviewCount || []);
       }
     } catch (error) {

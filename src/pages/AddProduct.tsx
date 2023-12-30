@@ -44,7 +44,7 @@ const AddProduct = () => {
       });
       setShowToast(true);
     } catch (err) {
-      console.log("error creating product:", err);
+      console.error("error creating product:", err);
     }
   };
 
