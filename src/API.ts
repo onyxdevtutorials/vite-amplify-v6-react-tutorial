@@ -2,23 +2,63 @@
 /* eslint-disable */
 //  This file was automatically generated and should not be edited.
 
-export type CreateProductInput = {
-  id?: string | null,
+export type Product = {
+  __typename: "Product",
+  id: string,
   name: string,
   description?: string | null,
   price?: string | null,
+  isArchived?: boolean | null,
+  reviews?: ModelReviewConnection | null,
+  createdAt: string,
+  updatedAt: string,
+  owner?: string | null,
 };
 
-export type ModelProductConditionInput = {
+export type ModelReviewConnection = {
+  __typename: "ModelReviewConnection",
+  items:  Array<Review | null >,
+  nextToken?: string | null,
+};
+
+export type Review = {
+  __typename: "Review",
+  id: string,
+  product?: Product | null,
+  rating?: number | null,
+  content?: string | null,
+  isArchived?: boolean | null,
+  user?: User | null,
+  createdAt: string,
+  updatedAt: string,
+  productReviewsId?: string | null,
+  userReviewsId?: string | null,
+  owner?: string | null,
+};
+
+export type User = {
+  __typename: "User",
+  id: string,
+  username: string,
+  isArchived?: boolean | null,
+  reviews?: ModelReviewConnection | null,
+  createdAt: string,
+  updatedAt: string,
+  owner?: string | null,
+};
+
+export type ModelProductFilterInput = {
+  id?: ModelIDInput | null,
   name?: ModelStringInput | null,
   description?: ModelStringInput | null,
   price?: ModelStringInput | null,
-  and?: Array< ModelProductConditionInput | null > | null,
-  or?: Array< ModelProductConditionInput | null > | null,
-  not?: ModelProductConditionInput | null,
+  isArchived?: ModelBooleanInput | null,
+  and?: Array< ModelProductFilterInput | null > | null,
+  or?: Array< ModelProductFilterInput | null > | null,
+  not?: ModelProductFilterInput | null,
 };
 
-export type ModelStringInput = {
+export type ModelIDInput = {
   ne?: string | null,
   eq?: string | null,
   le?: string | null,
@@ -58,46 +98,51 @@ export type ModelSizeInput = {
   between?: Array< number | null > | null,
 };
 
-export type Product = {
-  __typename: "Product",
-  id: string,
-  name: string,
-  description?: string | null,
-  price?: string | null,
-  reviews?: ModelReviewConnection | null,
-  createdAt: string,
-  updatedAt: string,
-  owner?: string | null,
+export type ModelStringInput = {
+  ne?: string | null,
+  eq?: string | null,
+  le?: string | null,
+  lt?: string | null,
+  ge?: string | null,
+  gt?: string | null,
+  contains?: string | null,
+  notContains?: string | null,
+  between?: Array< string | null > | null,
+  beginsWith?: string | null,
+  attributeExists?: boolean | null,
+  attributeType?: ModelAttributeTypes | null,
+  size?: ModelSizeInput | null,
 };
 
-export type ModelReviewConnection = {
-  __typename: "ModelReviewConnection",
-  items:  Array<Review | null >,
+export type ModelBooleanInput = {
+  ne?: boolean | null,
+  eq?: boolean | null,
+  attributeExists?: boolean | null,
+  attributeType?: ModelAttributeTypes | null,
+};
+
+export type ModelProductConnection = {
+  __typename: "ModelProductConnection",
+  items:  Array<Product | null >,
   nextToken?: string | null,
 };
 
-export type Review = {
-  __typename: "Review",
-  id: string,
-  product?: Product | null,
-  rating?: number | null,
-  content?: string | null,
-  user?: User | null,
-  createdAt: string,
-  updatedAt: string,
-  productReviewsId?: string | null,
-  userReviewsId?: string | null,
-  owner?: string | null,
+export type CreateProductInput = {
+  id?: string | null,
+  name: string,
+  description?: string | null,
+  price?: string | null,
+  isArchived?: boolean | null,
 };
 
-export type User = {
-  __typename: "User",
-  id: string,
-  username: string,
-  reviews?: ModelReviewConnection | null,
-  createdAt: string,
-  updatedAt: string,
-  owner?: string | null,
+export type ModelProductConditionInput = {
+  name?: ModelStringInput | null,
+  description?: ModelStringInput | null,
+  price?: ModelStringInput | null,
+  isArchived?: ModelBooleanInput | null,
+  and?: Array< ModelProductConditionInput | null > | null,
+  or?: Array< ModelProductConditionInput | null > | null,
+  not?: ModelProductConditionInput | null,
 };
 
 export type UpdateProductInput = {
@@ -105,6 +150,7 @@ export type UpdateProductInput = {
   name?: string | null,
   description?: string | null,
   price?: string | null,
+  isArchived?: boolean | null,
 };
 
 export type DeleteProductInput = {
@@ -115,6 +161,7 @@ export type CreateReviewInput = {
   id?: string | null,
   rating?: number | null,
   content?: string | null,
+  isArchived?: boolean | null,
   productReviewsId?: string | null,
   userReviewsId?: string | null,
 };
@@ -122,6 +169,7 @@ export type CreateReviewInput = {
 export type ModelReviewConditionInput = {
   rating?: ModelIntInput | null,
   content?: ModelStringInput | null,
+  isArchived?: ModelBooleanInput | null,
   and?: Array< ModelReviewConditionInput | null > | null,
   or?: Array< ModelReviewConditionInput | null > | null,
   not?: ModelReviewConditionInput | null,
@@ -141,26 +189,11 @@ export type ModelIntInput = {
   attributeType?: ModelAttributeTypes | null,
 };
 
-export type ModelIDInput = {
-  ne?: string | null,
-  eq?: string | null,
-  le?: string | null,
-  lt?: string | null,
-  ge?: string | null,
-  gt?: string | null,
-  contains?: string | null,
-  notContains?: string | null,
-  between?: Array< string | null > | null,
-  beginsWith?: string | null,
-  attributeExists?: boolean | null,
-  attributeType?: ModelAttributeTypes | null,
-  size?: ModelSizeInput | null,
-};
-
 export type UpdateReviewInput = {
   id: string,
   rating?: number | null,
   content?: string | null,
+  isArchived?: boolean | null,
   productReviewsId?: string | null,
   userReviewsId?: string | null,
 };
@@ -172,10 +205,12 @@ export type DeleteReviewInput = {
 export type CreateUserInput = {
   id?: string | null,
   username: string,
+  isArchived?: boolean | null,
 };
 
 export type ModelUserConditionInput = {
   username?: ModelStringInput | null,
+  isArchived?: ModelBooleanInput | null,
   and?: Array< ModelUserConditionInput | null > | null,
   or?: Array< ModelUserConditionInput | null > | null,
   not?: ModelUserConditionInput | null,
@@ -184,32 +219,18 @@ export type ModelUserConditionInput = {
 export type UpdateUserInput = {
   id: string,
   username?: string | null,
+  isArchived?: boolean | null,
 };
 
 export type DeleteUserInput = {
   id: string,
 };
 
-export type ModelProductFilterInput = {
-  id?: ModelIDInput | null,
-  name?: ModelStringInput | null,
-  description?: ModelStringInput | null,
-  price?: ModelStringInput | null,
-  and?: Array< ModelProductFilterInput | null > | null,
-  or?: Array< ModelProductFilterInput | null > | null,
-  not?: ModelProductFilterInput | null,
-};
-
-export type ModelProductConnection = {
-  __typename: "ModelProductConnection",
-  items:  Array<Product | null >,
-  nextToken?: string | null,
-};
-
 export type ModelReviewFilterInput = {
   id?: ModelIDInput | null,
   rating?: ModelIntInput | null,
   content?: ModelStringInput | null,
+  isArchived?: ModelBooleanInput | null,
   and?: Array< ModelReviewFilterInput | null > | null,
   or?: Array< ModelReviewFilterInput | null > | null,
   not?: ModelReviewFilterInput | null,
@@ -220,6 +241,7 @@ export type ModelReviewFilterInput = {
 export type ModelUserFilterInput = {
   id?: ModelIDInput | null,
   username?: ModelStringInput | null,
+  isArchived?: ModelBooleanInput | null,
   and?: Array< ModelUserFilterInput | null > | null,
   or?: Array< ModelUserFilterInput | null > | null,
   not?: ModelUserFilterInput | null,
@@ -236,6 +258,7 @@ export type ModelSubscriptionProductFilterInput = {
   name?: ModelSubscriptionStringInput | null,
   description?: ModelSubscriptionStringInput | null,
   price?: ModelSubscriptionStringInput | null,
+  isArchived?: ModelSubscriptionBooleanInput | null,
   and?: Array< ModelSubscriptionProductFilterInput | null > | null,
   or?: Array< ModelSubscriptionProductFilterInput | null > | null,
 };
@@ -270,10 +293,16 @@ export type ModelSubscriptionStringInput = {
   notIn?: Array< string | null > | null,
 };
 
+export type ModelSubscriptionBooleanInput = {
+  ne?: boolean | null,
+  eq?: boolean | null,
+};
+
 export type ModelSubscriptionReviewFilterInput = {
   id?: ModelSubscriptionIDInput | null,
   rating?: ModelSubscriptionIntInput | null,
   content?: ModelSubscriptionStringInput | null,
+  isArchived?: ModelSubscriptionBooleanInput | null,
   and?: Array< ModelSubscriptionReviewFilterInput | null > | null,
   or?: Array< ModelSubscriptionReviewFilterInput | null > | null,
 };
@@ -293,8 +322,74 @@ export type ModelSubscriptionIntInput = {
 export type ModelSubscriptionUserFilterInput = {
   id?: ModelSubscriptionIDInput | null,
   username?: ModelSubscriptionStringInput | null,
+  isArchived?: ModelSubscriptionBooleanInput | null,
   and?: Array< ModelSubscriptionUserFilterInput | null > | null,
   or?: Array< ModelSubscriptionUserFilterInput | null > | null,
+};
+
+export type ArchiveProductMutationVariables = {
+  id: string,
+};
+
+export type ArchiveProductMutation = {
+  updateProduct?:  {
+    __typename: "Product",
+    id: string,
+    isArchived?: boolean | null,
+  } | null,
+};
+
+export type RestoreProductMutationVariables = {
+  id: string,
+};
+
+export type RestoreProductMutation = {
+  updateProduct?:  {
+    __typename: "Product",
+    id: string,
+    isArchived?: boolean | null,
+  } | null,
+};
+
+export type ListProductsWithReviewsQueryVariables = {
+  filter?: ModelProductFilterInput | null,
+  limit?: number | null,
+  nextToken?: string | null,
+};
+
+export type ListProductsWithReviewsQuery = {
+  listProducts?:  {
+    __typename: "ModelProductConnection",
+    items:  Array< {
+      __typename: "Product",
+      id: string,
+      name: string,
+      description?: string | null,
+      price?: string | null,
+      createdAt: string,
+      updatedAt: string,
+      owner?: string | null,
+      isArchived?: boolean | null,
+      reviews?:  {
+        __typename: "ModelReviewConnection",
+        items:  Array< {
+          __typename: "Review",
+          id: string,
+          rating?: number | null,
+          content?: string | null,
+          isArchived?: boolean | null,
+          user?:  {
+            __typename: "User",
+            id: string,
+            username: string,
+            isArchived?: boolean | null,
+          } | null,
+        } | null >,
+        nextToken?: string | null,
+      } | null,
+    } | null >,
+    nextToken?: string | null,
+  } | null,
 };
 
 export type CreateProductMutationVariables = {
@@ -309,6 +404,7 @@ export type CreateProductMutation = {
     name: string,
     description?: string | null,
     price?: string | null,
+    isArchived?: boolean | null,
     reviews?:  {
       __typename: "ModelReviewConnection",
       nextToken?: string | null,
@@ -331,6 +427,7 @@ export type UpdateProductMutation = {
     name: string,
     description?: string | null,
     price?: string | null,
+    isArchived?: boolean | null,
     reviews?:  {
       __typename: "ModelReviewConnection",
       nextToken?: string | null,
@@ -353,6 +450,7 @@ export type DeleteProductMutation = {
     name: string,
     description?: string | null,
     price?: string | null,
+    isArchived?: boolean | null,
     reviews?:  {
       __typename: "ModelReviewConnection",
       nextToken?: string | null,
@@ -378,16 +476,19 @@ export type CreateReviewMutation = {
       name: string,
       description?: string | null,
       price?: string | null,
+      isArchived?: boolean | null,
       createdAt: string,
       updatedAt: string,
       owner?: string | null,
     } | null,
     rating?: number | null,
     content?: string | null,
+    isArchived?: boolean | null,
     user?:  {
       __typename: "User",
       id: string,
       username: string,
+      isArchived?: boolean | null,
       createdAt: string,
       updatedAt: string,
       owner?: string | null,
@@ -415,16 +516,19 @@ export type UpdateReviewMutation = {
       name: string,
       description?: string | null,
       price?: string | null,
+      isArchived?: boolean | null,
       createdAt: string,
       updatedAt: string,
       owner?: string | null,
     } | null,
     rating?: number | null,
     content?: string | null,
+    isArchived?: boolean | null,
     user?:  {
       __typename: "User",
       id: string,
       username: string,
+      isArchived?: boolean | null,
       createdAt: string,
       updatedAt: string,
       owner?: string | null,
@@ -452,16 +556,19 @@ export type DeleteReviewMutation = {
       name: string,
       description?: string | null,
       price?: string | null,
+      isArchived?: boolean | null,
       createdAt: string,
       updatedAt: string,
       owner?: string | null,
     } | null,
     rating?: number | null,
     content?: string | null,
+    isArchived?: boolean | null,
     user?:  {
       __typename: "User",
       id: string,
       username: string,
+      isArchived?: boolean | null,
       createdAt: string,
       updatedAt: string,
       owner?: string | null,
@@ -484,6 +591,7 @@ export type CreateUserMutation = {
     __typename: "User",
     id: string,
     username: string,
+    isArchived?: boolean | null,
     reviews?:  {
       __typename: "ModelReviewConnection",
       nextToken?: string | null,
@@ -504,6 +612,7 @@ export type UpdateUserMutation = {
     __typename: "User",
     id: string,
     username: string,
+    isArchived?: boolean | null,
     reviews?:  {
       __typename: "ModelReviewConnection",
       nextToken?: string | null,
@@ -524,6 +633,7 @@ export type DeleteUserMutation = {
     __typename: "User",
     id: string,
     username: string,
+    isArchived?: boolean | null,
     reviews?:  {
       __typename: "ModelReviewConnection",
       nextToken?: string | null,
@@ -545,6 +655,7 @@ export type GetProductQuery = {
     name: string,
     description?: string | null,
     price?: string | null,
+    isArchived?: boolean | null,
     reviews?:  {
       __typename: "ModelReviewConnection",
       nextToken?: string | null,
@@ -570,6 +681,7 @@ export type ListProductsQuery = {
       name: string,
       description?: string | null,
       price?: string | null,
+      isArchived?: boolean | null,
       createdAt: string,
       updatedAt: string,
       owner?: string | null,
@@ -592,16 +704,19 @@ export type GetReviewQuery = {
       name: string,
       description?: string | null,
       price?: string | null,
+      isArchived?: boolean | null,
       createdAt: string,
       updatedAt: string,
       owner?: string | null,
     } | null,
     rating?: number | null,
     content?: string | null,
+    isArchived?: boolean | null,
     user?:  {
       __typename: "User",
       id: string,
       username: string,
+      isArchived?: boolean | null,
       createdAt: string,
       updatedAt: string,
       owner?: string | null,
@@ -628,6 +743,7 @@ export type ListReviewsQuery = {
       id: string,
       rating?: number | null,
       content?: string | null,
+      isArchived?: boolean | null,
       createdAt: string,
       updatedAt: string,
       productReviewsId?: string | null,
@@ -647,6 +763,7 @@ export type GetUserQuery = {
     __typename: "User",
     id: string,
     username: string,
+    isArchived?: boolean | null,
     reviews?:  {
       __typename: "ModelReviewConnection",
       nextToken?: string | null,
@@ -670,6 +787,7 @@ export type ListUsersQuery = {
       __typename: "User",
       id: string,
       username: string,
+      isArchived?: boolean | null,
       createdAt: string,
       updatedAt: string,
       owner?: string | null,
@@ -690,6 +808,7 @@ export type OnCreateProductSubscription = {
     name: string,
     description?: string | null,
     price?: string | null,
+    isArchived?: boolean | null,
     reviews?:  {
       __typename: "ModelReviewConnection",
       nextToken?: string | null,
@@ -712,6 +831,7 @@ export type OnUpdateProductSubscription = {
     name: string,
     description?: string | null,
     price?: string | null,
+    isArchived?: boolean | null,
     reviews?:  {
       __typename: "ModelReviewConnection",
       nextToken?: string | null,
@@ -734,6 +854,7 @@ export type OnDeleteProductSubscription = {
     name: string,
     description?: string | null,
     price?: string | null,
+    isArchived?: boolean | null,
     reviews?:  {
       __typename: "ModelReviewConnection",
       nextToken?: string | null,
@@ -759,16 +880,19 @@ export type OnCreateReviewSubscription = {
       name: string,
       description?: string | null,
       price?: string | null,
+      isArchived?: boolean | null,
       createdAt: string,
       updatedAt: string,
       owner?: string | null,
     } | null,
     rating?: number | null,
     content?: string | null,
+    isArchived?: boolean | null,
     user?:  {
       __typename: "User",
       id: string,
       username: string,
+      isArchived?: boolean | null,
       createdAt: string,
       updatedAt: string,
       owner?: string | null,
@@ -796,16 +920,19 @@ export type OnUpdateReviewSubscription = {
       name: string,
       description?: string | null,
       price?: string | null,
+      isArchived?: boolean | null,
       createdAt: string,
       updatedAt: string,
       owner?: string | null,
     } | null,
     rating?: number | null,
     content?: string | null,
+    isArchived?: boolean | null,
     user?:  {
       __typename: "User",
       id: string,
       username: string,
+      isArchived?: boolean | null,
       createdAt: string,
       updatedAt: string,
       owner?: string | null,
@@ -833,16 +960,19 @@ export type OnDeleteReviewSubscription = {
       name: string,
       description?: string | null,
       price?: string | null,
+      isArchived?: boolean | null,
       createdAt: string,
       updatedAt: string,
       owner?: string | null,
     } | null,
     rating?: number | null,
     content?: string | null,
+    isArchived?: boolean | null,
     user?:  {
       __typename: "User",
       id: string,
       username: string,
+      isArchived?: boolean | null,
       createdAt: string,
       updatedAt: string,
       owner?: string | null,
@@ -865,6 +995,7 @@ export type OnCreateUserSubscription = {
     __typename: "User",
     id: string,
     username: string,
+    isArchived?: boolean | null,
     reviews?:  {
       __typename: "ModelReviewConnection",
       nextToken?: string | null,
@@ -885,6 +1016,7 @@ export type OnUpdateUserSubscription = {
     __typename: "User",
     id: string,
     username: string,
+    isArchived?: boolean | null,
     reviews?:  {
       __typename: "ModelReviewConnection",
       nextToken?: string | null,
@@ -905,6 +1037,7 @@ export type OnDeleteUserSubscription = {
     __typename: "User",
     id: string,
     username: string,
+    isArchived?: boolean | null,
     reviews?:  {
       __typename: "ModelReviewConnection",
       nextToken?: string | null,

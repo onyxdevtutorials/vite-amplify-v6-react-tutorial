@@ -1,6 +1,5 @@
 import { getCurrentUser } from "aws-amplify/auth";
 import { useEffect } from "react";
-import { signOut } from "aws-amplify/auth";
 import { useNavigate } from "react-router-dom";
 import Navbar from "react-bootstrap/Navbar";
 import Container from "react-bootstrap/Container";
@@ -19,12 +18,12 @@ const Banner = () => {
     try {
       const currentUser = await getCurrentUser();
       console.log("currentUser", currentUser);
-      const { username } = currentUser;
-      const { userId } = currentUser;
-      const { signInDetails } = currentUser;
-      console.log("username", username);
-      console.log("userId", userId);
-      console.log("signInDetails", signInDetails);
+      // const { username } = currentUser;
+      // const { userId } = currentUser;
+      // const { signInDetails } = currentUser;
+      // console.log("username", username);
+      // console.log("userId", userId);
+      // console.log("signInDetails", signInDetails);
       setIsLoggedIn(true);
     } catch (error) {
       setIsLoggedIn(false);
@@ -34,16 +33,6 @@ const Banner = () => {
   useEffect(() => {
     currentAuthenticatedUser();
   }, []);
-
-  const handleSignOut = async () => {
-    try {
-      await signOut();
-      setIsLoggedIn(false);
-      navigate("/");
-    } catch (error) {
-      console.error("could not sign out", error);
-    }
-  };
 
   const handleSignUp = () => {
     navigate("/signup");

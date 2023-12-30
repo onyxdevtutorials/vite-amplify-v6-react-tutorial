@@ -1,22 +1,47 @@
-import React from "react";
+import React, { useState } from "react";
 import Card from "react-bootstrap/Card";
 import { useNavigate } from "react-router-dom";
 import { ProductWithReviews } from "../types";
+import { archiveProduct, restoreProduct } from "../graphql/customMutations";
+import { generateClient } from "aws-amplify/api";
 
 interface ProductProps {
   product: ProductWithReviews;
   isAdmin: boolean;
 }
 
+const client = generateClient();
+
 const Product: React.FC<ProductProps> = ({ product, isAdmin }) => {
   const navigate = useNavigate();
+  const [isArchived, setIsArchived] = useState(product.isArchived);
 
   const handleEdit = () => {
     navigate(`/edit/${product.id}`);
   };
 
-  const handleDelete = () => {
-    // Handle delete logic here
+  const handleArchiveOrRestore = async () => {
+    // Handle archive logic here
+    try {
+      if (isArchived) {
+        await client.graphql({
+          query: restoreProduct,
+          variables: {
+            input: { id: product.id, isArchived: false },
+          },
+        });
+      } else {
+        await client.graphql({
+          query: archiveProduct,
+          variables: {
+            input: { id: product.id, isArchived: true },
+          },
+        });
+      }
+      setIsArchived(!isArchived);
+    } catch (err) {
+      console.error("error updating product: ", err);
+    }
   };
 
   return (
@@ -33,7 +58,9 @@ const Product: React.FC<ProductProps> = ({ product, isAdmin }) => {
             {isAdmin && (
               <div>
                 <button onClick={handleEdit}>Edit</button>
-                <button onClick={handleDelete}>Delete</button>
+                <button onClick={handleArchiveOrRestore}>
+                  {isArchived ? "Restore" : "Archive"}
+                </button>
               </div>
             )}
           </div>

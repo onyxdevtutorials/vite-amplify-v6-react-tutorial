@@ -1,5 +1,5 @@
 export const listProductsWithReviews = /* GraphQL */ `
-  query ListProducts(
+  query ListProductsWithReviews(
     $filter: ModelProductFilterInput
     $limit: Int
     $nextToken: String
@@ -13,9 +13,18 @@ export const listProductsWithReviews = /* GraphQL */ `
         createdAt
         updatedAt
         owner
+        isArchived
         reviews {
           items {
             id
+            rating
+            content
+            isArchived
+            user {
+              id
+              username
+              isArchived
+            }
           }
           nextToken
         }
