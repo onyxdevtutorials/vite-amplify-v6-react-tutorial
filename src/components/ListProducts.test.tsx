@@ -31,6 +31,7 @@ vi.mock("aws-amplify/api", () => {
                 name: "Product 1",
                 description: "Description 1",
                 price: "10",
+                isArchived: false,
                 reviews: {
                   items: Array(5).fill({
                     id: "1",
@@ -43,6 +44,7 @@ vi.mock("aws-amplify/api", () => {
                 name: "Product 2",
                 description: "Description 2",
                 price: "20",
+                isArchived: false,
                 reviews: {
                   items: Array(3).fill({
                     id: "2",

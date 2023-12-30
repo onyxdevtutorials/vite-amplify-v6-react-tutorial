@@ -159,7 +159,7 @@ describe("EditProduct", () => {
   });
 
   test("displays an alert message if getting the product fails, e.g., the product doesn't exist", async () => {
-    vi.mocked(graphqlMock).mockImplementation(({ query, variables }) => {
+    vi.mocked(graphqlMock).mockImplementation(({ query }) => {
       if (query === getProduct) {
         return Promise.reject(new Error("Error getting product"));
       }
@@ -180,7 +180,7 @@ describe("EditProduct", () => {
   test("displays an alert message if updating the product fails", async () => {
     const user = userEvent.setup();
     // Mock successful fetch
-    vi.mocked(graphqlMock).mockImplementation(({ query, variables }) => {
+    vi.mocked(graphqlMock).mockImplementation(({ query }) => {
       if (query === updateProduct) {
         return Promise.reject(new Error("Error updating product"));
       } else if (query === getProduct) {

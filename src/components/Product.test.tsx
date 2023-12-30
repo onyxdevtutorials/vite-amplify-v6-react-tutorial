@@ -4,6 +4,7 @@ import userEvent from "@testing-library/user-event";
 import { MemoryRouter } from "react-router-dom";
 import Product from "./Product";
 import { ProductWithReviews, Review } from "../types";
+import { archiveProduct, restoreProduct } from "../graphql/customMutations";
 
 const mockProduct: ProductWithReviews = {
   __typename: "Product",
@@ -13,6 +14,7 @@ const mockProduct: ProductWithReviews = {
   name: "Test Product",
   description: "This is a test product",
   price: "9.99",
+  isArchived: false,
   reviews: {
     __typename: "ModelReviewConnection",
     items: [
@@ -36,6 +38,16 @@ vi.mock("react-router-dom", async () => {
   };
 });
 
+const { graphqlMock } = vi.hoisted(() => {
+  return { graphqlMock: vi.fn() };
+});
+
+vi.mock("aws-amplify/api", () => ({
+  generateClient: vi.fn(() => ({
+    graphql: graphqlMock,
+  })),
+}));
+
 describe("Product", () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -55,21 +67,21 @@ describe("Product", () => {
     expect(screen.getByText("9.99")).toBeInTheDocument();
     expect(screen.getByText("2 reviews")).toBeInTheDocument();
     expect(
-      screen.queryByRole("button", { name: /Edit/i })
+      screen.queryByRole("button", { name: /edit/i })
     ).not.toBeInTheDocument();
     expect(
-      screen.queryByRole("button", { name: /Delete/i })
+      screen.queryByRole("button", { name: /archive/i })
     ).not.toBeInTheDocument();
   });
 
-  test("renders edit and delete buttons for admin", () => {
+  test("renders edit and archive buttons for admin", () => {
     render(
       <MemoryRouter>
         <Product product={mockProduct} isAdmin={true} />
       </MemoryRouter>
     );
 
-    expect(screen.getByRole("button", { name: /Edit/i })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /edit/i })).toBeInTheDocument();
     expect(
       screen.getByRole("button", { name: /archive/i })
     ).toBeInTheDocument();
@@ -90,7 +102,66 @@ describe("Product", () => {
     expect(mockNavigate).toHaveBeenCalledWith("/edit/1");
   });
 
-  test("handles delete logic when delete button is clicked", () => {
-    // TODO: Implement the test logic for handleDelete function
+  test("handles archive logic when archive button is clicked", async () => {
+    const user = userEvent.setup();
+
+    vi.mocked(graphqlMock).mockResolvedValueOnce({});
+
+    render(
+      <MemoryRouter>
+        <Product product={mockProduct} isAdmin={true} />
+      </MemoryRouter>
+    );
+
+    const archiveButton = await screen.findByRole("button", {
+      name: /Archive/i,
+    });
+
+    expect(archiveButton).toBeInTheDocument();
+
+    await user.click(archiveButton);
+
+    expect(graphqlMock).toHaveBeenCalledWith({
+      query: archiveProduct,
+      variables: { id: mockProduct.id },
+    });
+
+    expect(
+      await screen.findByRole("button", { name: /Restore/i })
+    ).toBeInTheDocument();
+  });
+
+  test("handles restore logic when restore button is clicked", async () => {
+    const user = userEvent.setup();
+
+    const archivedProduct = {
+      ...mockProduct,
+      isArchived: true,
+    };
+
+    vi.mocked(graphqlMock).mockResolvedValueOnce({});
+
+    render(
+      <MemoryRouter>
+        <Product product={archivedProduct} isAdmin={true} />
+      </MemoryRouter>
+    );
+
+    const restoreButton = await screen.findByRole("button", {
+      name: /restore/i,
+    });
+
+    expect(restoreButton).toBeInTheDocument();
+
+    await user.click(restoreButton);
+
+    expect(graphqlMock).toHaveBeenCalledWith({
+      query: restoreProduct,
+      variables: { id: mockProduct.id },
+    });
+
+    expect(
+      await screen.findByRole("button", { name: /archive/i })
+    ).toBeInTheDocument();
   });
 });

@@ -21,21 +21,16 @@ const Product: React.FC<ProductProps> = ({ product, isAdmin }) => {
   };
 
   const handleArchiveOrRestore = async () => {
-    // Handle archive logic here
     try {
       if (isArchived) {
         await client.graphql({
           query: restoreProduct,
-          variables: {
-            input: { id: product.id, isArchived: false },
-          },
+          variables: { id: product.id },
         });
       } else {
         await client.graphql({
           query: archiveProduct,
-          variables: {
-            input: { id: product.id, isArchived: true },
-          },
+          variables: { id: product.id },
         });
       }
       setIsArchived(!isArchived);
