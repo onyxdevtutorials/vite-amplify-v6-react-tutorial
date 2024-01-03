@@ -392,6 +392,40 @@ export type ListProductsWithReviewsQuery = {
   } | null,
 };
 
+export type GetProductWithReviewsQueryVariables = {
+  id: string,
+};
+
+export type GetProductWithReviewsQuery = {
+  getProduct?:  {
+    __typename: "Product",
+    id: string,
+    name: string,
+    description?: string | null,
+    price?: string | null,
+    isArchived?: boolean | null,
+    reviews?:  {
+      __typename: "ModelReviewConnection",
+      items:  Array< {
+        __typename: "Review",
+        id: string,
+        rating?: number | null,
+        content?: string | null,
+        isArchived?: boolean | null,
+        createdAt: string,
+        updatedAt: string,
+        productReviewsId?: string | null,
+        userReviewsId?: string | null,
+        owner?: string | null,
+      } | null >,
+      nextToken?: string | null,
+    } | null,
+    createdAt: string,
+    updatedAt: string,
+    owner?: string | null,
+  } | null,
+};
+
 export type CreateProductMutationVariables = {
   input: CreateProductInput,
   condition?: ModelProductConditionInput | null,

@@ -33,3 +33,35 @@ export const listProductsWithReviews = /* GraphQL */ `
     }
   }
 `;
+
+export const getProductWithReviews = /* GraphQL */ `
+  query GetProductWithReviews($id: ID!) {
+    getProduct(id: $id) {
+      id
+      name
+      description
+      price
+      isArchived
+      reviews {
+        items {
+          id
+          rating
+          content
+          isArchived
+          createdAt
+          updatedAt
+          productReviewsId
+          userReviewsId
+          owner
+          __typename
+        }
+        nextToken
+        __typename
+      }
+      createdAt
+      updatedAt
+      owner
+      __typename
+    }
+  }
+`;
