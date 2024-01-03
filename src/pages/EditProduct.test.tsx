@@ -14,7 +14,7 @@ vi.mock("react-router-dom", async () => {
     ...router,
     useParams: vi
       .fn()
-      .mockReturnValue({ id: "372db325-5f72-49fa-ba8c-ab628c0ed470" }),
+      .mockReturnValue({ productId: "372db325-5f72-49fa-ba8c-ab628c0ed470" }),
   };
 });
 
@@ -53,13 +53,14 @@ describe("EditProduct", () => {
       name: "Test Product",
       description: "Test Description",
       price: "10.99",
-      id: "372db325-5f72-49fa-ba8c-ab628c0ed470",
+      productId: "372db325-5f72-49fa-ba8c-ab628c0ed470",
     };
 
     const newValues = {
       name: "Test Product",
       description: "New Test Description",
       price: "10.99",
+      productId: "372db325-5f72-49fa-ba8c-ab628c0ed470",
     };
 
     vi.mocked(graphqlMock)
@@ -80,22 +81,29 @@ describe("EditProduct", () => {
       </MemoryRouter>
     );
 
-    await waitFor(() => {
+    await waitFor(async () => {
       expect(
-        screen.getByRole("form", { name: /^edit product form$/i })
+        await screen.findByRole("form", { name: /^edit product form$/i })
       ).toBeInTheDocument();
-      const productNameInput = screen.getByRole("textbox", {
-        name: /product name/i,
-      });
-      const descriptionInput = screen.getByRole("textbox", {
-        name: /description/i,
-      });
-      const priceInput = screen.getByRole("textbox", { name: /price/i });
-
-      expect(productNameInput).toHaveValue("Test Product");
-      expect(descriptionInput).toHaveValue("Test Description");
-      expect(priceInput).toHaveValue("10.99");
     });
+
+    expect(graphqlMock).toHaveBeenCalledTimes(1);
+    expect(graphqlMock.mock.calls[0][0]).toEqual({
+      query: getProduct,
+      variables: { id: "372db325-5f72-49fa-ba8c-ab628c0ed470" },
+    });
+
+    const productNameInput = await screen.findByRole("textbox", {
+      name: /product name/i,
+    });
+    const descriptionInput = await screen.findByRole("textbox", {
+      name: /description/i,
+    });
+    const priceInput = await screen.findByRole("textbox", { name: /price/i });
+
+    expect(productNameInput).toHaveValue("Test Product");
+    expect(descriptionInput).toHaveValue("Test Description");
+    expect(priceInput).toHaveValue("10.99");
   });
 
   test("calls graphql() with updated product data when form is submitted", async () => {
@@ -145,7 +153,7 @@ describe("EditProduct", () => {
     await user.click(screen.getByRole("button", { name: /update/i }));
 
     // Assert that graphql() was called with the updated product data
-    await waitFor(() => {
+    waitFor(() => {
       expect(graphqlMock.mock.calls[1][0]).toEqual({
         query: updateProduct,
         variables: {
@@ -172,6 +180,7 @@ describe("EditProduct", () => {
     );
 
     const alert = await screen.findByRole("alert");
+    screen.debug();
 
     expect(alert).toBeInTheDocument();
     expect(alert).toHaveTextContent("Error getting product");
@@ -179,6 +188,7 @@ describe("EditProduct", () => {
 
   test("displays an alert message if updating the product fails", async () => {
     const user = userEvent.setup();
+
     // Mock successful fetch
     vi.mocked(graphqlMock).mockImplementation(({ query }) => {
       if (query === updateProduct) {
@@ -225,7 +235,6 @@ describe("EditProduct", () => {
     await user.click(screen.getByRole("button", { name: /update/i }));
 
     const alert = await screen.findByRole("alert");
-
     expect(alert).toBeInTheDocument();
     expect(alert).toHaveTextContent("Error updating product");
   });

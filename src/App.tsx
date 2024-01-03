@@ -4,11 +4,17 @@ import {
   HomeLayout,
   Landing,
   AddProduct,
+  AddReview,
   EditProduct,
+  EditReview,
   SignUp,
   SignUpConfirm,
   SignIn,
   ChangePassword,
+  ProductDetail,
+  ProductDelete,
+  ReviewDetail,
+  DeleteReview,
 } from "./pages";
 import { Authenticator } from "@aws-amplify/ui-react";
 import "@aws-amplify/ui-react/styles.css";
@@ -25,7 +31,7 @@ const router = createBrowserRouter([
         element: <Landing />,
       },
       {
-        path: "add",
+        path: "products/new",
         element: (
           <Authenticator>
             <AddProduct />
@@ -33,13 +39,69 @@ const router = createBrowserRouter([
         ),
       },
       {
-        path: "edit/:id",
+        path: "products/:productId",
+        element: (
+          <Authenticator>
+            <ProductDetail />
+          </Authenticator>
+        ),
+      },
+      {
+        path: "products/:productId/edit",
         element: (
           <Authenticator>
             <EditProduct />
           </Authenticator>
         ),
       },
+      {
+        path: "products/:productId/delete",
+        element: (
+          <Authenticator>
+            <ProductDelete />
+          </Authenticator>
+        ),
+      },
+      {
+        path: "reviews/new",
+        element: (
+          <Authenticator>
+            <AddReview />
+          </Authenticator>
+        ),
+      },
+      {
+        path: "reviews/:reviewId",
+        element: (
+          <Authenticator>
+            <ReviewDetail />
+          </Authenticator>
+        ),
+      },
+      {
+        path: "reviews/:reviewId/edit",
+        element: (
+          <Authenticator>
+            <EditReview />
+          </Authenticator>
+        ),
+      },
+      {
+        path: "reviews/:reviewId/delete",
+        element: (
+          <Authenticator>
+            <DeleteReview />
+          </Authenticator>
+        ),
+      },
+      // {
+      //   path: "edit/:id",
+      //   element: (
+      //     <Authenticator>
+      //       <EditProduct />
+      //     </Authenticator>
+      //   ),
+      // },
       {
         path: "signup",
         element: <SignUp />,
