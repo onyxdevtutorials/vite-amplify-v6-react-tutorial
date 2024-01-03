@@ -1,21 +1,21 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { generateClient, GraphQLResult } from "aws-amplify/api";
-import { getProduct } from "../graphql/queries";
-import { GetProductQuery, ModelReviewConnection } from "../types";
 import useCheckForUser from "../hooks/useCheckForUser";
 import useIsAdmin from "../hooks/useIsAdmin";
 import { Button, Card } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import { archiveProduct, restoreProduct } from "../graphql/customMutations";
+import { getProductWithReviews } from "../graphql/customQueries";
+import { GetProductWithReviewsQuery } from "../API";
 
 const client = generateClient();
 
 function ProductDetail() {
   const { productId } = useParams<{ productId: string }>();
-  const [product, setProduct] = useState<GetProductQuery["getProduct"] | null>(
-    null
-  );
+  const [product, setProduct] = useState<
+    GetProductWithReviewsQuery["getProduct"] | null
+  >(null);
   const [errorMessage, setErrorMessage] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const { isAdmin } = useIsAdmin();
@@ -30,15 +30,15 @@ function ProductDetail() {
       }
 
       try {
-        const result: GraphQLResult<GetProductQuery> = await client.graphql({
-          query: getProduct,
+        const result = (await client.graphql({
+          query: getProductWithReviews,
           variables: { id: productId },
           authMode: isLoggedIn ? "userPool" : "iam",
-        });
+        })) as GraphQLResult<GetProductWithReviewsQuery>;
 
         const productData = result.data?.getProduct;
         console.log("productData: ", productData);
-        if (!productData || !("items" in productData)) {
+        if (!productData || result.errors) {
           setErrorMessage("Could not get product with ID: " + productId);
           return;
         }

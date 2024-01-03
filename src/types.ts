@@ -1,4 +1,4 @@
-import { ModelReviewConnection, Product, Review } from "./API";
+import { ModelReviewConnection, Product } from "./API";
 
 export type {
   Product,
