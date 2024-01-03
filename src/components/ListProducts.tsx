@@ -4,11 +4,8 @@ import { useEffect, useState, useCallback } from "react";
 import { Product as ProductComponent } from "./index";
 import useIsAdmin from "../hooks/useIsAdmin";
 import useCheckForUser from "../hooks/useCheckForUser";
-import {
-  ProductWithReviews,
-  ListProductsQueryWithReviews,
-  Product as ProductType,
-} from "../types";
+import { ProductWithReviews } from "../types";
+import { ListProductsWithReviewsQuery } from "../API";
 
 const client = generateClient();
 
@@ -27,23 +24,24 @@ const ListProducts = () => {
         authMode: isLoggedIn ? "userPool" : "iam",
         // Fetch the reviews for each product
         variables: { limit: 1000 },
-      })) as { data: ListProductsQueryWithReviews };
+      })) as { data: ListProductsWithReviewsQuery };
 
       if (productsData.data?.listProducts?.items) {
         const productsWithReviewCount = productsData.data.listProducts.items
+          .map((product) => {
+            if (product) {
+              const reviewCount = product.reviews?.items.length || 0;
+              return {
+                ...product,
+                reviewCount,
+              };
+            }
+          })
           .filter(
-            (product: ProductType): product is NonNullable<typeof product> =>
-              product !== null
-          )
-          .map((product: ProductType) => {
-            const reviewCount = product.reviews?.items.length || 0;
-            return {
-              ...product,
-              reviewCount,
-            };
-          });
+            (product): product is ProductWithReviews => product !== undefined
+          );
 
-        setProducts(productsWithReviewCount || []);
+        setProducts(productsWithReviewCount);
       }
     } catch (error) {
       console.error("error fetching products", error);
