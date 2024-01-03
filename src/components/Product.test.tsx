@@ -99,7 +99,7 @@ describe("Product", () => {
     const editButton = await screen.findByRole("button", { name: /Edit/i });
 
     await user.click(editButton);
-    expect(mockNavigate).toHaveBeenCalledWith("/edit/1");
+    expect(mockNavigate).toHaveBeenCalledWith("/products/1/edit");
   });
 
   test("handles archive logic when archive button is clicked", async () => {

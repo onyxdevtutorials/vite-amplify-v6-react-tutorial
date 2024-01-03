@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { ProductWithReviews } from "../types";
 import { archiveProduct, restoreProduct } from "../graphql/customMutations";
 import { generateClient } from "aws-amplify/api";
+import { Button } from "react-bootstrap";
 
 interface ProductProps {
   product: ProductWithReviews;
@@ -17,7 +18,7 @@ const Product: React.FC<ProductProps> = ({ product, isAdmin }) => {
   const [isArchived, setIsArchived] = useState(product.isArchived);
 
   const handleEdit = () => {
-    navigate(`/edit/${product.id}`);
+    navigate(`/products/${product.id}/edit`);
   };
 
   const handleArchiveOrRestore = async () => {
@@ -52,10 +53,13 @@ const Product: React.FC<ProductProps> = ({ product, isAdmin }) => {
           <div>
             {isAdmin && (
               <div>
-                <button onClick={handleEdit}>Edit</button>
-                <button onClick={handleArchiveOrRestore}>
+                <Button onClick={handleEdit}>Edit</Button>
+                <Button onClick={handleArchiveOrRestore}>
                   {isArchived ? "Restore" : "Archive"}
-                </button>
+                </Button>
+                <Button onClick={() => navigate(`/products/${product.id}`)}>
+                  Detail
+                </Button>
               </div>
             )}
           </div>

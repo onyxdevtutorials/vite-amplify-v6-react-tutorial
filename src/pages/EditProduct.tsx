@@ -10,6 +10,7 @@ import { Link, useParams } from "react-router-dom";
 import { generateClient, GraphQLResult } from "aws-amplify/api";
 import { updateProduct } from "../graphql/mutations";
 import { getProduct } from "../graphql/queries";
+import { GetProductQuery } from "../API";
 
 const validationSchema = yup.object().shape({
   name: yup.string().required("Required"),
@@ -30,7 +31,9 @@ const EditProduct = () => {
   const [errorMessage, setErrorMessage] = useState("");
   const [loading, setLoading] = useState(true);
   const [showToast, setShowToast] = useState(false);
-  const { id } = useParams<{ id: string }>();
+  const { productId } = useParams<{ productId: string }>();
+
+  console.log("Edit Product page productId: ", productId);
   const initialFormValues = {
     name: "",
     description: "",
@@ -39,9 +42,9 @@ const EditProduct = () => {
   };
 
   const onSubmit = async (values: Product) => {
-    if (!id) return;
+    if (!productId) return;
     const { name, description, price } = values;
-    const product = { name, description, price, id };
+    const product = { name, description, price, id: productId };
     try {
       await client.graphql({
         query: updateProduct,
@@ -52,7 +55,7 @@ const EditProduct = () => {
       setShowToast(true);
     } catch (err) {
       console.error("error updating product: ", err);
-      setErrorMessage("Error updating product id: " + id);
+      setErrorMessage("Error updating product id: " + productId);
     }
   };
 
@@ -74,17 +77,23 @@ const EditProduct = () => {
   useEffect(() => {
     const fetchProduct = async () => {
       try {
-        if (!id) return;
-        const result = (await client.graphql({
+        if (!productId) return;
+        const result: GraphQLResult<GetProductQuery> = await client.graphql({
           query: getProduct,
-          variables: { id },
-        })) as GraphQLResult<{ getProduct: Product }>;
+          variables: { id: productId },
+        });
         const productData = result.data?.getProduct;
         if (!productData) {
           setErrorMessage("Error getting product");
           return;
         }
-        resetForm({ values: productData });
+        const name = productData.name || "";
+        const description = productData.description || "";
+        const price = productData.price || "";
+        const id = productData.id || "";
+        const formValues = { name, description, price, id };
+        console.log("formValues: ", formValues);
+        resetForm({ values: formValues });
       } catch (err) {
         console.error("error getting product:", err);
         setErrorMessage("Error getting product");
@@ -93,7 +102,7 @@ const EditProduct = () => {
       }
     };
     fetchProduct();
-  }, [id, resetForm]);
+  }, [productId, resetForm]);
 
   if (loading) {
     return (
