@@ -1,18 +1,21 @@
 import { useState, useEffect, useCallback } from "react";
-import { getCurrentUser } from "aws-amplify/auth";
+import { AuthUser, getCurrentUser } from "aws-amplify/auth";
 
 const useCheckForUser = () => {
   const initialIsLoggedIn = localStorage.getItem("isLoggedIn") === "true";
   const [isLoggedIn, setIsLoggedIn] = useState(initialIsLoggedIn);
+  const [user, setUser] = useState<AuthUser | null>(null);
 
   const checkUser = useCallback(async () => {
     try {
-      await getCurrentUser();
+      const currentUser = await getCurrentUser();
       setIsLoggedIn(true);
+      setUser(currentUser);
       localStorage.setItem("isLoggedIn", "true");
     } catch (err) {
       console.error(err);
       setIsLoggedIn(false);
+      setUser(null);
       localStorage.setItem("isLoggedIn", "false");
     }
   }, []);
@@ -21,7 +24,7 @@ const useCheckForUser = () => {
     checkUser();
   }, [checkUser]);
 
-  return { isLoggedIn, checkUser };
+  return { isLoggedIn, user, checkUser };
 };
 
 export default useCheckForUser;
