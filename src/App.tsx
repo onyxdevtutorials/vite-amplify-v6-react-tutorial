@@ -63,7 +63,7 @@ const router = createBrowserRouter([
         ),
       },
       {
-        path: "reviews/new",
+        path: "products/:productId/reviews/new",
         element: (
           <Authenticator>
             <AddReview />
