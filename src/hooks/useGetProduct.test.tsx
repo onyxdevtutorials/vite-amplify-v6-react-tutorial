@@ -1,8 +1,8 @@
 import { renderHook, waitFor } from "@testing-library/react";
-import { describe, test, expect, vi } from "vitest";
+import { describe, test, expect, vi, beforeEach } from "vitest";
 import useGetProduct from "./useGetProduct";
 
-vi.mock("aws-amplify/api");
+// vi.mock("aws-amplify/api");
 
 vi.mock("aws-amplify/auth");
 
@@ -33,6 +33,10 @@ const mockProduct = {
 };
 
 describe("useGetProduct", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
   test("should return product when getProduct resolves", async () => {
     vi.mocked(graphqlMock).mockResolvedValueOnce({
       data: {
@@ -50,7 +54,12 @@ describe("useGetProduct", () => {
   });
 
   test("should return error message when getProduct rejects", async () => {
-    vi.mocked(graphqlMock).mockRejectedValueOnce(new Error("Error"));
+    vi.mocked(graphqlMock).mockResolvedValueOnce({
+      data: {
+        getProduct: null,
+      },
+      errors: ["error fetching product"],
+    });
 
     const { result } = renderHook(() =>
       useGetProduct("372db325-5f72-49fa-ba8c-ab628c0ed470")

@@ -6,7 +6,7 @@ import { GetProductQuery } from "../API";
 
 const client = generateClient();
 
-const useGetProduct = (productId: string) => {
+const useGetProduct = (productId: string | undefined) => {
   const [product, setProduct] = useState<GetProductQuery["getProduct"]>(null);
   const [errorMessage, setErrorMessage] = useState("");
   const [isLoading, setIsLoading] = useState(true);
@@ -15,6 +15,8 @@ const useGetProduct = (productId: string) => {
   useEffect(() => {
     const fetchProduct = async () => {
       if (!productId) {
+        setErrorMessage("No product ID provided");
+        setIsLoading(false);
         console.error("no product id provided");
         return;
       }
@@ -25,11 +27,11 @@ const useGetProduct = (productId: string) => {
           variables: { id: productId },
           authMode: isLoggedIn ? "userPool" : "iam",
         })) as GraphQLResult<GetProductQuery>;
-        console.log("result: ", result);
+        // console.log("result: ", result);
         const productData = result.data?.getProduct;
         // console.log("productData: ", productData);
         if (!productData || result.errors) {
-          setErrorMessage("Could not get product with ID: " + productId);
+          setErrorMessage("Error fetching product with ID: " + productId);
           return;
         }
 
