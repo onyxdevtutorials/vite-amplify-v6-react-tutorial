@@ -94,24 +94,37 @@ function ProductDetail() {
   }
 
   return (
-    <Card>
-      <Card.Body>
-        <Card.Title>{product?.name}</Card.Title>
-        <Card.Text>{product?.description}</Card.Text>
-        <Card.Text>{product?.price}</Card.Text>
-        <p>{product?.reviews?.items?.length || 0} reviews</p>
-        <div>
-          {isAdmin && (
-            <div>
-              <Button onClick={handleEdit}>Edit</Button>
-              <Button onClick={handleArchiveOrRestore}>
-                {product?.isArchived ? "Restore" : "Archive"}
-              </Button>
-            </div>
-          )}
-        </div>
-      </Card.Body>
-    </Card>
+    <>
+      <Card>
+        <Card.Body>
+          <Card.Title>{product?.name}</Card.Title>
+          <Card.Text>{product?.description}</Card.Text>
+          <Card.Text>{product?.price}</Card.Text>
+          <p>{product?.reviews?.items?.length || 0} reviews</p>
+          <div>
+            {isAdmin && (
+              <div>
+                <Button onClick={handleEdit}>Edit</Button>
+                <Button onClick={handleArchiveOrRestore}>
+                  {product?.isArchived ? "Restore" : "Archive"}
+                </Button>
+              </div>
+            )}
+          </div>
+        </Card.Body>
+      </Card>
+      <h2>Reviews</h2>
+      {product?.reviews?.items?.length === 0 && <p>No reviews yet</p>}
+      {product?.reviews?.items?.map((review) => (
+        <Card key={review?.id}>
+          <Card.Body>
+            <Card.Title>{review?.owner}</Card.Title>
+            <Card.Text>{review?.content}</Card.Text>
+            <Card.Text>{review?.rating}</Card.Text>
+          </Card.Body>
+        </Card>
+      ))}
+    </>
   );
 }
 

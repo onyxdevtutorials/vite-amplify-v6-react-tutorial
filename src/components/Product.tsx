@@ -1,13 +1,13 @@
 import React, { useState } from "react";
 import Card from "react-bootstrap/Card";
 import { useNavigate } from "react-router-dom";
-import { ProductWithReviews } from "../types";
+import { Product } from "../types";
 import { archiveProduct, restoreProduct } from "../graphql/customMutations";
 import { generateClient } from "aws-amplify/api";
 import { Button } from "react-bootstrap";
 
 interface ProductProps {
-  product: ProductWithReviews;
+  product: Product;
   isAdmin: boolean;
 }
 
@@ -57,11 +57,13 @@ const Product: React.FC<ProductProps> = ({ product, isAdmin }) => {
                 <Button onClick={handleArchiveOrRestore}>
                   {isArchived ? "Restore" : "Archive"}
                 </Button>
-                <Button onClick={() => navigate(`/products/${product.id}`)}>
-                  Detail
-                </Button>
               </div>
             )}
+            <div>
+              <Button onClick={() => navigate(`/products/${product.id}`)}>
+                Detail
+              </Button>
+            </div>
           </div>
         </Card.Body>
       </Card>
