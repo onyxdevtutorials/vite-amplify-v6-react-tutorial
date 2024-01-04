@@ -3,10 +3,10 @@ import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { MemoryRouter } from "react-router-dom";
 import Product from "./Product";
-import { ProductWithReviews, Review } from "../types";
+import { Product as ProductType, Review } from "../types";
 import { archiveProduct, restoreProduct } from "../graphql/customMutations";
 
-const mockProduct: ProductWithReviews = {
+const mockProduct: ProductType = {
   __typename: "Product",
   createdAt: "2022-01-01T00:00:00Z",
   updatedAt: "2022-01-01T00:00:00Z",
