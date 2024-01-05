@@ -92,7 +92,7 @@ describe("ProductDetail", () => {
     vi.clearAllMocks();
   });
 
-  test.only("renders product details", async () => {
+  test("renders product details", async () => {
     vi.mocked(useCheckForUser).mockResolvedValue({
       isLoggedIn: true,
       user: { userId: "1", username: "testuser" },
