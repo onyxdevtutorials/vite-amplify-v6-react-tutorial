@@ -20,6 +20,8 @@ import { Authenticator } from "@aws-amplify/ui-react";
 import "@aws-amplify/ui-react/styles.css";
 import Container from "react-bootstrap/Container";
 import { AuthContextProvider } from "./context/AuthContext";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const router = createBrowserRouter([
   {
@@ -40,11 +42,7 @@ const router = createBrowserRouter([
       },
       {
         path: "products/:productId",
-        element: (
-          <Authenticator>
-            <ProductDetail />
-          </Authenticator>
-        ),
+        element: <ProductDetail />,
       },
       {
         path: "products/:productId/edit",
@@ -128,6 +126,7 @@ const App = () => {
       <AuthContextProvider>
         <Container className="p-3">
           <RouterProvider router={router} />
+          <ToastContainer />
         </Container>
       </AuthContextProvider>
     </React.StrictMode>
