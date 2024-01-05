@@ -1,13 +1,13 @@
 import React, { useState } from "react";
 import Card from "react-bootstrap/Card";
 import { useNavigate } from "react-router-dom";
-import { Product } from "../types";
+import { Product as ProductType } from "../types";
 import { archiveProduct, restoreProduct } from "../graphql/customMutations";
 import { generateClient } from "aws-amplify/api";
 import { Button } from "react-bootstrap";
 
 interface ProductProps {
-  product: Product;
+  product: ProductType;
   isAdmin: boolean;
 }
 
