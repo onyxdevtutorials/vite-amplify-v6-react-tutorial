@@ -4,8 +4,15 @@ import { MemoryRouter } from "react-router-dom";
 import ChangePassword from "./ChangePassword";
 import userEvent from "@testing-library/user-event";
 import * as awsAmplifyAuth from "aws-amplify/auth";
+import { toast } from "react-toastify";
 
 vi.mock("aws-amplify/auth");
+
+vi.mock("react-toastify", () => ({
+  toast: {
+    success: vi.fn(),
+  },
+}));
 
 describe("ChangePassword", () => {
   beforeEach(() => {
@@ -65,9 +72,9 @@ describe("ChangePassword", () => {
       newPassword: "newpassword",
     });
 
-    expect(
-      screen.getByText("Password changed successfully")
-    ).toBeInTheDocument();
+    expect(vi.mocked(toast.success)).toHaveBeenCalledWith(
+      "Password changed successfully"
+    );
   });
 
   test("displays error message when password update fails because user entered incorrect old password", async () => {
