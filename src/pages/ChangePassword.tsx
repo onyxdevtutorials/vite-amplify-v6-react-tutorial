@@ -7,8 +7,7 @@ import {
 import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
 import Alert from "react-bootstrap/Alert";
-import { ToastContainer } from "react-bootstrap";
-import { Toast } from "react-bootstrap";
+import { toast } from "react-toastify";
 import { useFormik } from "formik";
 import * as yup from "yup";
 import { useNavigate } from "react-router-dom";
@@ -30,7 +29,6 @@ const validationSchema = yup.object().shape({
 const ChangePassword = () => {
   const navigate = useNavigate();
   const [username, setUsername] = useState("");
-  const [showToast, setShowToast] = useState(false);
 
   useEffect(() => {
     const checkUser = async () => {
@@ -51,7 +49,7 @@ const ChangePassword = () => {
   }: UpdatePasswordInput) => {
     try {
       await updatePassword({ oldPassword, newPassword });
-      setShowToast(true);
+      toast.success("Password changed successfully");
     } catch (error) {
       const authError = error as AuthError;
       console.error(`Problem updating password: ${authError.message}`);
@@ -121,22 +119,6 @@ const ChangePassword = () => {
           </Button>
         </div>
       </Form>
-      <ToastContainer position="top-center" style={{ zIndex: 1 }}>
-        <Toast
-          onClose={() => setShowToast(false)}
-          show={showToast}
-          delay={3000}
-          autohide
-          bg="success"
-        >
-          <Toast.Header style={{ justifyContent: "space-between" }}>
-            <strong>Success</strong>
-          </Toast.Header>
-          <Toast.Body style={{ color: "white" }}>
-            Password changed successfully
-          </Toast.Body>
-        </Toast>
-      </ToastContainer>
       {changePasswordError && (
         <Alert variant="danger">{changePasswordError}</Alert>
       )}
