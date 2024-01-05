@@ -1,8 +1,7 @@
 import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
 import Alert from "react-bootstrap/Alert";
-import { ToastContainer } from "react-bootstrap";
-import Toast from "react-bootstrap/Toast";
+import { toast } from "react-toastify";
 import { useState, useEffect } from "react";
 import { useFormik } from "formik";
 import * as yup from "yup";
@@ -30,7 +29,6 @@ const client = generateClient();
 const EditProduct = () => {
   const [errorMessage, setErrorMessage] = useState("");
   const [loading, setLoading] = useState(true);
-  const [showToast, setShowToast] = useState(false);
   const { productId } = useParams<{ productId: string }>();
 
   console.log("Edit Product page productId: ", productId);
@@ -52,7 +50,7 @@ const EditProduct = () => {
           input: product,
         },
       });
-      setShowToast(true);
+      toast.success("Product updated successfully");
     } catch (err) {
       console.error("error updating product: ", err);
       setErrorMessage("Error updating product id: " + productId);
@@ -171,22 +169,6 @@ const EditProduct = () => {
       <Alert variant="danger" show={!!errorMessage}>
         {errorMessage}
       </Alert>
-      <ToastContainer position="top-center" style={{ zIndex: 1 }}>
-        <Toast
-          onClose={() => setShowToast(false)}
-          show={showToast}
-          delay={3000}
-          autohide
-          bg="success"
-        >
-          <Toast.Header style={{ justifyContent: "space-between" }}>
-            <strong>Success</strong>
-          </Toast.Header>
-          <Toast.Body style={{ color: "white" }}>
-            Product updated successfully
-          </Toast.Body>
-        </Toast>
-      </ToastContainer>
     </>
   );
 };
