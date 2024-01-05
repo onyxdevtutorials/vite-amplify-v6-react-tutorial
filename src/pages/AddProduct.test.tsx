@@ -4,6 +4,7 @@ import AddProduct from "./AddProduct";
 import { MemoryRouter } from "react-router-dom";
 import userEvent from "@testing-library/user-event";
 import { createProduct } from "../graphql/mutations";
+import { toast } from "react-toastify";
 
 const { graphqlMock } = vi.hoisted(() => {
   return { graphqlMock: vi.fn() };
@@ -13,6 +14,12 @@ vi.mock("aws-amplify/api", () => ({
   generateClient: () => ({
     graphql: graphqlMock,
   }),
+}));
+
+vi.mock("react-toastify", () => ({
+  toast: {
+    success: vi.fn(),
+  },
 }));
 
 describe("AddProduct", () => {
@@ -83,7 +90,9 @@ describe("AddProduct", () => {
       },
     });
 
-    // Assert that the success toast is displayed
-    expect(screen.getByText("Product added successfully")).toBeInTheDocument();
+    // Assert that the success toast is called
+    expect(vi.mocked(toast.success)).toHaveBeenCalledWith(
+      "Product added successfully"
+    );
   });
 });
