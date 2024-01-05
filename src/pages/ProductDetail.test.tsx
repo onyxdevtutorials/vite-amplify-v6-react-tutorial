@@ -113,5 +113,29 @@ describe("ProductDetail", () => {
     });
 
     screen.debug();
+
+    expect(screen.getByText("Test Product")).toBeInTheDocument();
+
+    expect(screen.getByText("This is a test product")).toBeInTheDocument();
+
+    expect(screen.getByText("9.99")).toBeInTheDocument();
+
+    expect(screen.getByText("2 reviews")).toBeInTheDocument();
+
+    expect(
+      screen.getByRole("heading", { level: 2, name: "Reviews" })
+    ).toBeInTheDocument();
+
+    expect(screen.getByText("John Doe")).toBeInTheDocument();
+
+    expect(screen.getByText("Great product!")).toBeInTheDocument();
+
+    expect(screen.getByText("Rating: 5")).toBeInTheDocument();
+
+    expect(screen.getByText("Jane Smith")).toBeInTheDocument();
+
+    expect(screen.getByText("Not so good")).toBeInTheDocument();
+
+    expect(screen.getByText("Rating: 2")).toBeInTheDocument();
   });
 });

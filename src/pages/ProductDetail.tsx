@@ -120,7 +120,7 @@ function ProductDetail() {
           <Card.Body>
             <Card.Title>{review?.owner}</Card.Title>
             <Card.Text>{review?.content}</Card.Text>
-            <Card.Text>{review?.rating}</Card.Text>
+            <Card.Text>Rating: {review?.rating}</Card.Text>
           </Card.Body>
         </Card>
       ))}
