@@ -126,6 +126,8 @@ const EditReview = () => {
           <Form.Label>Rating</Form.Label>
           <Form.Control
             type="number"
+            min={1}
+            max={5}
             name="rating"
             placeholder="Enter rating"
             onChange={handleChange}

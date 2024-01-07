@@ -77,6 +77,8 @@ const AddReview = () => {
               <Form.Label>Rating</Form.Label>
               <Form.Control
                 type="number"
+                min={1}
+                max={5}
                 name="rating"
                 placeholder="1-5"
                 value={values.rating}
