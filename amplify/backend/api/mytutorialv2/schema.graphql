@@ -5,6 +5,7 @@ type Product
       { allow: owner }
       { allow: private, provider: userPools, operations: [read] }
       { allow: public, provider: iam, operations: [read] }
+      { allow: groups, groups: ["admin"] }
     ]
   ) {
   id: ID!
@@ -22,6 +23,7 @@ type Review
       { allow: owner }
       { allow: private, provider: userPools, operations: [read] }
       { allow: public, provider: iam, operations: [read] }
+      { allow: groups, groups: ["admin"] }
     ]
   ) {
   id: ID!
@@ -39,6 +41,7 @@ type User
       { allow: owner }
       { allow: private, provider: userPools, operations: [read] }
       { allow: public, provider: iam, operations: [read] }
+      { allow: groups, groups: ["admin"] }
     ]
   ) {
   id: ID!
