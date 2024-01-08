@@ -4,7 +4,7 @@ import userEvent from "@testing-library/user-event";
 import { MemoryRouter } from "react-router-dom";
 import { updateReview } from "../graphql/mutations";
 import EditReview from "./EditReview";
-import { getReview } from "../graphql/queries";
+import { toast } from "react-toastify";
 
 vi.mock("react-router-dom", async () => {
   const router = await vi.importActual<typeof import("react-router-dom")>(
@@ -40,6 +40,12 @@ const newValues = {
   content: "Test Review Updated",
   rating: 3,
 };
+
+vi.mock("react-toastify", () => ({
+  toast: {
+    success: vi.fn(),
+  },
+}));
 
 describe("EditReview", () => {
   beforeEach(() => {
@@ -162,5 +168,10 @@ describe("EditReview", () => {
         },
       });
     });
+
+    // Assert that the success toast is called
+    expect(vi.mocked(toast.success)).toHaveBeenCalledWith(
+      "Review updated successfully"
+    );
   });
 });
