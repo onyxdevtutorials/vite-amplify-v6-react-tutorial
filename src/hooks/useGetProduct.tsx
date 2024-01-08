@@ -22,6 +22,7 @@ const useGetProduct = (productId: string | undefined) => {
       }
 
       try {
+        setIsLoading(true);
         const result = (await client.graphql({
           query: getProduct,
           variables: { id: productId },
