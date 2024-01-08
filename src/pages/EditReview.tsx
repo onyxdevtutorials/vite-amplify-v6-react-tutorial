@@ -140,7 +140,7 @@ const EditReview = () => {
           </Form.Control.Feedback>
         </Form.Group>
         <Button variant="primary" type="submit" disabled={isSubmitting}>
-          Submit
+          Update
         </Button>
       </Form>
     </div>
