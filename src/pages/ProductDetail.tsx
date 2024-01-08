@@ -91,7 +91,7 @@ function ProductDetail() {
   const handleEditReview = (reviewId: string | undefined) => {
     if (!reviewId) return;
 
-    navigate(`reviews/${reviewId}/edit`);
+    navigate(`/reviews/${reviewId}/edit`);
   };
 
   const handleDeleteReview = async () => {
