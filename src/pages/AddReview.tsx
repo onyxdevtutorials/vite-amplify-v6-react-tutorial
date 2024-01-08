@@ -1,6 +1,6 @@
 import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
-import { useEffect, useState } from "react";
+import Spinner from "react-bootstrap/Spinner";
 import { useFormik } from "formik";
 import * as yup from "yup";
 import { generateClient } from "aws-amplify/api";
@@ -8,8 +8,8 @@ import { createReview } from "../graphql/mutations";
 import { useParams } from "react-router-dom";
 import useGetProduct from "../hooks/useGetProduct";
 import { Card } from "react-bootstrap";
-import { Review } from "../API";
 import useCheckForUser from "../hooks/useCheckForUser";
+import { toast } from "react-toastify";
 
 const validationSchema = yup.object().shape({
   rating: yup.number().required("Required"),
@@ -20,9 +20,8 @@ const client = generateClient();
 
 const AddReview = () => {
   const { productId } = useParams<{ productId: string }>();
-  const { product, loading } = useGetProduct(productId);
+  const { product, isLoading } = useGetProduct(productId);
   const { user } = useCheckForUser();
-  console.log("user: ", user);
 
   const {
     values,
@@ -53,11 +52,17 @@ const AddReview = () => {
             input: reviewInput,
           },
         });
+        toast.success("Review added successfully");
       } catch (err) {
-        console.error("error creating review:", err);
+        console.error("error creating review: ", err);
+        toast.error("Error creating review");
       }
     },
   });
+
+  if (isLoading) {
+    return <Spinner animation="border" />;
+  }
 
   return (
     <>
