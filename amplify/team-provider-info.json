@@ -38,6 +38,9 @@
       },
       "api": {
         "mytutorialv2": {}
+      },
+      "storage": {
+        "productimages": {}
       }
     }
   }

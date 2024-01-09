@@ -19,6 +19,7 @@ export const getProduct = /* GraphQL */ `query GetProduct($id: ID!) {
       nextToken
       __typename
     }
+    image
     createdAt
     updatedAt
     owner
@@ -41,6 +42,7 @@ export const listProducts = /* GraphQL */ `query ListProducts(
       description
       price
       isArchived
+      image
       createdAt
       updatedAt
       owner
@@ -63,6 +65,7 @@ export const getReview = /* GraphQL */ `query GetReview($id: ID!) {
       description
       price
       isArchived
+      image
       createdAt
       updatedAt
       owner

@@ -22,6 +22,7 @@ export const onCreateProduct = /* GraphQL */ `subscription OnCreateProduct(
       nextToken
       __typename
     }
+    image
     createdAt
     updatedAt
     owner
@@ -46,6 +47,7 @@ export const onUpdateProduct = /* GraphQL */ `subscription OnUpdateProduct(
       nextToken
       __typename
     }
+    image
     createdAt
     updatedAt
     owner
@@ -70,6 +72,7 @@ export const onDeleteProduct = /* GraphQL */ `subscription OnDeleteProduct(
       nextToken
       __typename
     }
+    image
     createdAt
     updatedAt
     owner
@@ -92,6 +95,7 @@ export const onCreateReview = /* GraphQL */ `subscription OnCreateReview(
       description
       price
       isArchived
+      image
       createdAt
       updatedAt
       owner
@@ -133,6 +137,7 @@ export const onUpdateReview = /* GraphQL */ `subscription OnUpdateReview(
       description
       price
       isArchived
+      image
       createdAt
       updatedAt
       owner
@@ -174,6 +179,7 @@ export const onDeleteReview = /* GraphQL */ `subscription OnDeleteReview(
       description
       price
       isArchived
+      image
       createdAt
       updatedAt
       owner
