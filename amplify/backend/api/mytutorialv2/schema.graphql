@@ -14,6 +14,7 @@ type Product
   price: String
   isArchived: Boolean
   reviews: [Review] @hasMany
+  image: String
 }
 
 type Review

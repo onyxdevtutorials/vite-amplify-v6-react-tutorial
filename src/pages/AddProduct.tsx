@@ -1,3 +1,4 @@
+import { uploadData } from "aws-amplify/storage";
 import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
 import { toast } from "react-toastify";
@@ -18,20 +19,46 @@ const initialValues = {
   name: "",
   description: "",
   price: "",
+  image: null,
 };
 
 type Product = {
   name: string;
   description: string;
   price: string;
+  image: File | null;
 };
 
 const client = generateClient();
 
 const AddProduct = () => {
+  const [imageKey, setImageKey] = useState<string>("");
+
+  const onProgress = (progress: any) => {
+    console.log("progress:", progress);
+  };
+
+  const handleFileSelect: React.ChangeEventHandler<HTMLInputElement> = async (
+    event
+  ) => {
+    if (event?.target?.files) {
+      const file = event.target.files[0];
+      const result = await uploadData({
+        key: file.name,
+        data: file,
+        options: {
+          accessLevel: "guest",
+          onProgress,
+        },
+      }).result;
+      setImageKey(result.key);
+      console.log("upload succeeded: ", result);
+    }
+  };
   const onSubmit = async (values: Product) => {
     const { name, description, price } = values;
-    const product = { name, description, price };
+    const product = { name, description, price, image: imageKey };
+    console.log("product:", product);
     try {
       await client.graphql({
         query: createProduct,
@@ -103,6 +130,20 @@ const AddProduct = () => {
           />
           <Form.Control.Feedback type="invalid">
             {errors.price}
+          </Form.Control.Feedback>
+        </Form.Group>
+        <Form.Group controlId="productImage">
+          <Form.Label>Image</Form.Label>
+          <Form.Control
+            type="file"
+            name="image"
+            onChange={(e) => handleFileSelect(e)}
+            onBlur={handleBlur}
+            isInvalid={!!errors.image && touched.image}
+            required
+          />
+          <Form.Control.Feedback type="invalid">
+            {errors.image}
           </Form.Control.Feedback>
         </Form.Group>
         <Button type="submit" variant="primary" disabled={isSubmitting}>

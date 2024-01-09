@@ -35,6 +35,7 @@ export default function ProductUpdateForm(props) {
     description: "",
     price: "",
     isArchived: false,
+    image: "",
   };
   const [name, setName] = React.useState(initialValues.name);
   const [description, setDescription] = React.useState(
@@ -42,6 +43,7 @@ export default function ProductUpdateForm(props) {
   );
   const [price, setPrice] = React.useState(initialValues.price);
   const [isArchived, setIsArchived] = React.useState(initialValues.isArchived);
+  const [image, setImage] = React.useState(initialValues.image);
   const [errors, setErrors] = React.useState({});
   const resetStateValues = () => {
     const cleanValues = productRecord
@@ -51,6 +53,7 @@ export default function ProductUpdateForm(props) {
     setDescription(cleanValues.description);
     setPrice(cleanValues.price);
     setIsArchived(cleanValues.isArchived);
+    setImage(cleanValues.image);
     setErrors({});
   };
   const [productRecord, setProductRecord] = React.useState(productModelProp);
@@ -74,6 +77,7 @@ export default function ProductUpdateForm(props) {
     description: [],
     price: [],
     isArchived: [],
+    image: [],
   };
   const runValidationTasks = async (
     fieldName,
@@ -105,6 +109,7 @@ export default function ProductUpdateForm(props) {
           description: description ?? null,
           price: price ?? null,
           isArchived: isArchived ?? null,
+          image: image ?? null,
         };
         const validationResponses = await Promise.all(
           Object.keys(validations).reduce((promises, fieldName) => {
@@ -169,6 +174,7 @@ export default function ProductUpdateForm(props) {
               description,
               price,
               isArchived,
+              image,
             };
             const result = onChange(modelFields);
             value = result?.name ?? value;
@@ -196,6 +202,7 @@ export default function ProductUpdateForm(props) {
               description: value,
               price,
               isArchived,
+              image,
             };
             const result = onChange(modelFields);
             value = result?.description ?? value;
@@ -223,6 +230,7 @@ export default function ProductUpdateForm(props) {
               description,
               price: value,
               isArchived,
+              image,
             };
             const result = onChange(modelFields);
             value = result?.price ?? value;
@@ -250,6 +258,7 @@ export default function ProductUpdateForm(props) {
               description,
               price,
               isArchived: value,
+              image,
             };
             const result = onChange(modelFields);
             value = result?.isArchived ?? value;
@@ -264,6 +273,34 @@ export default function ProductUpdateForm(props) {
         hasError={errors.isArchived?.hasError}
         {...getOverrideProps(overrides, "isArchived")}
       ></SwitchField>
+      <TextField
+        label="Image"
+        isRequired={false}
+        isReadOnly={false}
+        value={image}
+        onChange={(e) => {
+          let { value } = e.target;
+          if (onChange) {
+            const modelFields = {
+              name,
+              description,
+              price,
+              isArchived,
+              image: value,
+            };
+            const result = onChange(modelFields);
+            value = result?.image ?? value;
+          }
+          if (errors.image?.hasError) {
+            runValidationTasks("image", value);
+          }
+          setImage(value);
+        }}
+        onBlur={() => runValidationTasks("image", image)}
+        errorMessage={errors.image?.errorMessage}
+        hasError={errors.image?.hasError}
+        {...getOverrideProps(overrides, "image")}
+      ></TextField>
       <Flex
         justifyContent="space-between"
         {...getOverrideProps(overrides, "CTAFlex")}

@@ -22,6 +22,7 @@ export const createProduct = /* GraphQL */ `mutation CreateProduct(
       nextToken
       __typename
     }
+    image
     createdAt
     updatedAt
     owner
@@ -46,6 +47,7 @@ export const updateProduct = /* GraphQL */ `mutation UpdateProduct(
       nextToken
       __typename
     }
+    image
     createdAt
     updatedAt
     owner
@@ -70,6 +72,7 @@ export const deleteProduct = /* GraphQL */ `mutation DeleteProduct(
       nextToken
       __typename
     }
+    image
     createdAt
     updatedAt
     owner
@@ -92,6 +95,7 @@ export const createReview = /* GraphQL */ `mutation CreateReview(
       description
       price
       isArchived
+      image
       createdAt
       updatedAt
       owner
@@ -133,6 +137,7 @@ export const updateReview = /* GraphQL */ `mutation UpdateReview(
       description
       price
       isArchived
+      image
       createdAt
       updatedAt
       owner
@@ -174,6 +179,7 @@ export const deleteReview = /* GraphQL */ `mutation DeleteReview(
       description
       price
       isArchived
+      image
       createdAt
       updatedAt
       owner
