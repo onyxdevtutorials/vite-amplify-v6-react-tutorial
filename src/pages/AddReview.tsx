@@ -45,13 +45,16 @@ const AddReview = () => {
         productReviewsId: productId,
         userReviewsId: user?.userId,
       };
+
       try {
-        await client.graphql({
+        const graphqlObject = {
           query: createReview,
           variables: {
             input: reviewInput,
           },
-        });
+        };
+
+        await client.graphql(graphqlObject);
         toast.success("Review added successfully");
       } catch (err) {
         console.error("error creating review: ", err);
@@ -112,7 +115,11 @@ const AddReview = () => {
                 {errors.content}
               </Form.Control.Feedback>
             </Form.Group>
-            <Button variant="primary" type="submit" disabled={isSubmitting}>
+            <Button
+              variant="primary"
+              type="submit"
+              disabled={isSubmitting || Object.keys(errors).length > 0}
+            >
               Submit
             </Button>
           </Form>
