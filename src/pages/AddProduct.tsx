@@ -1,8 +1,7 @@
 import { TransferProgressEvent, uploadData } from "aws-amplify/storage";
-import ProgressBar from "react-bootstrap/ProgressBar";
 import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
-import { toast } from "react-toastify";
+import { toast, Id } from "react-toastify";
 import { useState } from "react";
 import { useFormik } from "formik";
 import * as yup from "yup";
@@ -14,6 +13,7 @@ const validationSchema = yup.object().shape({
   name: yup.string().required("Required"),
   description: yup.string().required("Required"),
   price: yup.string().required("Required"),
+  image: yup.string().nullable(),
 });
 
 const initialValues = {
@@ -34,16 +34,30 @@ const client = generateClient();
 
 const AddProduct = () => {
   const [imageKey, setImageKey] = useState<string>("");
-  const [progress, setProgress] = useState<number | null>(null);
+
+  let loadingToastId: Id | null = null;
 
   const onProgress = (event: TransferProgressEvent) => {
     const { transferredBytes, totalBytes } = event;
     if (!transferredBytes || !totalBytes) return;
 
-    if (transferredBytes === totalBytes) setProgress(null);
+    const progress = Math.round((transferredBytes / totalBytes) * 100);
 
-    console.log(`progress: ${transferredBytes}/${totalBytes}`);
-    setProgress(Math.round((transferredBytes / totalBytes) * 100));
+    if (loadingToastId === null) {
+      loadingToastId = toast.info(`Upload progress: ${progress}%`, {
+        progress: progress / 100,
+        autoClose: false,
+      });
+    } else {
+      toast.update(loadingToastId, {
+        render: `Upload progress: ${progress}%`,
+        progress: progress / 100,
+      });
+    }
+
+    if (transferredBytes === totalBytes) {
+      toast.done(loadingToastId);
+    }
   };
 
   const handleFileSelect: React.ChangeEventHandler<HTMLInputElement> = async (
@@ -51,6 +65,13 @@ const AddProduct = () => {
   ) => {
     if (event?.target?.files) {
       const file = event.target.files[0];
+      const validImageTypes = ["image/jpg", "image/jpeg", "image/png"];
+
+      if (!validImageTypes.includes(file.type)) {
+        toast.error("Unsupported file type");
+        return;
+      }
+
       try {
         const uploadOutput = await uploadData({
           key: file.name,
@@ -63,7 +84,6 @@ const AddProduct = () => {
 
         const result = await uploadOutput.result;
         setImageKey(result.key);
-        setProgress(null);
         toast.success("Image uploaded successfully");
         console.log("upload succeeded: ", result);
       } catch (err) {
@@ -155,17 +175,9 @@ const AddProduct = () => {
             type="file"
             name="image"
             onChange={handleFileSelect}
-            // onChange={(e) =>
-            //   handleFileSelect(e as React.ChangeEvent<HTMLInputElement>)
-            // }
             onBlur={handleBlur}
             isInvalid={!!errors.image && touched.image}
           />
-          <div>
-            {progress !== null && (
-              <ProgressBar now={progress} label={`${progress}%`} />
-            )}
-          </div>
           <Form.Control.Feedback type="invalid">
             {errors.image}
           </Form.Control.Feedback>
