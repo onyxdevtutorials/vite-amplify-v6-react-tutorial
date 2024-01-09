@@ -5,6 +5,9 @@ import { MemoryRouter } from "react-router-dom";
 import userEvent from "@testing-library/user-event";
 import { createProduct } from "../graphql/mutations";
 import { toast } from "react-toastify";
+import { uploadData, UploadDataOutput } from "aws-amplify/storage";
+
+vi.mock("aws-amplify/storage");
 
 const { graphqlMock } = vi.hoisted(() => {
   return { graphqlMock: vi.fn() };
@@ -94,5 +97,38 @@ describe("AddProduct", () => {
     expect(vi.mocked(toast.success)).toHaveBeenCalledWith(
       "Product added successfully"
     );
+  });
+
+  test.only("should call uploadData() when a file is selected", async () => {
+    const user = userEvent.setup();
+
+    vi.mocked(uploadData).mockResolvedValue({
+      cancel: vi.fn(),
+      pause: vi.fn(),
+      resume: vi.fn(),
+      state: "complete",
+      result: Promise.resolve({ key: "chucknorris.png" }),
+    } as unknown as UploadDataOutput);
+
+    const file = new File(["(⌐□_□)"], "chucknorris.png", {
+      type: "image/png",
+    });
+
+    render(
+      <MemoryRouter>
+        <AddProduct />
+      </MemoryRouter>
+    );
+
+    await user.upload(screen.getByLabelText("Image"), file);
+
+    expect(uploadData).toHaveBeenCalledWith({
+      key: file.name,
+      data: file,
+      options: {
+        accessLevel: "guest",
+        onProgress: expect.any(Function),
+      },
+    });
   });
 });

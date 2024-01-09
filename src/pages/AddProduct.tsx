@@ -52,14 +52,16 @@ const AddProduct = () => {
     if (event?.target?.files) {
       const file = event.target.files[0];
       try {
-        const result = await uploadData({
+        const uploadOutput = await uploadData({
           key: file.name,
           data: file,
           options: {
             accessLevel: "guest",
             onProgress,
           },
-        }).result;
+        });
+
+        const result = await uploadOutput.result;
         setImageKey(result.key);
         setProgress(null);
         toast.success("Image uploaded successfully");
