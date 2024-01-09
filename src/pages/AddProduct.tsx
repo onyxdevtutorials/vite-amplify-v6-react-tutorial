@@ -1,4 +1,5 @@
-import { uploadData } from "aws-amplify/storage";
+import { TransferProgressEvent, uploadData } from "aws-amplify/storage";
+import ProgressBar from "react-bootstrap/ProgressBar";
 import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
 import { toast } from "react-toastify";
@@ -33,26 +34,40 @@ const client = generateClient();
 
 const AddProduct = () => {
   const [imageKey, setImageKey] = useState<string>("");
+  const [progress, setProgress] = useState<number | null>(null);
 
-  const onProgress = (progress: any) => {
-    console.log("progress:", progress);
+  const onProgress = (event: TransferProgressEvent) => {
+    const { transferredBytes, totalBytes } = event;
+    if (!transferredBytes || !totalBytes) return;
+
+    if (transferredBytes === totalBytes) setProgress(null);
+
+    console.log(`progress: ${transferredBytes}/${totalBytes}`);
+    setProgress(Math.round((transferredBytes / totalBytes) * 100));
   };
 
   const handleFileSelect: React.ChangeEventHandler<HTMLInputElement> = async (
-    event
+    event: React.ChangeEvent<HTMLInputElement>
   ) => {
     if (event?.target?.files) {
       const file = event.target.files[0];
-      const result = await uploadData({
-        key: file.name,
-        data: file,
-        options: {
-          accessLevel: "guest",
-          onProgress,
-        },
-      }).result;
-      setImageKey(result.key);
-      console.log("upload succeeded: ", result);
+      try {
+        const result = await uploadData({
+          key: file.name,
+          data: file,
+          options: {
+            accessLevel: "guest",
+            onProgress,
+          },
+        }).result;
+        setImageKey(result.key);
+        setProgress(null);
+        toast.success("Image uploaded successfully");
+        console.log("upload succeeded: ", result);
+      } catch (err) {
+        console.error("error uploading image:", err);
+        toast.error("Error uploading image");
+      }
     }
   };
   const onSubmit = async (values: Product) => {
@@ -137,11 +152,18 @@ const AddProduct = () => {
           <Form.Control
             type="file"
             name="image"
-            onChange={(e) => handleFileSelect(e)}
+            onChange={handleFileSelect}
+            // onChange={(e) =>
+            //   handleFileSelect(e as React.ChangeEvent<HTMLInputElement>)
+            // }
             onBlur={handleBlur}
             isInvalid={!!errors.image && touched.image}
-            required
           />
+          <div>
+            {progress !== null && (
+              <ProgressBar now={progress} label={`${progress}%`} />
+            )}
+          </div>
           <Form.Control.Feedback type="invalid">
             {errors.image}
           </Form.Control.Feedback>
