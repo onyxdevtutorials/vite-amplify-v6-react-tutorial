@@ -6,32 +6,37 @@ import Button from "react-bootstrap/Button";
 import { toast, Id } from "react-toastify";
 import { useState } from "react";
 
+interface OnFormSubmitValues {
+  name: string;
+  description: string;
+  price: string;
+  imageKey: string;
+}
+
 type FormValues = {
   name: string;
   description: string;
   price: string;
-  image: File | null;
 };
 
 type ProductFormProps = {
   initialValues: FormValues;
   onSubmit: (
     values: FormValues,
-    imageKey: string,
     formikHelpers: FormikHelpers<FormValues>
   ) => void;
 };
 
+// image is part of the form, but formik doesn't really "do" file uploads
 const validationSchema = yup.object().shape({
   name: yup.string().required("Required"),
   description: yup.string().required("Required"),
   price: yup.string().required("Required"),
-  image: yup.string().nullable(),
 });
 
 const ProductForm: React.FC<ProductFormProps> = ({
   initialValues,
-  onSubmit,
+  onSubmit: onFormSubmit,
 }) => {
   const [imageKey, setImageKey] = useState<string>("");
   let loadingToastId: Id | null = null;
@@ -54,8 +59,10 @@ const ProductForm: React.FC<ProductFormProps> = ({
   } = useFormik({
     initialValues,
     validationSchema,
-    onSubmit: (values, formikHelpers) =>
-      onSubmit(values, imageKey, formikHelpers),
+    onSubmit: (values, formikHelpers) => {
+      const valuesWithImageKey: OnFormSubmitValues = { ...values, imageKey };
+      onFormSubmit(valuesWithImageKey, formikHelpers);
+    },
   });
 
   const onProgress = (event: TransferProgressEvent) => {
@@ -170,11 +177,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
           name="image"
           onChange={handleFileSelect}
           onBlur={handleBlur}
-          isInvalid={!!errors.image && touched.image}
         />
-        <Form.Control.Feedback type="invalid">
-          {errors.image}
-        </Form.Control.Feedback>
       </Form.Group>
       <Button type="submit" disabled={isSubmitting}>
         Submit

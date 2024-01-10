@@ -15,10 +15,10 @@ const initialValues = {
 const client = generateClient();
 
 const AddProduct = () => {
-  const onSubmit = async (values: FormikValues, imageKey: string) => {
-    const { name, description, price } = values;
-    const product = { name, description, price, image: imageKey };
-    console.log("product:", product);
+  const onSubmit = async (values: FormikValues) => {
+    const { name, description, price, image } = values;
+    const product = { name, description, price, image };
+
     try {
       await client.graphql({
         query: createProduct,
