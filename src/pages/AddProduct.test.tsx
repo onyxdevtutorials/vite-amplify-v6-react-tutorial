@@ -99,7 +99,7 @@ describe("AddProduct", () => {
     );
   });
 
-  test.only("should call uploadData() when a file is selected", async () => {
+  test("should call uploadData() when a file is selected", async () => {
     const user = userEvent.setup();
 
     vi.mocked(uploadData).mockResolvedValue({
