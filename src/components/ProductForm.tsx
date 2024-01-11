@@ -1,22 +1,23 @@
 import { TransferProgressEvent, uploadData } from "aws-amplify/storage";
-import { FormikHelpers, useFormik, useFormikContext } from "formik";
+import { FormikHelpers, useFormik } from "formik";
 import * as yup from "yup";
 import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
 import { toast, Id } from "react-toastify";
-import { useState } from "react";
+// import { useState } from "react";
 
 interface OnFormSubmitValues {
   name: string;
   description: string;
   price: string;
-  imageKey: string;
+  image: string;
 }
 
 type FormValues = {
   name: string;
   description: string;
   price: string;
+  image?: string;
 };
 
 type ProductFormProps = {
@@ -43,7 +44,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
   onRemoveImage,
 }) => {
   console.log("ProductForm initialImageKey: ", initialImageKey);
-  const [imageKey, setImageKey] = useState<string>("");
+  // const [imageKey, setImageKey] = useState<string>(initialImageKey || "");
   let loadingToastId: Id | null = null;
 
   const handleSubmitWithImageKey: React.FormEventHandler<HTMLFormElement> = (
@@ -66,7 +67,10 @@ const ProductForm: React.FC<ProductFormProps> = ({
     initialValues,
     validationSchema,
     onSubmit: (values, formikHelpers) => {
-      const valuesWithImageKey: OnFormSubmitValues = { ...values, imageKey };
+      const valuesWithImageKey: OnFormSubmitValues = {
+        ...values,
+        image: values.image || initialImageKey || "",
+      };
       onFormSubmit(valuesWithImageKey, formikHelpers);
     },
   });
@@ -117,6 +121,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
         });
 
         const result = await uploadOutput.result;
+        console.log("upload result: ", result);
         // setImageKey(result.key);
         setFieldValue("image", result.key);
         toast.success("Image uploaded successfully");
@@ -131,7 +136,11 @@ const ProductForm: React.FC<ProductFormProps> = ({
   };
 
   return (
-    <Form onSubmit={handleSubmitWithImageKey} noValidate>
+    <Form
+      onSubmit={handleSubmitWithImageKey}
+      noValidate
+      aria-label="product form"
+    >
       <Form.Group controlId="productName">
         <Form.Label>Product Name</Form.Label>
         <Form.Control
@@ -182,7 +191,9 @@ const ProductForm: React.FC<ProductFormProps> = ({
         <Form.Control
           type="file"
           name="image"
-          onChange={(event) => handleFileSelect(event, setFieldValue)}
+          onChange={(event) =>
+            handleFileSelect(event as React.ChangeEvent<HTMLInputElement>)
+          }
           onBlur={handleBlur}
         />
         {initialImageKey && (

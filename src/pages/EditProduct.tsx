@@ -1,20 +1,11 @@
 import { toast } from "react-toastify";
-import { useState, useEffect } from "react";
-import { FormikValues, useFormik } from "formik";
+import { useEffect } from "react";
+import { FormikValues } from "formik";
 import { Link, useParams } from "react-router-dom";
-import { generateClient, GraphQLResult } from "aws-amplify/api";
+import { generateClient } from "aws-amplify/api";
 import { updateProduct } from "../graphql/mutations";
-import { getProduct } from "../graphql/queries";
-import { GetProductQuery } from "../API";
 import useGetProduct from "../hooks/useGetProduct";
 import ProductForm from "../components/ProductForm";
-
-type Product = {
-  name: string;
-  description: string;
-  price: string;
-  id: string;
-};
 
 const client = generateClient();
 
@@ -25,6 +16,12 @@ const EditProduct = () => {
     errorMessage: getProductErrorMessage,
     isLoading,
   } = useGetProduct(productId);
+
+  useEffect(() => {
+    if (getProductErrorMessage) {
+      toast.error(getProductErrorMessage);
+    }
+  }, [getProductErrorMessage]);
 
   console.log("Edit Product page productId: ", product);
   const initialFormValues = {
