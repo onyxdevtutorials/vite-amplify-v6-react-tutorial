@@ -4,8 +4,8 @@ import { render, screen, waitFor } from "@testing-library/react";
 import { MemoryRouter, useParams } from "react-router-dom";
 import { updateProduct } from "../graphql/mutations";
 import EditProduct from "./EditProduct";
-import { getProduct } from "../graphql/queries";
 import useGetProduct from "../hooks/useGetProduct";
+import { toast } from "react-toastify";
 
 vi.mock("react-router-dom", async () => {
   const router = await vi.importActual<typeof import("react-router-dom")>(
@@ -40,7 +40,23 @@ vi.mock("../hooks/useGetProduct", () => {
 });
 
 const { graphqlMock } = vi.hoisted(() => {
-  return { graphqlMock: vi.fn() };
+  return {
+    graphqlMock: vi.fn().mockImplementation((query, variables) => {
+      if (query === updateProduct) {
+        return Promise.resolve({
+          data: {
+            updateProduct: {
+              name: "Test Product",
+              description: "New Test Description",
+              price: "10.99",
+              id: "372db325-5f72-49fa-ba8c-ab628c0ed470",
+              image: "chuck-norris.jpg",
+            },
+          },
+        });
+      }
+    }),
+  };
 });
 
 vi.mock("aws-amplify/api", () => ({
@@ -50,6 +66,14 @@ vi.mock("aws-amplify/api", () => ({
 }));
 
 vi.mock("aws-amplify/auth");
+
+vi.mock("react-toastify", () => ({
+  toast: {
+    success: vi.fn(),
+    info: vi.fn(),
+    error: vi.fn(),
+  },
+}));
 
 const mockProduct = {
   name: "Test Product",
@@ -77,7 +101,9 @@ describe("EditProduct", () => {
       productId: "372db325-5f72-49fa-ba8c-ab628c0ed470",
     };
 
-    vi.mocked(useParams).mockReturnValue({ productId: mockProduct.productId });
+    vi.mocked(useParams).mockReturnValueOnce({
+      productId: mockProduct.productId,
+    });
 
     render(
       <MemoryRouter>
@@ -97,17 +123,39 @@ describe("EditProduct", () => {
   test("calls graphql() with updated product data when form is submitted", async () => {
     const user = userEvent.setup();
 
-    vi.mocked(graphqlMock)
-      .mockResolvedValueOnce({
-        data: {
-          getProduct: mockProduct,
-        },
-      })
-      .mockResolvedValueOnce({
-        data: {
-          updateProduct: { ...mockProduct, ...newValues },
-        },
-      });
+    vi.mocked(useGetProduct).mockReturnValueOnce({
+      product: {
+        __typename: "Product",
+        id: "some-id",
+        name: "some-name",
+        description: "some-description",
+        price: "some-price",
+        isArchived: false,
+        reviews: null,
+        image: undefined,
+        createdAt: "2022-01-01T00:00:00Z",
+        updatedAt: "2022-01-01T00:00:00Z",
+        owner: undefined,
+      },
+      errorMessage: "",
+      isLoading: false,
+    });
+
+    graphqlMock.mockImplementationOnce(({ query }) => {
+      if (query === updateProduct) {
+        return Promise.resolve({
+          data: {
+            updateProduct: {
+              name: "Test Product",
+              description: "New Test Description",
+              price: "10.99",
+              id: "372db325-5f72-49fa-ba8c-ab628c0ed470",
+              image: "chuck-norris.jpg",
+            },
+          },
+        });
+      }
+    });
 
     render(
       <MemoryRouter>
@@ -142,7 +190,7 @@ describe("EditProduct", () => {
 
     // Assert that graphql() was called with the updated product data
     waitFor(() => {
-      expect(graphqlMock.mock.calls[1][0]).toEqual({
+      expect(graphqlMock).toHaveBeenCalledWith({
         query: updateProduct,
         variables: {
           input: {
@@ -155,10 +203,10 @@ describe("EditProduct", () => {
   });
 
   test("displays an alert message if getting the product fails, e.g., the product doesn't exist", async () => {
-    vi.mocked(graphqlMock).mockImplementation(({ query }) => {
-      if (query === getProduct) {
-        return Promise.reject(new Error("Error getting product"));
-      }
+    vi.mocked(useGetProduct).mockReturnValueOnce({
+      product: null,
+      errorMessage: "Error getting product",
+      isLoading: false,
     });
 
     render(
@@ -167,22 +215,37 @@ describe("EditProduct", () => {
       </MemoryRouter>
     );
 
-    // TODO: assert that toast.error() was called with the correct message
+    await waitFor(() => {
+      expect(toast.error).toHaveBeenCalledWith(
+        expect.stringMatching(/error getting product/i)
+      );
+    });
   });
 
   test("displays an alert message if updating the product fails", async () => {
     const user = userEvent.setup();
 
-    // Mock successful fetch
-    vi.mocked(graphqlMock).mockImplementation(({ query }) => {
+    vi.mocked(useGetProduct).mockReturnValueOnce({
+      product: {
+        __typename: "Product",
+        id: "some-id",
+        name: "some-name",
+        description: "some-description",
+        price: "some-price",
+        isArchived: false,
+        reviews: null,
+        image: undefined,
+        createdAt: "2022-01-01T00:00:00Z",
+        updatedAt: "2022-01-01T00:00:00Z",
+        owner: undefined,
+      },
+      errorMessage: "",
+      isLoading: false,
+    });
+
+    graphqlMock.mockImplementationOnce(({ query }) => {
       if (query === updateProduct) {
         return Promise.reject(new Error("Error updating product"));
-      } else if (query === getProduct) {
-        return Promise.resolve({
-          data: {
-            getProduct: mockProduct,
-          },
-        });
       }
     });
 
@@ -218,6 +281,10 @@ describe("EditProduct", () => {
     // Submit the form
     await user.click(screen.getByRole("button", { name: /submit/i }));
 
-    // TODO: assert that toast.error() was called with the correct message
+    await waitFor(() => {
+      expect(toast.error).toHaveBeenCalledWith(
+        expect.stringMatching(/error updating product/i)
+      );
+    });
   });
 });
