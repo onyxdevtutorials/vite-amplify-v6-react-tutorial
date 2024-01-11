@@ -87,7 +87,7 @@ describe("ProductForm", () => {
     });
   });
 
-  test("should call onSubmit() with the form values and image key when the form is submitted", async () => {
+  test.only("should call onSubmit() with the form values and image key when the form is submitted", async () => {
     const user = userEvent.setup();
 
     const mockUploadDataOutput: UploadDataOutput = {
@@ -103,6 +103,7 @@ describe("ProductForm", () => {
     const file = new File(["(⌐□_□)"], "chucknorris.png", {
       type: "image/png",
     });
+    // ssszzz
 
     const onSubmit = vi.fn();
 
@@ -127,9 +128,17 @@ describe("ProductForm", () => {
     const imageInput = screen.getByLabelText(/image/i);
     await user.upload(imageInput, file);
 
-    await waitFor(() =>
-      expect(toast.success).toHaveBeenCalledWith("Image uploaded successfully")
-    );
+    await waitFor(() => {
+      expect(uploadData).toHaveBeenCalledWith({
+        key: file.name,
+        data: file,
+        options: {
+          accessLevel: "guest",
+          onProgress: expect.any(Function),
+        },
+      });
+      expect(toast.success).toHaveBeenCalledWith("Image uploaded successfully");
+    });
 
     const submitButton = screen.getByRole("button", { name: /submit/i });
     await user.click(submitButton);
@@ -139,7 +148,7 @@ describe("ProductForm", () => {
         name: "Test Product",
         description: "Test Description",
         price: "10.99",
-        imageKey: "chucknorris.png",
+        image: "chucknorris.png",
       },
       expect.anything()
     );

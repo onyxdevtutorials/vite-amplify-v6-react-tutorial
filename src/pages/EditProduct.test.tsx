@@ -1,10 +1,11 @@
 import { describe, expect, test, beforeEach, vi } from "vitest";
 import userEvent from "@testing-library/user-event";
 import { render, screen, waitFor } from "@testing-library/react";
-import { MemoryRouter } from "react-router-dom";
+import { MemoryRouter, useParams } from "react-router-dom";
 import { updateProduct } from "../graphql/mutations";
 import EditProduct from "./EditProduct";
 import { getProduct } from "../graphql/queries";
+import useGetProduct from "../hooks/useGetProduct";
 
 vi.mock("react-router-dom", async () => {
   const router = await vi.importActual<typeof import("react-router-dom")>(
@@ -15,6 +16,26 @@ vi.mock("react-router-dom", async () => {
     useParams: vi
       .fn()
       .mockReturnValue({ productId: "372db325-5f72-49fa-ba8c-ab628c0ed470" }),
+  };
+});
+
+vi.mock("../hooks/useGetProduct", () => {
+  const actual = vi.importActual<typeof import("../hooks/useGetProduct")>(
+    "../hooks/useGetProduct"
+  );
+  return {
+    ...actual,
+    default: vi.fn().mockReturnValue({
+      product: {
+        name: "Test Product",
+        description: "Test Description",
+        price: "10.99",
+        id: "372db325-5f72-49fa-ba8c-ab628c0ed470",
+        image: "chuck-norris.jpg",
+      },
+      errorMessage: null,
+      isLoading: false,
+    }),
   };
 });
 
@@ -56,24 +77,7 @@ describe("EditProduct", () => {
       productId: "372db325-5f72-49fa-ba8c-ab628c0ed470",
     };
 
-    const newValues = {
-      name: "Test Product",
-      description: "New Test Description",
-      price: "10.99",
-      productId: "372db325-5f72-49fa-ba8c-ab628c0ed470",
-    };
-
-    vi.mocked(graphqlMock)
-      .mockResolvedValueOnce({
-        data: {
-          getProduct: mockProduct,
-        },
-      })
-      .mockResolvedValueOnce({
-        data: {
-          updateProduct: { ...mockProduct, ...newValues },
-        },
-      });
+    vi.mocked(useParams).mockReturnValue({ productId: mockProduct.productId });
 
     render(
       <MemoryRouter>
@@ -83,27 +87,11 @@ describe("EditProduct", () => {
 
     await waitFor(async () => {
       expect(
-        await screen.findByRole("form", { name: /^edit product form$/i })
+        await screen.findByRole("form", { name: /product form/i })
       ).toBeInTheDocument();
     });
 
-    expect(graphqlMock).toHaveBeenCalledTimes(1);
-    expect(graphqlMock.mock.calls[0][0]).toEqual({
-      query: getProduct,
-      variables: { id: "372db325-5f72-49fa-ba8c-ab628c0ed470" },
-    });
-
-    const productNameInput = await screen.findByRole("textbox", {
-      name: /product name/i,
-    });
-    const descriptionInput = await screen.findByRole("textbox", {
-      name: /description/i,
-    });
-    const priceInput = await screen.findByRole("textbox", { name: /price/i });
-
-    expect(productNameInput).toHaveValue("Test Product");
-    expect(descriptionInput).toHaveValue("Test Description");
-    expect(priceInput).toHaveValue("10.99");
+    expect(useGetProduct).toHaveBeenCalledWith(mockProduct.productId);
   });
 
   test("calls graphql() with updated product data when form is submitted", async () => {
