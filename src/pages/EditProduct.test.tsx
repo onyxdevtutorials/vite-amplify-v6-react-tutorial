@@ -191,7 +191,7 @@ describe("EditProduct", () => {
     await user.click(screen.getByRole("button", { name: /submit/i }));
 
     // Assert that graphql() was called with the updated product data
-    waitFor(() => {
+    await waitFor(() => {
       expect(graphqlMock).toHaveBeenCalledWith({
         query: updateProduct,
         variables: {

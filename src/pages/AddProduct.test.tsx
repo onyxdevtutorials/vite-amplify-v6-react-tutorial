@@ -22,6 +22,8 @@ vi.mock("aws-amplify/api", () => ({
 vi.mock("react-toastify", () => ({
   toast: {
     success: vi.fn(),
+    info: vi.fn(),
+    error: vi.fn(),
   },
 }));
 
@@ -45,7 +47,7 @@ describe("AddProduct", () => {
       screen.getByRole("textbox", { name: /description/i })
     ).toBeInTheDocument();
     expect(screen.getByRole("textbox", { name: /price/i })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: /add/i })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /submit/i })).toBeInTheDocument();
   });
 
   test("displays validation errors when form is submitted with invalid data", async () => {
@@ -58,7 +60,7 @@ describe("AddProduct", () => {
     );
 
     // Submit the form without filling in any fields
-    await user.click(screen.getByRole("button", { name: /add/i }));
+    await user.click(screen.getByRole("button", { name: /submit/i }));
 
     const requiredInputs = screen.getAllByText("Required");
 
@@ -80,7 +82,7 @@ describe("AddProduct", () => {
     await user.type(screen.getByLabelText("Price"), "10.99");
 
     // Submit the form
-    await user.click(screen.getByRole("button", { name: "Add" }));
+    await user.click(screen.getByRole("button", { name: /submit/i }));
 
     expect(graphqlMock).toHaveBeenCalledWith({
       query: createProduct,
@@ -89,6 +91,7 @@ describe("AddProduct", () => {
           name: "Test Product",
           description: "Test Description",
           price: "10.99",
+          image: "",
         },
       },
     });
