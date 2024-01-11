@@ -50,7 +50,6 @@ const EditProduct = () => {
       toast.success("Product updated successfully");
     } catch (err) {
       console.error("error updating product: ", err);
-      console.log("HOWDY!!!!!!!!!!!!!");
       toast.error("Error updating product");
     }
   };

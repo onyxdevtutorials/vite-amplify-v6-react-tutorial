@@ -43,7 +43,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
   initialImageKey,
   onRemoveImage,
 }) => {
-  console.log("ProductForm initialImageKey: ", initialImageKey);
+  // console.log("ProductForm initialImageKey: ", initialImageKey);
   // const [imageKey, setImageKey] = useState<string>(initialImageKey || "");
   let loadingToastId: Id | null = null;
 
