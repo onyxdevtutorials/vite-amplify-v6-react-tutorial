@@ -1,5 +1,5 @@
 import { TransferProgressEvent, uploadData } from "aws-amplify/storage";
-import { FormikHelpers, useFormik } from "formik";
+import { FormikHelpers, useFormik, useFormikContext } from "formik";
 import * as yup from "yup";
 import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
@@ -25,6 +25,8 @@ type ProductFormProps = {
     values: FormValues,
     formikHelpers: FormikHelpers<FormValues>
   ) => void;
+  initialImageKey?: string;
+  onRemoveImage?: () => void;
 };
 
 // image is part of the form, but formik doesn't really "do" file uploads
@@ -37,7 +39,10 @@ const validationSchema = yup.object().shape({
 const ProductForm: React.FC<ProductFormProps> = ({
   initialValues,
   onSubmit: onFormSubmit,
+  initialImageKey,
+  onRemoveImage,
 }) => {
+  console.log("ProductForm initialImageKey: ", initialImageKey);
   const [imageKey, setImageKey] = useState<string>("");
   let loadingToastId: Id | null = null;
 
@@ -56,6 +61,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
     handleBlur,
     handleSubmit,
     isSubmitting,
+    setFieldValue,
   } = useFormik({
     initialValues,
     validationSchema,
@@ -111,7 +117,8 @@ const ProductForm: React.FC<ProductFormProps> = ({
         });
 
         const result = await uploadOutput.result;
-        setImageKey(result.key);
+        // setImageKey(result.key);
+        setFieldValue("image", result.key);
         toast.success("Image uploaded successfully");
         console.log("upload succeeded: ", result);
       } catch (err) {
@@ -175,9 +182,21 @@ const ProductForm: React.FC<ProductFormProps> = ({
         <Form.Control
           type="file"
           name="image"
-          onChange={handleFileSelect}
+          onChange={(event) => handleFileSelect(event, setFieldValue)}
           onBlur={handleBlur}
         />
+        {initialImageKey && (
+          <div>
+            <strong>{initialImageKey}</strong>
+            <Button
+              variant="danger"
+              onClick={onRemoveImage}
+              style={{ marginTop: "1rem" }}
+            >
+              Remove Image
+            </Button>
+          </div>
+        )}
       </Form.Group>
       <Button type="submit" disabled={isSubmitting}>
         Submit
