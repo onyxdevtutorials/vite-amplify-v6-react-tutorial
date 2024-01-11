@@ -88,6 +88,30 @@ const newValues = {
   price: "10.99",
 };
 
+const fillInForm = async (
+  productName: string,
+  description: string,
+  price: string
+) => {
+  const user = userEvent.setup();
+
+  // Fill in the form fields
+  const productNameInput = screen.getByRole("textbox", {
+    name: /product name/i,
+  });
+  const descriptionInput = screen.getByRole("textbox", {
+    name: /description/i,
+  });
+  const priceInput = screen.getByRole("textbox", { name: /price/i });
+
+  await user.clear(productNameInput);
+  await user.type(productNameInput, productName);
+  await user.clear(descriptionInput);
+  await user.type(descriptionInput, description);
+  await user.clear(priceInput);
+  await user.type(priceInput, price);
+};
+
 describe("EditProduct", () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -170,20 +194,22 @@ describe("EditProduct", () => {
     expect(form).toBeInTheDocument();
 
     // Fill in the form fields
-    const productNameInput = screen.getByRole("textbox", {
-      name: /product name/i,
-    });
-    const descriptionInput = screen.getByRole("textbox", {
-      name: /description/i,
-    });
-    const priceInput = screen.getByRole("textbox", { name: /price/i });
+    // const productNameInput = screen.getByRole("textbox", {
+    //   name: /product name/i,
+    // });
+    // const descriptionInput = screen.getByRole("textbox", {
+    //   name: /description/i,
+    // });
+    // const priceInput = screen.getByRole("textbox", { name: /price/i });
 
-    await user.clear(productNameInput);
-    await user.type(productNameInput, "Test Product");
-    await user.clear(descriptionInput);
-    await user.type(descriptionInput, "New Test Description");
-    await user.clear(priceInput);
-    await user.type(priceInput, "10.99");
+    // await user.clear(productNameInput);
+    // await user.type(productNameInput, "Test Product");
+    // await user.clear(descriptionInput);
+    // await user.type(descriptionInput, "New Test Description");
+    // await user.clear(priceInput);
+    // await user.type(priceInput, "10.99");
+
+    await fillInForm("Test Product", "New Test Description", "10.99");
 
     // Submit the form
     await user.click(screen.getByRole("button", { name: /submit/i }));
@@ -261,22 +287,7 @@ describe("EditProduct", () => {
 
     expect(form).toBeInTheDocument();
 
-    // Simulate user actions that trigger the update...
-    // Fill in the form fields
-    const productNameInput = screen.getByRole("textbox", {
-      name: /product name/i,
-    });
-    const descriptionInput = screen.getByRole("textbox", {
-      name: /description/i,
-    });
-    const priceInput = screen.getByRole("textbox", { name: /price/i });
-
-    await user.clear(productNameInput);
-    await user.type(productNameInput, "Test Product");
-    await user.clear(descriptionInput);
-    await user.type(descriptionInput, "New Test Description");
-    await user.clear(priceInput);
-    await user.type(priceInput, "10.99");
+    await fillInForm("Test Product", "New Test Description", "10.99");
 
     // Submit the form
     await user.click(screen.getByRole("button", { name: /submit/i }));
