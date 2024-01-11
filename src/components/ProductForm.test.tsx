@@ -87,7 +87,7 @@ describe("ProductForm", () => {
     });
   });
 
-  test.only("should call onSubmit() with the form values and image key when the form is submitted", async () => {
+  test("should call onSubmit() with the form values and image key when the form is submitted", async () => {
     const user = userEvent.setup();
 
     const mockUploadDataOutput: UploadDataOutput = {
@@ -103,7 +103,6 @@ describe("ProductForm", () => {
     const file = new File(["(⌐□_□)"], "chucknorris.png", {
       type: "image/png",
     });
-    // ssszzz
 
     const onSubmit = vi.fn();
 
