@@ -95,7 +95,6 @@ const fillInForm = async (
 ) => {
   const user = userEvent.setup();
 
-  // Fill in the form fields
   const productNameInput = screen.getByRole("textbox", {
     name: /product name/i,
   });
@@ -112,28 +111,25 @@ const fillInForm = async (
   await user.type(priceInput, price);
 };
 
+const renderEditProduct = () => {
+  render(
+    <MemoryRouter>
+      <EditProduct />
+    </MemoryRouter>
+  );
+};
+
 describe("EditProduct", () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
   test("renders EditProduct page, showing form containing test data", async () => {
-    const mockProduct = {
-      name: "Test Product",
-      description: "Test Description",
-      price: "10.99",
-      productId: "372db325-5f72-49fa-ba8c-ab628c0ed470",
-    };
-
     vi.mocked(useParams).mockReturnValueOnce({
-      productId: mockProduct.productId,
+      productId: mockProduct.id,
     });
 
-    render(
-      <MemoryRouter>
-        <EditProduct />
-      </MemoryRouter>
-    );
+    renderEditProduct();
 
     await waitFor(async () => {
       expect(
@@ -141,7 +137,7 @@ describe("EditProduct", () => {
       ).toBeInTheDocument();
     });
 
-    expect(useGetProduct).toHaveBeenCalledWith(mockProduct.productId);
+    expect(useGetProduct).toHaveBeenCalledWith(mockProduct.id);
   });
 
   test("calls graphql() with updated product data when form is submitted", async () => {
@@ -181,33 +177,13 @@ describe("EditProduct", () => {
       }
     });
 
-    render(
-      <MemoryRouter>
-        <EditProduct />
-      </MemoryRouter>
-    );
+    renderEditProduct();
 
     const form = await screen.findByRole("form", {
       name: /^product form$/i,
     });
 
     expect(form).toBeInTheDocument();
-
-    // Fill in the form fields
-    // const productNameInput = screen.getByRole("textbox", {
-    //   name: /product name/i,
-    // });
-    // const descriptionInput = screen.getByRole("textbox", {
-    //   name: /description/i,
-    // });
-    // const priceInput = screen.getByRole("textbox", { name: /price/i });
-
-    // await user.clear(productNameInput);
-    // await user.type(productNameInput, "Test Product");
-    // await user.clear(descriptionInput);
-    // await user.type(descriptionInput, "New Test Description");
-    // await user.clear(priceInput);
-    // await user.type(priceInput, "10.99");
 
     await fillInForm("Test Product", "New Test Description", "10.99");
 
@@ -235,11 +211,7 @@ describe("EditProduct", () => {
       isLoading: false,
     });
 
-    render(
-      <MemoryRouter>
-        <EditProduct />
-      </MemoryRouter>
-    );
+    renderEditProduct();
 
     await waitFor(() => {
       expect(toast.error).toHaveBeenCalledWith(
@@ -275,11 +247,7 @@ describe("EditProduct", () => {
       }
     });
 
-    render(
-      <MemoryRouter>
-        <EditProduct />
-      </MemoryRouter>
-    );
+    renderEditProduct();
 
     const form = await screen.findByRole("form", {
       name: /^product form$/i,
