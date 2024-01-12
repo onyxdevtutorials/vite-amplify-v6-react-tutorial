@@ -53,6 +53,7 @@ vi.mock("aws-amplify/api", () => {
                 },
               },
             ] as ProductWithReviews[],
+            nextToken: "",
           },
         } as ListProductsQueryWithReviews,
       }),
@@ -68,21 +69,15 @@ describe("ListProducts", () => {
   });
 
   test("renders products for a signed-in user", async () => {
-    vi.mocked(awsAmplifyAuth.getCurrentUser).mockResolvedValue({
+    vi.mocked(awsAmplifyAuth.getCurrentUser).mockResolvedValueOnce({
       username: "mockUser",
       userId: "111",
     });
 
     renderWithAuthContext(<ListProducts />);
 
-    await waitFor(async () => {
-      const productName = await screen.findByText("Product 1");
-      expect(productName).toBeInTheDocument();
-    });
-
-    screen.debug();
     const headings = await screen.findAllByRole("generic", {
-      name: (content, element) => element?.classList.contains("product-name"),
+      name: (_, element) => element?.classList.contains("product-name"),
     });
 
     expect(headings).toHaveLength(2);
@@ -99,12 +94,12 @@ describe("ListProducts", () => {
   });
 
   test("renders products for a signed-out user", async () => {
-    vi.mocked(awsAmplifyAuth.getCurrentUser).mockRejectedValue({});
+    vi.mocked(awsAmplifyAuth.getCurrentUser).mockRejectedValueOnce({});
 
     renderWithAuthContext(<ListProducts />);
 
     const headings = await screen.findAllByRole("generic", {
-      name: (content, element) => element?.classList.contains("product-name"),
+      name: (_, element) => element?.classList.contains("product-name"),
     });
 
     expect(headings).toHaveLength(2);

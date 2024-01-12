@@ -46,7 +46,7 @@ describe("SignInConfirm", () => {
   });
 
   test("renders the sign in confirm form", () => {
-    vi.mocked(useSignInContext).mockReturnValue({
+    vi.mocked(useSignInContext).mockReturnValueOnce({
       signInStep: "CONFIRM_SIGN_IN_WITH_NEW_PASSWORD_REQUIRED",
       setSignInStep: vi.fn(),
     });
@@ -63,14 +63,14 @@ describe("SignInConfirm", () => {
   test("user (not an admin) fills out and successfully submits the confirm sign in form", async () => {
     const user = userEvent.setup();
 
-    vi.mocked(awsAmplifyAuth.confirmSignIn).mockResolvedValue({
+    vi.mocked(awsAmplifyAuth.confirmSignIn).mockResolvedValueOnce({
       isSignedIn: true,
       nextStep: {
         signInStep: "DONE",
       },
     });
 
-    vi.mocked(awsAmplifyAuth.fetchAuthSession).mockResolvedValue({
+    vi.mocked(awsAmplifyAuth.fetchAuthSession).mockResolvedValueOnce({
       tokens: {
         accessToken: {
           payload: {},
@@ -78,11 +78,13 @@ describe("SignInConfirm", () => {
       },
     });
 
+    // Tests fail if we use mockReturnValueOnce with useSignInContext
     vi.mocked(useSignInContext).mockReturnValue({
       signInStep: "CONFIRM_SIGN_IN_WITH_NEW_PASSWORD_REQUIRED",
       setSignInStep: vi.fn(),
     });
 
+    // Tests fail if we use mockReturnValueOnce with useAuthContext
     vi.mocked(useAuthContext).mockReturnValue({
       setIsLoggedIn: vi.fn(),
       setIsAdmin: vi.fn(),
@@ -115,7 +117,7 @@ describe("SignInConfirm", () => {
   test("submits the form without filling in a new password", async () => {
     const user = userEvent.setup();
 
-    vi.mocked(useSignInContext).mockReturnValue({
+    vi.mocked(useSignInContext).mockReturnValueOnce({
       signInStep: "CONFIRM_SIGN_IN_WITH_NEW_PASSWORD_REQUIRED",
       setSignInStep: vi.fn(),
     });
@@ -136,14 +138,14 @@ describe("SignInConfirm", () => {
   test("user (an admin) fills out and successfully submits the confirm sign in form", async () => {
     const user = userEvent.setup();
 
-    vi.mocked(awsAmplifyAuth.confirmSignIn).mockResolvedValue({
+    vi.mocked(awsAmplifyAuth.confirmSignIn).mockResolvedValueOnce({
       isSignedIn: true,
       nextStep: {
         signInStep: "DONE",
       },
     });
 
-    vi.mocked(awsAmplifyAuth.fetchAuthSession).mockResolvedValue({
+    vi.mocked(awsAmplifyAuth.fetchAuthSession).mockResolvedValueOnce({
       tokens: {
         accessToken: {
           payload: {
@@ -153,12 +155,12 @@ describe("SignInConfirm", () => {
       },
     });
 
-    vi.mocked(useSignInContext).mockReturnValue({
+    vi.mocked(useSignInContext).mockReturnValueOnce({
       signInStep: "CONFIRM_SIGN_IN_WITH_NEW_PASSWORD_REQUIRED",
       setSignInStep: vi.fn(),
     });
 
-    vi.mocked(useAuthContext).mockReturnValue({
+    vi.mocked(useAuthContext).mockReturnValueOnce({
       setIsLoggedIn: vi.fn(),
       setIsAdmin: vi.fn(),
       isLoggedIn: false,

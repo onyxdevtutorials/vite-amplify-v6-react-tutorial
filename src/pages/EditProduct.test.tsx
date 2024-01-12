@@ -31,7 +31,7 @@ vi.mock("../hooks/useGetProduct", () => {
         description: "Test Description",
         price: "10.99",
         id: "372db325-5f72-49fa-ba8c-ab628c0ed470",
-        image: "chuck-norris.jpg",
+        image: "chucknorris.jpg",
       },
       errorMessage: null,
       isLoading: false,
@@ -50,7 +50,7 @@ const { graphqlMock } = vi.hoisted(() => {
               description: "New Test Description",
               price: "10.99",
               id: "372db325-5f72-49fa-ba8c-ab628c0ed470",
-              image: "chuck-norris.jpg",
+              image: "chucknorris.jpg",
             },
           },
         });
@@ -170,7 +170,7 @@ describe("EditProduct", () => {
               description: "New Test Description",
               price: "10.99",
               id: "372db325-5f72-49fa-ba8c-ab628c0ed470",
-              image: "chuck-norris.jpg",
+              image: "chucknorris.jpg",
             },
           },
         });

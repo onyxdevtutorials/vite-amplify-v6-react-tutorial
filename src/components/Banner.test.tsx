@@ -62,7 +62,7 @@ describe("Banner", () => {
   });
 
   test("renders Sign In and Sign Up buttons when not logged in", () => {
-    vi.mocked(useAuthContext).mockReturnValue({
+    vi.mocked(useAuthContext).mockReturnValueOnce({
       setIsLoggedIn: vi.fn(),
       setIsAdmin: vi.fn(),
       isLoggedIn: false,
@@ -88,7 +88,7 @@ describe("Banner", () => {
   });
 
   test("renders Add Product link when logged in as admin", () => {
-    vi.mocked(useAuthContext).mockReturnValue({
+    vi.mocked(useAuthContext).mockReturnValueOnce({
       setIsLoggedIn: vi.fn(),
       setIsAdmin: vi.fn(),
       isLoggedIn: true,
@@ -104,7 +104,7 @@ describe("Banner", () => {
   });
 
   test("renders Sign Out button when logged in but not Sign In or Sign Up buttons", () => {
-    vi.mocked(useAuthContext).mockReturnValue({
+    vi.mocked(useAuthContext).mockReturnValueOnce({
       setIsLoggedIn: vi.fn(),
       setIsAdmin: vi.fn(),
       isLoggedIn: true,
@@ -128,7 +128,7 @@ describe("Banner", () => {
   test("navigates to /signin when Sign In button is clicked", async () => {
     const user = userEvent.setup();
 
-    vi.mocked(useAuthContext).mockReturnValue({
+    vi.mocked(useAuthContext).mockReturnValueOnce({
       setIsLoggedIn: vi.fn(),
       setIsAdmin: vi.fn(),
       isLoggedIn: false,
@@ -149,7 +149,7 @@ describe("Banner", () => {
   test("navigates to /signup when Sign Up button is clicked", async () => {
     const user = userEvent.setup();
 
-    vi.mocked(useAuthContext).mockReturnValue({
+    vi.mocked(useAuthContext).mockReturnValueOnce({
       setIsLoggedIn: vi.fn(),
       setIsAdmin: vi.fn(),
       isLoggedIn: false,
@@ -168,7 +168,7 @@ describe("Banner", () => {
   });
 
   test("calls signOut when Sign Out button is clicked", async () => {
-    vi.mocked(useAuthContext).mockReturnValue({
+    vi.mocked(useAuthContext).mockReturnValueOnce({
       setIsLoggedIn: vi.fn(),
       setIsAdmin: vi.fn(),
       isLoggedIn: true,

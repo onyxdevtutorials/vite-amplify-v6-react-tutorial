@@ -46,7 +46,7 @@ describe("SignIn component", () => {
   });
 
   test("renders sign in form", () => {
-    vi.mocked(useSignInContext).mockReturnValue({
+    vi.mocked(useSignInContext).mockReturnValueOnce({
       signInStep: "",
       setSignInStep: vi.fn(),
     });
@@ -66,20 +66,22 @@ describe("SignIn component", () => {
   test("user (not an admin) submits form with valid input", async () => {
     const user = userEvent.setup();
 
-    vi.mocked(awsAmplifyAuth.signIn).mockResolvedValue({
+    vi.mocked(awsAmplifyAuth.signIn).mockResolvedValueOnce({
       nextStep: {
         signInStep: "DONE",
       },
       isSignedIn: true,
     });
 
-    vi.mocked(awsAmplifyAuth.fetchAuthSession).mockResolvedValue({
+    vi.mocked(awsAmplifyAuth.fetchAuthSession).mockResolvedValueOnce({
       tokens: {
         accessToken: {
           payload: {},
         },
       },
     });
+
+    // Tests fail if we use mockReturnValueOnce with useSignInContext and useAuthContext
 
     vi.mocked(useSignInContext).mockReturnValue({
       signInStep: "",
@@ -108,7 +110,7 @@ describe("SignIn component", () => {
     // Submit the form
     await user.click(screen.getByRole("button", { name: /sign in/i }));
 
-    vi.mocked(awsAmplifyAuth.signIn).mockResolvedValue({
+    vi.mocked(awsAmplifyAuth.signIn).mockResolvedValueOnce({
       nextStep: {
         signInStep: "DONE",
       },
@@ -127,7 +129,7 @@ describe("SignIn component", () => {
   });
 
   test("displays error message with invalid input", async () => {
-    vi.mocked(useSignInContext).mockReturnValue({
+    vi.mocked(useSignInContext).mockReturnValueOnce({
       signInStep: "",
       setSignInStep: vi.fn(),
     });
@@ -153,14 +155,14 @@ describe("SignIn component", () => {
   test("user signs in and is an admin", async () => {
     const user = userEvent.setup();
 
-    vi.mocked(awsAmplifyAuth.signIn).mockResolvedValue({
+    vi.mocked(awsAmplifyAuth.signIn).mockResolvedValueOnce({
       nextStep: {
         signInStep: "DONE",
       },
       isSignedIn: true,
     });
 
-    vi.mocked(awsAmplifyAuth.fetchAuthSession).mockResolvedValue({
+    vi.mocked(awsAmplifyAuth.fetchAuthSession).mockResolvedValueOnce({
       tokens: {
         accessToken: {
           payload: {
@@ -170,12 +172,12 @@ describe("SignIn component", () => {
       },
     });
 
-    vi.mocked(useSignInContext).mockReturnValue({
+    vi.mocked(useSignInContext).mockReturnValueOnce({
       signInStep: "",
       setSignInStep: vi.fn(),
     });
 
-    vi.mocked(useAuthContext).mockReturnValue({
+    vi.mocked(useAuthContext).mockReturnValueOnce({
       setIsLoggedIn: vi.fn(),
       setIsAdmin: vi.fn(),
       isLoggedIn: true,
@@ -204,8 +206,6 @@ describe("SignIn component", () => {
       });
       expect(awsAmplifyAuth.signIn).toHaveBeenCalledTimes(1);
     });
-
-    // screen.debug();
 
     // Wait for setIsAdmin to be called
     await waitFor(() => {

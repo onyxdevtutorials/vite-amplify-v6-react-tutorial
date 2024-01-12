@@ -59,7 +59,7 @@ describe("ProductForm", () => {
       result: Promise.resolve({ key: "chucknorris.png" }),
     };
 
-    vi.mocked(uploadData).mockResolvedValue(mockUploadDataOutput);
+    vi.mocked(uploadData).mockResolvedValueOnce(mockUploadDataOutput);
 
     const file = new File(["(⌐□_□)"], "chucknorris.png", {
       type: "image/png",
@@ -98,7 +98,7 @@ describe("ProductForm", () => {
       result: Promise.resolve({ key: "chucknorris.png" }),
     };
 
-    vi.mocked(uploadData).mockResolvedValue(mockUploadDataOutput);
+    vi.mocked(uploadData).mockResolvedValueOnce(mockUploadDataOutput);
 
     const file = new File(["(⌐□_□)"], "chucknorris.png", {
       type: "image/png",

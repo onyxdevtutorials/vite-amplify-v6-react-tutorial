@@ -69,6 +69,7 @@ describe("SignOut", () => {
 
     vi.mocked(awsAmplifyAuth.signOut).mockResolvedValueOnce(undefined);
 
+    // Tests fail if we use mockReturnValueOnce instead of mockReturnValue
     vi.mocked(useAuthContext).mockReturnValue({
       setIsLoggedIn: vi.fn(),
       setIsAdmin: vi.fn(),
@@ -97,7 +98,7 @@ describe("SignOut", () => {
 
     vi.mocked(awsAmplifyAuth.signOut).mockRejectedValueOnce(new Error());
 
-    vi.mocked(useAuthContext).mockReturnValue({
+    vi.mocked(useAuthContext).mockReturnValueOnce({
       setIsLoggedIn: vi.fn(),
       setIsAdmin: vi.fn(),
       isLoggedIn: true,
