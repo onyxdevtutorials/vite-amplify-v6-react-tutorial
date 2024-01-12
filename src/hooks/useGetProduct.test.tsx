@@ -2,8 +2,6 @@ import { renderHook, waitFor } from "@testing-library/react";
 import { describe, test, expect, vi, beforeEach } from "vitest";
 import useGetProduct from "./useGetProduct";
 
-// vi.mock("aws-amplify/api");
-
 vi.mock("aws-amplify/auth");
 
 const { graphqlMock } = vi.hoisted(() => {

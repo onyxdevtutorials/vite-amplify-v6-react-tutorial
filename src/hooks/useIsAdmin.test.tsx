@@ -12,7 +12,7 @@ describe("useIsAdmin", () => {
 
   test("should set isAdmin to true if user is an admin", async () => {
     // Mock the fetchAuthSession function to return a session with admin group
-    vi.mocked(fetchAuthSession).mockResolvedValue({
+    vi.mocked(fetchAuthSession).mockResolvedValueOnce({
       tokens: {
         accessToken: {
           payload: {
@@ -33,7 +33,7 @@ describe("useIsAdmin", () => {
 
   test("should set isAdmin to false if user is not an admin", async () => {
     // Mock the fetchAuthSession function to return a session without admin group
-    vi.mocked(fetchAuthSession).mockResolvedValue({
+    vi.mocked(fetchAuthSession).mockResolvedValueOnce({
       tokens: {
         accessToken: {
           payload: {
