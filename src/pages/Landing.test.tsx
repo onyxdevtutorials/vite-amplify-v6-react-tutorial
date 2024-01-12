@@ -64,12 +64,12 @@ describe("Landing", () => {
   });
 
   test("renders 'Is logged in: yes' when user is logged in", async () => {
-    vi.mocked(awsAmplifyAuth.getCurrentUser).mockResolvedValue({
+    vi.mocked(awsAmplifyAuth.getCurrentUser).mockResolvedValueOnce({
       username: "mockUser",
       userId: "111",
     });
 
-    vi.mocked(useAuthContext).mockReturnValue({
+    vi.mocked(useAuthContext).mockReturnValueOnce({
       setIsLoggedIn: vi.fn(),
       setIsAdmin: vi.fn(),
       isLoggedIn: true,
@@ -85,7 +85,7 @@ describe("Landing", () => {
   });
 
   test("renders 'Is logged in: no' when user is not logged in", () => {
-    vi.mocked(awsAmplifyAuth.getCurrentUser).mockRejectedValue({});
+    vi.mocked(awsAmplifyAuth.getCurrentUser).mockRejectedValueOnce({});
 
     vi.mocked(useAuthContext).mockReturnValue({
       setIsLoggedIn: vi.fn(),
@@ -103,12 +103,12 @@ describe("Landing", () => {
   });
 
   test("renders the ListProducts component when user is logged in", async () => {
-    vi.mocked(awsAmplifyAuth.getCurrentUser).mockResolvedValue({
+    vi.mocked(awsAmplifyAuth.getCurrentUser).mockResolvedValueOnce({
       username: "mockUser",
       userId: "111",
     });
 
-    vi.mocked(useAuthContext).mockReturnValue({
+    vi.mocked(useAuthContext).mockReturnValueOnce({
       setIsLoggedIn: vi.fn(),
       setIsAdmin: vi.fn(),
       isLoggedIn: true,
@@ -127,9 +127,9 @@ describe("Landing", () => {
   });
 
   test("renders the ListProducts component when user is not logged in", async () => {
-    vi.mocked(awsAmplifyAuth.getCurrentUser).mockRejectedValue({});
+    vi.mocked(awsAmplifyAuth.getCurrentUser).mockRejectedValueOnce({});
 
-    vi.mocked(useAuthContext).mockReturnValue({
+    vi.mocked(useAuthContext).mockReturnValueOnce({
       setIsLoggedIn: vi.fn(),
       setIsAdmin: vi.fn(),
       isLoggedIn: false,

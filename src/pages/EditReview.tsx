@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useFormik } from "formik";
 import * as yup from "yup";
 import { useParams } from "react-router-dom";
@@ -9,7 +9,6 @@ import { GetReviewQuery } from "../API";
 import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
 import { Review } from "../API";
-import useCheckForUser from "../hooks/useCheckForUser";
 import { toast } from "react-toastify";
 
 const client = generateClient();
@@ -26,7 +25,6 @@ const validationSchema = yup.object().shape({
 const EditReview = () => {
   const { reviewId } = useParams<{ reviewId: string }>();
   const [review, setReview] = useState<Review | null>(null);
-  const { isLoggedIn, user } = useCheckForUser();
 
   const initialValues = {
     content: review?.content || "",
