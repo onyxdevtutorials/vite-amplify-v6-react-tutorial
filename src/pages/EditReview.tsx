@@ -139,7 +139,11 @@ const EditReview = () => {
             {errors.rating}
           </Form.Control.Feedback>
         </Form.Group>
-        <Button variant="primary" type="submit" disabled={isSubmitting}>
+        <Button
+          variant="primary"
+          type="submit"
+          disabled={isSubmitting || Object.keys(errors).length > 0}
+        >
           Update
         </Button>
       </Form>
