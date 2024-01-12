@@ -27,17 +27,21 @@ vi.mock("react-toastify", () => ({
   },
 }));
 
+const renderAddProduct = () => {
+  render(
+    <MemoryRouter>
+      <AddProduct />
+    </MemoryRouter>
+  );
+};
+
 describe("AddProduct", () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
   test("renders Add Product form", () => {
-    render(
-      <MemoryRouter>
-        <AddProduct />
-      </MemoryRouter>
-    );
+    renderAddProduct();
 
     // Assert that the form elements are rendered
     expect(
@@ -53,11 +57,7 @@ describe("AddProduct", () => {
   test("displays validation errors when form is submitted with invalid data", async () => {
     const user = userEvent.setup();
 
-    render(
-      <MemoryRouter>
-        <AddProduct />
-      </MemoryRouter>
-    );
+    renderAddProduct();
 
     // Submit the form without filling in any fields
     await user.click(screen.getByRole("button", { name: /submit/i }));
@@ -70,11 +70,7 @@ describe("AddProduct", () => {
   test("submits the form with valid data and calls graphql()", async () => {
     const user = userEvent.setup();
 
-    render(
-      <MemoryRouter>
-        <AddProduct />
-      </MemoryRouter>
-    );
+    renderAddProduct();
 
     // Fill in the form fields
     await user.type(screen.getByLabelText("Product Name"), "Test Product");
@@ -105,7 +101,7 @@ describe("AddProduct", () => {
   test("should call uploadData() when a file is selected", async () => {
     const user = userEvent.setup();
 
-    vi.mocked(uploadData).mockResolvedValue({
+    vi.mocked(uploadData).mockResolvedValueOnce({
       cancel: vi.fn(),
       pause: vi.fn(),
       resume: vi.fn(),
@@ -117,11 +113,7 @@ describe("AddProduct", () => {
       type: "image/png",
     });
 
-    render(
-      <MemoryRouter>
-        <AddProduct />
-      </MemoryRouter>
-    );
+    renderAddProduct();
 
     await user.upload(screen.getByLabelText("Image"), file);
 

@@ -1,11 +1,10 @@
 import { vi, expect, describe, beforeEach, test } from "vitest";
 import { render, screen, waitFor } from "@testing-library/react";
 import AddReview from "./AddReview";
-import { MemoryRouter, useParams } from "react-router-dom";
+import { MemoryRouter } from "react-router-dom";
 import userEvent from "@testing-library/user-event";
 import { createReview } from "../graphql/mutations";
 import { toast } from "react-toastify";
-import { generateClient } from "../lib/graphql";
 import useCheckForUser from "../hooks/useCheckForUser";
 import useGetProduct from "../hooks/useGetProduct";
 
@@ -48,13 +47,21 @@ const mockReview = {
   userReviewsId: "1234",
 };
 
+const renderAddReview = () => {
+  return render(
+    <MemoryRouter>
+      <AddReview />
+    </MemoryRouter>
+  );
+};
+
 describe("AddReview", () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
   test("renders AddReview form", async () => {
-    vi.mocked(useGetProduct).mockImplementation((productId) => {
+    vi.mocked(useGetProduct).mockImplementationOnce((productId) => {
       if (productId === "372db325-5f72-49fa-ba8c-ab628c0ed470") {
         return {
           product: {
@@ -83,7 +90,7 @@ describe("AddReview", () => {
       }
     });
 
-    vi.mocked(useCheckForUser).mockReturnValue({
+    vi.mocked(useCheckForUser).mockReturnValueOnce({
       user: {
         userId: "1234",
         username: "testuser",
@@ -92,11 +99,7 @@ describe("AddReview", () => {
       checkUser: vi.fn(),
     });
 
-    render(
-      <MemoryRouter>
-        <AddReview />
-      </MemoryRouter>
-    );
+    renderAddReview();
 
     await waitFor(() => {
       expect(screen.getByText("Test Product")).toBeInTheDocument();
@@ -114,6 +117,7 @@ describe("AddReview", () => {
   test("displays validation errors when form is submitted with invalid data", async () => {
     const user = userEvent.setup();
 
+    // Test fails if we use mockImplementationOnce() here
     vi.mocked(useGetProduct).mockImplementation((productId) => {
       if (productId === "372db325-5f72-49fa-ba8c-ab628c0ed470") {
         return {
@@ -143,6 +147,7 @@ describe("AddReview", () => {
       }
     });
 
+    // Test fails if we use mockReturnValueOnce() here
     vi.mocked(useCheckForUser).mockResolvedValue({
       user: {
         userId: "1234",
@@ -152,11 +157,7 @@ describe("AddReview", () => {
       checkUser: vi.fn(),
     });
 
-    render(
-      <MemoryRouter>
-        <AddReview />
-      </MemoryRouter>
-    );
+    renderAddReview();
 
     await waitFor(() => {
       expect(screen.getByText("Test Product")).toBeInTheDocument();
@@ -172,6 +173,7 @@ describe("AddReview", () => {
     // Submit the form without filling in any fields
     // Actually, submit button is disabled until rating and content are filled in
     await user.click(button);
+    expect(button).toBeDisabled();
 
     const requiredInputs = screen.getAllByText("Required");
 
@@ -181,7 +183,7 @@ describe("AddReview", () => {
   test("calls createReview mutation with correct variables when form is submitted with valid data", async () => {
     const user = userEvent.setup();
 
-    vi.mocked(useGetProduct).mockImplementation((productId) => {
+    vi.mocked(useGetProduct).mockImplementationOnce((productId) => {
       if (productId === "372db325-5f72-49fa-ba8c-ab628c0ed470") {
         return {
           product: {
@@ -210,6 +212,7 @@ describe("AddReview", () => {
       }
     });
 
+    // Test fails if we use mockReturnValueOnce() here
     vi.mocked(useCheckForUser).mockReturnValue({
       user: {
         userId: "1234",
@@ -219,17 +222,13 @@ describe("AddReview", () => {
       checkUser: vi.fn(),
     });
 
-    vi.mocked(graphqlMock).mockResolvedValue({
+    vi.mocked(graphqlMock).mockResolvedValueOnce({
       data: {
         createReview: mockReview,
       },
     });
 
-    render(
-      <MemoryRouter>
-        <AddReview />
-      </MemoryRouter>
-    );
+    renderAddReview();
 
     await user.type(
       screen.getByLabelText(/rating/i),
@@ -255,7 +254,7 @@ describe("AddReview", () => {
   test("displays success message when review is added successfully", async () => {
     const user = userEvent.setup();
 
-    vi.mocked(useGetProduct).mockImplementation((productId) => {
+    vi.mocked(useGetProduct).mockImplementationOnce((productId) => {
       if (productId === "372db325-5f72-49fa-ba8c-ab628c0ed470") {
         return {
           product: {
@@ -284,7 +283,7 @@ describe("AddReview", () => {
       }
     });
 
-    vi.mocked(useCheckForUser).mockReturnValue({
+    vi.mocked(useCheckForUser).mockReturnValueOnce({
       user: {
         userId: "1234",
         username: "testuser",
@@ -293,17 +292,13 @@ describe("AddReview", () => {
       checkUser: vi.fn(),
     });
 
-    vi.mocked(graphqlMock).mockResolvedValue({
+    vi.mocked(graphqlMock).mockResolvedValueOnce({
       data: {
         createReview: mockReview,
       },
     });
 
-    render(
-      <MemoryRouter>
-        <AddReview />
-      </MemoryRouter>
-    );
+    renderAddReview();
 
     await user.type(
       screen.getByLabelText(/rating/i),
