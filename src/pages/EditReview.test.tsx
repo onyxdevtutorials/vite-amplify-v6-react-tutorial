@@ -47,6 +47,14 @@ vi.mock("react-toastify", () => ({
   },
 }));
 
+const renderEditReview = () => {
+  render(
+    <MemoryRouter>
+      <EditReview />
+    </MemoryRouter>
+  );
+};
+
 describe("EditReview", () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -59,11 +67,7 @@ describe("EditReview", () => {
       },
     });
 
-    render(
-      <MemoryRouter>
-        <EditReview />
-      </MemoryRouter>
-    );
+    renderEditReview();
 
     await waitFor(() => {
       expect(screen.getByRole("textbox", { name: /content/i })).toHaveValue(
@@ -84,11 +88,7 @@ describe("EditReview", () => {
       },
     });
 
-    render(
-      <MemoryRouter>
-        <EditReview />
-      </MemoryRouter>
-    );
+    renderEditReview();
 
     await waitFor(() => {
       expect(screen.getByRole("textbox", { name: /content/i })).toHaveValue(
@@ -102,8 +102,9 @@ describe("EditReview", () => {
     await user.clear(screen.getByRole("textbox", { name: /content/i }));
     await user.clear(screen.getByRole("spinbutton", { name: /rating/i }));
 
-    // Submit the form without filling in any fields
+    // Try to submit the form without filling in any fields
     await user.click(screen.getByRole("button", { name: /update/i }));
+    expect(screen.getByRole("button", { name: /update/i })).toBeDisabled();
 
     const requiredInputs = screen.getAllByText("Required");
     expect(requiredInputs.length).toBe(2);
@@ -124,11 +125,7 @@ describe("EditReview", () => {
         },
       });
 
-    render(
-      <MemoryRouter>
-        <EditReview />
-      </MemoryRouter>
-    );
+    renderEditReview();
 
     await waitFor(() => {
       expect(screen.getByRole("textbox", { name: /content/i })).toHaveValue(

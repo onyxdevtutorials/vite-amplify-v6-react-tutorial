@@ -14,17 +14,21 @@ vi.mock("react-toastify", () => ({
   },
 }));
 
+const renderChangePassword = () => {
+  render(
+    <MemoryRouter>
+      <ChangePassword />
+    </MemoryRouter>
+  );
+};
+
 describe("ChangePassword", () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
   test("renders Change Password form", () => {
-    render(
-      <MemoryRouter>
-        <ChangePassword />
-      </MemoryRouter>
-    );
+    renderChangePassword();
 
     expect(
       screen.getByRole("heading", { level: 1, name: /change password/i })
@@ -42,18 +46,15 @@ describe("ChangePassword", () => {
   test("updates password successfully", async () => {
     const user = userEvent.setup();
 
+    // Tests seem to hang indefinitely if use mockResolvedValueOnce
     vi.mocked(awsAmplifyAuth.getCurrentUser).mockResolvedValue({
       username: "testuser",
       userId: "123",
     });
 
-    vi.mocked(awsAmplifyAuth.updatePassword).mockResolvedValue();
+    vi.mocked(awsAmplifyAuth.updatePassword).mockResolvedValueOnce();
 
-    render(
-      <MemoryRouter>
-        <ChangePassword />
-      </MemoryRouter>
-    );
+    renderChangePassword();
 
     const oldPasswordInput = screen.getByLabelText("Old Password");
     const newPasswordInput = screen.getByLabelText("New Password");
@@ -81,20 +82,16 @@ describe("ChangePassword", () => {
     const user = userEvent.setup();
     const errorMessage = "Incorrect username or password.";
 
-    vi.mocked(awsAmplifyAuth.getCurrentUser).mockResolvedValue({
+    vi.mocked(awsAmplifyAuth.getCurrentUser).mockResolvedValueOnce({
       username: "testuser",
       userId: "123",
     });
 
-    vi.mocked(awsAmplifyAuth.updatePassword).mockRejectedValue({
+    vi.mocked(awsAmplifyAuth.updatePassword).mockRejectedValueOnce({
       message: errorMessage,
     });
 
-    render(
-      <MemoryRouter>
-        <ChangePassword />
-      </MemoryRouter>
-    );
+    renderChangePassword();
 
     const oldPasswordInput = screen.getByLabelText("Old Password");
     const newPasswordInput = screen.getByLabelText("New Password");
@@ -115,16 +112,12 @@ describe("ChangePassword", () => {
   test("displays feedback if user tries to submit form without entering old and new passwords", async () => {
     const user = userEvent.setup();
 
-    vi.mocked(awsAmplifyAuth.getCurrentUser).mockResolvedValue({
+    vi.mocked(awsAmplifyAuth.getCurrentUser).mockResolvedValueOnce({
       username: "testuser",
       userId: "123",
     });
 
-    render(
-      <MemoryRouter>
-        <ChangePassword />
-      </MemoryRouter>
-    );
+    renderChangePassword();
 
     const oldPasswordInput = screen.getByLabelText(/old password/i);
     const newPasswordInput = screen.getByLabelText(/new password/i);
