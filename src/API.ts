@@ -376,6 +376,7 @@ export type ListProductsWithReviewsQuery = {
       updatedAt: string,
       owner?: string | null,
       isArchived?: boolean | null,
+      image?: string | null,
       reviews?:  {
         __typename: "ModelReviewConnection",
         items:  Array< {
@@ -410,6 +411,7 @@ export type GetProductWithReviewsQuery = {
     description?: string | null,
     price?: string | null,
     isArchived?: boolean | null,
+    image?: string | null,
     reviews?:  {
       __typename: "ModelReviewConnection",
       items:  Array< {

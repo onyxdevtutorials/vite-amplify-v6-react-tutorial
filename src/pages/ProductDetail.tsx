@@ -110,6 +110,13 @@ function ProductDetail() {
     <>
       <Card>
         <Card.Body>
+          {product?.image && (
+            <Card.Img
+              src={`https://productimagesbucket203201-myenv.s3.amazonaws.com/public/${product.image}`}
+              alt={product.name}
+              className="product-image"
+            />
+          )}
           <Card.Title>{product?.name}</Card.Title>
           <Card.Text>{product?.description}</Card.Text>
           <Card.Text>{product?.price}</Card.Text>

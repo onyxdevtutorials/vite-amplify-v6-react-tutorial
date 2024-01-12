@@ -14,6 +14,7 @@ export const listProductsWithReviews = /* GraphQL */ `
         updatedAt
         owner
         isArchived
+        image
         reviews {
           items {
             id
@@ -42,6 +43,7 @@ export const getProductWithReviews = /* GraphQL */ `
       description
       price
       isArchived
+      image
       reviews {
         items {
           id

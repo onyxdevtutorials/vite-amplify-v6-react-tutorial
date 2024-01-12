@@ -44,6 +44,13 @@ const Product: React.FC<ProductProps> = ({ product, isAdmin }) => {
     <div>
       <Card role="listitem">
         <Card.Body>
+          {product.image && (
+            <Card.Img
+              src={`https://productimagesbucket203201-myenv.s3.amazonaws.com/public/${product.image}`}
+              alt={product.name}
+              className="product-image"
+            />
+          )}
           <Card.Title aria-label="product name" className="product-name">
             {product.name}
           </Card.Title>
