@@ -15,6 +15,7 @@ const mockProduct: ProductType = {
   description: "This is a test product",
   price: "9.99",
   isArchived: false,
+  image: "test-product.jpg",
   reviews: {
     __typename: "ModelReviewConnection",
     items: [
@@ -53,13 +54,15 @@ describe("Product", () => {
     vi.clearAllMocks();
   });
 
-  test("renders product list item correctly", () => {
+  test("renders product list item correctly for regular user", () => {
     render(
       <MemoryRouter>
         <Product product={mockProduct} isAdmin={false} />
       </MemoryRouter>
     );
 
+    const productImage = screen.getByRole("img");
+    expect(productImage.getAttribute("src")).toMatch(/test-product\.jpg$/);
     expect(screen.getByLabelText("product name")).toHaveTextContent(
       "Test Product"
     );
