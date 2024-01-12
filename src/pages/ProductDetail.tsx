@@ -23,8 +23,6 @@ function ProductDetail() {
   const { isLoggedIn, user } = useCheckForUser();
   const navigate = useNavigate();
 
-  console.log("user: ", user);
-
   useEffect(() => {
     const fetchProduct = async () => {
       if (!productId) {
@@ -40,7 +38,6 @@ function ProductDetail() {
         })) as GraphQLResult<GetProductWithReviewsQuery>;
 
         const productData = result.data?.getProduct;
-        console.log("productData: ", productData);
         if (!productData || result.errors) {
           setErrorMessage("Could not get product with ID: " + productId);
           return;

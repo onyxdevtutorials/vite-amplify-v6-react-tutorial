@@ -18,6 +18,7 @@ const { graphqlMock } = vi.hoisted(() => {
     description: "This is a test product",
     price: "9.99",
     isArchived: false,
+    image: "test-product.jpg",
     createdAt: "2022-01-01T00:00:00Z",
     updatedAt: "2022-01-01T00:00:00Z",
     reviews: {
@@ -116,7 +117,8 @@ describe("ProductDetail", () => {
 
     await renderProductDetail();
 
-    screen.debug();
+    const productImage = screen.getByRole("img");
+    expect(productImage.getAttribute("src")).toMatch(/test-product\.jpg$/);
 
     expect(screen.getByText("Test Product")).toBeInTheDocument();
 
