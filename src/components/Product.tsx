@@ -41,40 +41,38 @@ const Product: React.FC<ProductProps> = ({ product, isAdmin }) => {
   };
 
   return (
-    <div>
-      <Card role="listitem">
-        <Card.Body>
-          {product.image && (
-            <Card.Img
-              src={`https://productimagesbucket203201-myenv.s3.amazonaws.com/public/${product.image}`}
-              alt={product.name}
-              className="product-image"
-            />
-          )}
-          <Card.Title aria-label="product name" className="product-name">
-            {product.name}
-          </Card.Title>
-          <Card.Text>{product.description}</Card.Text>
-          <Card.Text>{product.price}</Card.Text>
-          <Card.Text>{product.reviews?.items?.length || 0} reviews</Card.Text>
-          <div>
-            {isAdmin && (
-              <>
-                <Button onClick={handleEdit}>Edit</Button>
-                <Button onClick={handleArchiveOrRestore}>
-                  {isArchived ? "Restore" : "Archive"}
-                </Button>
-              </>
-            )}
+    <Card role="listitem">
+      <Card.Body>
+        {product.image && (
+          <Card.Img
+            src={`https://productimagesbucket203201-myenv.s3.amazonaws.com/public/${product.image}`}
+            alt={product.name}
+            className="product-image"
+          />
+        )}
+        <Card.Title aria-label="product name" className="product-name">
+          {product.name}
+        </Card.Title>
+        <Card.Text>{product.description}</Card.Text>
+        <Card.Text>{product.price}</Card.Text>
+        <Card.Text>{product.reviews?.items?.length || 0} reviews</Card.Text>
+        <div>
+          {isAdmin && (
             <>
-              <Button onClick={() => navigate(`/products/${product.id}`)}>
-                Detail
+              <Button onClick={handleEdit}>Edit</Button>
+              <Button onClick={handleArchiveOrRestore}>
+                {isArchived ? "Restore" : "Archive"}
               </Button>
             </>
-          </div>
-        </Card.Body>
-      </Card>
-    </div>
+          )}
+          <>
+            <Button onClick={() => navigate(`/products/${product.id}`)}>
+              Detail
+            </Button>
+          </>
+        </div>
+      </Card.Body>
+    </Card>
   );
 };
 
