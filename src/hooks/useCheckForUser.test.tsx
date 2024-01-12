@@ -7,7 +7,7 @@ vi.mock("aws-amplify/auth");
 
 describe("useCheckForUser", () => {
   test("should set isLoggedIn to true when getCurrentUser resolves", async () => {
-    vi.mocked(getCurrentUser).mockResolvedValue({
+    vi.mocked(getCurrentUser).mockResolvedValueOnce({
       username: "test",
       userId: "123",
     });
@@ -22,7 +22,7 @@ describe("useCheckForUser", () => {
   });
 
   test("should set isLoggedIn to false when getCurrentUser rejects", async () => {
-    vi.mocked(getCurrentUser).mockRejectedValue(new Error("Error"));
+    vi.mocked(getCurrentUser).mockRejectedValueOnce(new Error("Error"));
 
     const { result } = renderHook(() => useCheckForUser());
 
