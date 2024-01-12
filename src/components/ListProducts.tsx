@@ -6,6 +6,7 @@ import useIsAdmin from "../hooks/useIsAdmin";
 import useCheckForUser from "../hooks/useCheckForUser";
 import { ProductWithReviews } from "../types";
 import { ListProductsWithReviewsQuery } from "../API";
+import { Button } from "react-bootstrap";
 
 const client = generateClient();
 
@@ -14,6 +15,18 @@ const ListProducts = () => {
   const [isLoading, setIsLoading] = useState(true);
   const { isAdmin, checkIsAdmin } = useIsAdmin();
   const { isLoggedIn, checkUser } = useCheckForUser();
+  const [sortField, setSortField] = useState<"name" | "price">("name");
+  const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
+
+  const toggleSortField = () => {
+    setSortField((prevField) => (prevField === "name" ? "price" : "name"));
+  };
+
+  const toggleSortDirection = () => {
+    setSortDirection((prevDirection) =>
+      prevDirection === "asc" ? "desc" : "asc"
+    );
+  };
 
   // memoize the function so it doesn't get recreated on every render
   const fetchProducts = useCallback(async () => {
@@ -61,21 +74,49 @@ const ListProducts = () => {
     }
   }, [checkUser, isLoggedIn, checkIsAdmin]);
 
+  const sortedProducts = [...products].sort((a, b) => {
+    if (sortField === "name") {
+      return sortDirection === "asc"
+        ? a.name.localeCompare(b.name)
+        : b.name.localeCompare(a.name);
+    } else {
+      if (a.price && b.price) {
+        const priceA = parseFloat(a.price);
+        const priceB = parseFloat(b.price);
+        return sortDirection === "asc" ? priceA - priceB : priceB - priceA;
+      } else {
+        return 0;
+      }
+    }
+  });
+
   if (isLoading) return <p>Loading...</p>;
 
   return (
     <div>
       <h1>List Products</h1>
       {products.length > 0 ? (
-        <div role="list">
-          {products.map((product) => (
-            <ProductComponent
-              key={product.id}
-              product={product}
-              isAdmin={isAdmin}
-            />
-          ))}
-        </div>
+        <>
+          <Button onClick={toggleSortField}>
+            Sort by {sortField === "price" ? "name" : "price"}
+          </Button>
+          <Button onClick={toggleSortDirection}>
+            Sort {sortDirection === "asc" ? "descending" : "ascending"}
+          </Button>
+          {isLoading ? (
+            <p>Loading...</p>
+          ) : (
+            <div role="list">
+              {sortedProducts.map((product) => (
+                <ProductComponent
+                  key={product.id}
+                  product={product}
+                  isAdmin={isAdmin}
+                />
+              ))}
+            </div>
+          )}
+        </>
       ) : (
         <p>No products to display</p>
       )}
