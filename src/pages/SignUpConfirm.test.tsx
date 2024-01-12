@@ -17,15 +17,23 @@ vi.mock("react-router-dom", async () => {
   };
 });
 
+const renderSignUpConfirm = () => {
+  render(
+    <MemoryRouter>
+      <SignUpConfirm />
+    </MemoryRouter>
+  );
+};
+
 describe("SignUpConfirm page", () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
   test("renders sign up confirmation form", () => {
-    vi.mocked(awsAmplifyAuth.getCurrentUser).mockRejectedValue({});
+    vi.mocked(awsAmplifyAuth.getCurrentUser).mockRejectedValueOnce({});
 
-    render(<SignUpConfirm />);
+    renderSignUpConfirm();
 
     const usernameInput = screen.getByRole("textbox", { name: /^username$/i });
     const confirmationCodeInput = screen.getByRole("textbox", {
@@ -41,12 +49,12 @@ describe("SignUpConfirm page", () => {
   });
 
   test("displays warning message when user is already signed in", async () => {
-    vi.mocked(awsAmplifyAuth.getCurrentUser).mockResolvedValue({
+    vi.mocked(awsAmplifyAuth.getCurrentUser).mockResolvedValueOnce({
       username: "testuser",
       userId: "111",
     });
 
-    render(<SignUpConfirm />);
+    renderSignUpConfirm();
 
     expect(
       await screen.findByText(
@@ -57,18 +65,18 @@ describe("SignUpConfirm page", () => {
 
   test("displays success message after successful sign up confirmation", async () => {
     const user = userEvent.setup();
+    // Tests fail when we use mockResolvedValueOnce
     vi.mocked(awsAmplifyAuth.getCurrentUser).mockRejectedValue({});
-    vi.mocked(awsAmplifyAuth.confirmSignUp).mockResolvedValue({
+
+    vi.mocked(awsAmplifyAuth.confirmSignUp).mockResolvedValueOnce({
       isSignUpComplete: true,
       nextStep: {
         signUpStep: "DONE",
       },
     });
-    render(
-      <MemoryRouter>
-        <SignUpConfirm />
-      </MemoryRouter>
-    );
+
+    renderSignUpConfirm();
+
     const confirmationCodeInput = screen.getByRole("textbox", {
       name: /^confirmation Code$/i,
     });
@@ -82,12 +90,10 @@ describe("SignUpConfirm page", () => {
 
   test("displays error message when user does not enter confirmation code", async () => {
     const user = userEvent.setup();
-    vi.mocked(awsAmplifyAuth.getCurrentUser).mockRejectedValue({});
-    render(
-      <MemoryRouter>
-        <SignUpConfirm />
-      </MemoryRouter>
-    );
+    vi.mocked(awsAmplifyAuth.getCurrentUser).mockRejectedValueOnce({});
+
+    renderSignUpConfirm();
+
     const submitButton = screen.getByRole("button", { name: /^submit$/i });
     await user.click(submitButton);
     const confirmationCodeInput = screen.getByRole("textbox", {
@@ -99,13 +105,11 @@ describe("SignUpConfirm page", () => {
 
   test("displays error message when user enters invalid confirmation code", async () => {
     const user = userEvent.setup();
-    vi.mocked(awsAmplifyAuth.getCurrentUser).mockRejectedValue({});
-    vi.mocked(awsAmplifyAuth.confirmSignUp).mockRejectedValue({});
-    render(
-      <MemoryRouter>
-        <SignUpConfirm />
-      </MemoryRouter>
-    );
+    vi.mocked(awsAmplifyAuth.getCurrentUser).mockRejectedValueOnce({});
+    vi.mocked(awsAmplifyAuth.confirmSignUp).mockRejectedValueOnce({});
+
+    renderSignUpConfirm();
+
     const confirmationCodeInput = screen.getByRole("textbox", {
       name: /^confirmation Code$/i,
     });

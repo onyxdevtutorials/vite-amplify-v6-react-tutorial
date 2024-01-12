@@ -4,27 +4,25 @@ import HomeLayout from "./HomeLayout";
 import { AuthContextProvider } from "../context/AuthContext";
 import { MemoryRouter } from "react-router-dom";
 
+const renderComponent = () => {
+  render(
+    <AuthContextProvider>
+      <MemoryRouter>
+        <HomeLayout />
+      </MemoryRouter>
+    </AuthContextProvider>
+  );
+};
+
 describe("HomeLayout", () => {
   test("renders the Banner component", () => {
-    render(
-      <AuthContextProvider>
-        <MemoryRouter>
-          <HomeLayout />
-        </MemoryRouter>
-      </AuthContextProvider>
-    );
+    renderComponent();
     const bannerElement = screen.getByRole("navigation");
     expect(bannerElement).toBeInTheDocument();
   });
 
   test("renders the main element", () => {
-    render(
-      <AuthContextProvider>
-        <MemoryRouter>
-          <HomeLayout />
-        </MemoryRouter>
-      </AuthContextProvider>
-    );
+    renderComponent();
     const mainElement = screen.getByRole("main");
     expect(mainElement).toBeInTheDocument();
   });

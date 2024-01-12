@@ -27,8 +27,7 @@ describe("SignUp page", () => {
   });
 
   test("renders sign up form when user is not logged in", () => {
-    // user not logged in
-    vi.mocked(awsAmplifyAuth.getCurrentUser).mockRejectedValue({});
+    vi.mocked(awsAmplifyAuth.getCurrentUser).mockRejectedValueOnce({});
 
     const { container } = render(
       <MemoryRouter>
@@ -52,7 +51,7 @@ describe("SignUp page", () => {
   });
 
   test("does not render sign up form when user is logged in", async () => {
-    vi.mocked(awsAmplifyAuth.getCurrentUser).mockResolvedValue({
+    vi.mocked(awsAmplifyAuth.getCurrentUser).mockResolvedValueOnce({
       username: "mockUser",
       userId: "111",
     });
@@ -75,10 +74,10 @@ describe("SignUp page", () => {
   test("redirects to /signupconfirm/:username upon successful submission", async () => {
     const user = userEvent.setup();
 
-    vi.mocked(awsAmplifyAuth.getCurrentUser).mockRejectedValue({});
+    vi.mocked(awsAmplifyAuth.getCurrentUser).mockRejectedValueOnce({});
 
     // Mock the signUp function from aws-amplify/auth
-    vi.mocked(awsAmplifyAuth.signUp).mockResolvedValue({
+    vi.mocked(awsAmplifyAuth.signUp).mockResolvedValueOnce({
       nextStep: {
         signUpStep: "CONFIRM_SIGN_UP",
         codeDeliveryDetails: {},
@@ -123,7 +122,7 @@ describe("SignUp page", () => {
   test("shows error feedback if user fails to fill out required fields", async () => {
     const user = userEvent.setup();
 
-    vi.mocked(awsAmplifyAuth.getCurrentUser).mockRejectedValue({});
+    vi.mocked(awsAmplifyAuth.getCurrentUser).mockRejectedValueOnce({});
 
     render(
       <MemoryRouter>

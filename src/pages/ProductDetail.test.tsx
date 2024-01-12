@@ -1,18 +1,16 @@
 import { expect, test, beforeEach, vi, describe } from "vitest";
 import { act } from "react-dom/test-utils";
-import { render, screen, waitFor } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
+import { render, screen } from "@testing-library/react";
 import { GetProductWithReviewsQuery } from "../API";
 import ProductDetail from "./ProductDetail";
 import { MemoryRouter } from "react-router-dom";
 import useCheckForUser from "../hooks/useCheckForUser";
 import useIsAdmin from "../hooks/useIsAdmin";
-import { generateClient } from "aws-amplify/api";
 
 vi.mock("../hooks/useCheckForUser");
 vi.mock("../hooks/useIsAdmin");
 
-const { mockProduct, graphqlMock } = vi.hoisted(() => {
+const { graphqlMock } = vi.hoisted(() => {
   const mockProduct: GetProductWithReviewsQuery["getProduct"] = {
     __typename: "Product",
     id: "372db325-5f72-49fa-ba8c-ab628c0ed470",
@@ -87,30 +85,36 @@ vi.mock("aws-amplify/api", () => ({
   })),
 }));
 
+const renderProductDetail = async () => {
+  await act(async () => {
+    render(
+      <MemoryRouter>
+        <ProductDetail />
+      </MemoryRouter>
+    );
+  });
+};
+
 describe("ProductDetail", () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
   test("renders product details", async () => {
+    // Test fails when using mockResolvedValueOnce
     vi.mocked(useCheckForUser).mockResolvedValue({
       isLoggedIn: true,
       user: { userId: "1", username: "testuser" },
       checkUser: vi.fn(),
     });
 
+    // Test fails when using mockResolvedValueOnce
     vi.mocked(useIsAdmin).mockResolvedValue({
       isAdmin: true,
       checkIsAdmin: vi.fn(),
     });
 
-    await act(async () => {
-      render(
-        <MemoryRouter>
-          <ProductDetail />
-        </MemoryRouter>
-      );
-    });
+    await renderProductDetail();
 
     screen.debug();
 

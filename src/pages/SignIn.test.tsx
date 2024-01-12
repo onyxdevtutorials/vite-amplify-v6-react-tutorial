@@ -41,12 +41,21 @@ vi.mock("../context/SignInContext", async () => {
   };
 });
 
+const renderSignIn = () => {
+  return render(
+    <MemoryRouter>
+      <SignIn />
+    </MemoryRouter>
+  );
+};
+
 describe("Sign In page", () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
   test("renders the sign in form if user is not already signed in", () => {
+    // Test fails with mockReturnValueOnce
     vi.mocked(useAuthContext).mockReturnValue({
       isAdmin: false,
       isLoggedIn: false,
@@ -56,16 +65,12 @@ describe("Sign In page", () => {
       setSignInStep: vi.fn(),
     });
 
-    vi.mocked(useSignInContext).mockReturnValue({
+    vi.mocked(useSignInContext).mockReturnValueOnce({
       signInStep: "",
       setSignInStep: vi.fn(),
     });
 
-    const { container } = render(
-      <MemoryRouter>
-        <SignIn />
-      </MemoryRouter>
-    );
+    const { container } = renderSignIn();
     const signInForm = container.querySelector("form.sign-in-form");
     expect(signInForm).toBeInTheDocument();
 
@@ -75,7 +80,7 @@ describe("Sign In page", () => {
   });
 
   test("does not show sign in form if user is already signed in", async () => {
-    vi.mocked(useAuthContext).mockReturnValue({
+    vi.mocked(useAuthContext).mockReturnValueOnce({
       isAdmin: false,
       isLoggedIn: true,
       setIsLoggedIn: vi.fn(),
@@ -84,16 +89,12 @@ describe("Sign In page", () => {
       setSignInStep: vi.fn(),
     });
 
-    vi.mocked(useSignInContext).mockReturnValue({
+    vi.mocked(useSignInContext).mockReturnValueOnce({
       signInStep: "DONE",
       setSignInStep: vi.fn(),
     });
 
-    const { container } = render(
-      <MemoryRouter>
-        <SignIn />
-      </MemoryRouter>
-    );
+    const { container } = renderSignIn();
 
     const signInForm = container.querySelector("form.sign-in-form");
     expect(signInForm).not.toBeInTheDocument();
@@ -102,7 +103,7 @@ describe("Sign In page", () => {
   });
 
   test("renders the sign in confirmation if a new password is required", () => {
-    vi.mocked(useAuthContext).mockReturnValue({
+    vi.mocked(useAuthContext).mockReturnValueOnce({
       isAdmin: false,
       isLoggedIn: false,
       setIsLoggedIn: vi.fn(),
@@ -111,16 +112,12 @@ describe("Sign In page", () => {
       setSignInStep: vi.fn(),
     });
 
-    vi.mocked(useSignInContext).mockReturnValue({
+    vi.mocked(useSignInContext).mockReturnValueOnce({
       signInStep: "CONFIRM_SIGN_IN_WITH_NEW_PASSWORD_REQUIRED",
       setSignInStep: vi.fn(),
     });
 
-    const { container } = render(
-      <MemoryRouter>
-        <SignIn />
-      </MemoryRouter>
-    );
+    const { container } = renderSignIn();
 
     const signInConfirm = container.querySelector("form.sign-in-confirm-form");
     expect(signInConfirm).toBeInTheDocument();
