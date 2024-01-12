@@ -59,18 +59,18 @@ const Product: React.FC<ProductProps> = ({ product, isAdmin }) => {
           <Card.Text>{product.reviews?.items?.length || 0} reviews</Card.Text>
           <div>
             {isAdmin && (
-              <div>
+              <>
                 <Button onClick={handleEdit}>Edit</Button>
                 <Button onClick={handleArchiveOrRestore}>
                   {isArchived ? "Restore" : "Archive"}
                 </Button>
-              </div>
+              </>
             )}
-            <div>
+            <>
               <Button onClick={() => navigate(`/products/${product.id}`)}>
                 Detail
               </Button>
-            </div>
+            </>
           </div>
         </Card.Body>
       </Card>
