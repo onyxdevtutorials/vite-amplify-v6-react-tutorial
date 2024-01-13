@@ -10,6 +10,7 @@ import {
   SignUp,
   SignUpConfirm,
   SignIn,
+  SignInConfirm,
   ChangePassword,
   ProductDetail,
   ProductDelete,
@@ -107,6 +108,10 @@ const router = createBrowserRouter([
       {
         path: "signin",
         element: <SignIn />,
+      },
+      {
+        path: "signinconfirm",
+        element: <SignInConfirm />,
       },
       {
         path: "changepassword",

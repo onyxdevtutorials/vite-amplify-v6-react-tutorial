@@ -5,6 +5,7 @@ export { default as EditProduct } from "./EditProduct";
 export { default as SignUp } from "./SignUp";
 export { default as SignUpConfirm } from "./SignUpConfirm";
 export { default as SignIn } from "./SignIn";
+export { default as SignInConfirm } from "./SignInConfirm";
 export { default as ChangePassword } from "./ChangePassword";
 export { default as ProductDetail } from "./ProductDetail";
 export { default as ProductDelete } from "./ProductDelete";
