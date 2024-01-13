@@ -1,15 +1,17 @@
 import React, { useState, useContext, createContext } from "react";
 import useCheckForUser from "../hooks/useCheckForUser";
 import {
-  signIn as awsSignIn,
-  signOut as awsSignOut,
   signUp as awsSignUp,
+  confirmSignUp as awsConfirmSignUp,
+  signIn as awsSignIn,
+  confirmSignIn as awsConfirmSignIn,
+  signOut as awsSignOut,
   AuthError,
   AuthUser,
   SignInInput,
   fetchAuthSession,
-  confirmSignUp as awsConfirmSignUp,
   ConfirmSignUpInput,
+  ConfirmSignInInput,
 } from "aws-amplify/auth";
 import { NavigateFunction } from "react-router-dom";
 import { toast } from "react-toastify";
@@ -37,6 +39,10 @@ export type AuthContextType = {
     values: ConfirmSignUpInput,
     navigate: NavigateFunction
   ) => Promise<void>;
+  confirmSignIn: (
+    values: ConfirmSignInInput,
+    navigate: NavigateFunction
+  ) => Promise<void>;
 };
 
 const AuthContext = createContext<AuthContextType | null>(null);
@@ -55,7 +61,10 @@ export const AuthContextProvider: React.FC<AuthContextProviderProps> = ({
     const { username, password } = values;
 
     try {
-      const { isSignedIn, nextStep } = await awsSignIn({ username, password });
+      const result = await awsSignIn({ username, password });
+      const isSignedIn = result.isSignedIn;
+      const nextStep = result.nextStep;
+      console.log("nextStep", nextStep);
 
       setSignInStep(nextStep.signInStep);
       setIsLoggedIn(isSignedIn);
@@ -66,7 +75,13 @@ export const AuthContextProvider: React.FC<AuthContextProviderProps> = ({
       }
 
       if (nextStep.signInStep === "DONE") {
+        toast.success("Sign in complete!");
         navigate("/");
+      } else if (
+        nextStep.signInStep === "CONFIRM_SIGN_IN_WITH_NEW_PASSWORD_REQUIRED"
+      ) {
+        toast.success("Please set a new password.");
+        navigate("/signinconfirm"); // signinconfirm
       }
     } catch (error) {
       // NotAuthorizedException: Incorrect username or password.
@@ -74,6 +89,37 @@ export const AuthContextProvider: React.FC<AuthContextProviderProps> = ({
       setIsLoggedIn(false);
       toast.error(`There was a problem signing you in: ${authError.message}`);
       console.error("error signing in", error);
+    }
+  };
+
+  const confirmSignIn = async (
+    values: ConfirmSignInInput,
+    navigate: NavigateFunction
+  ) => {
+    const { challengeResponse } = values;
+
+    try {
+      const { isSignedIn, nextStep } = await awsConfirmSignIn({
+        challengeResponse: challengeResponse,
+      });
+
+      setIsLoggedIn(isSignedIn);
+      setSignInStep(nextStep.signInStep);
+      if (isSignedIn) {
+        localStorage.setItem("isLoggedIn", "true");
+        const isAdmin = await checkIsAdmin();
+        setIsAdmin(isAdmin);
+      }
+      if (nextStep.signInStep === "DONE") {
+        navigate("/");
+      }
+    } catch (error) {
+      const authError = error as AuthError;
+      setIsLoggedIn(false);
+      toast.error(
+        `There was a problem confirming your sign in: ${authError.message}`
+      );
+      console.error("error confirming sign in", error);
     }
   };
 
@@ -176,6 +222,7 @@ export const AuthContextProvider: React.FC<AuthContextProviderProps> = ({
         signOut,
         signUp,
         confirmSignUp,
+        confirmSignIn,
       }}
     >
       {children}
