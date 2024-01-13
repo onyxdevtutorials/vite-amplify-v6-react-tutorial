@@ -1,40 +1,20 @@
 import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
-import Alert from "react-bootstrap/Alert";
-import {
-  confirmSignUp,
-  ConfirmSignUpInput,
-  AuthError,
-  getCurrentUser,
-} from "aws-amplify/auth";
-import { useState, useEffect } from "react";
-import { Link, useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { useFormik } from "formik";
 import * as yup from "yup";
+import { useAuthContext } from "../context/AuthContext";
+import { ConfirmSignUpInput } from "aws-amplify/auth";
+import { Alert } from "react-bootstrap";
 
 const validationSchema = yup.object().shape({
   confirmationCode: yup.string().required("Required"),
 });
 
-const checkForUser = async () => {
-  try {
-    await getCurrentUser();
-    return true;
-  } catch (err) {
-    // console.log(err);
-    return false;
-  }
-};
-
 const SignUpConfirm = () => {
   const { username = "" } = useParams<{ username: string }>();
-  const [signUpConfirmError, setSignUpConfirmError] = useState("");
-  const [isSignUpConfirmed, setIsSignUpConfirmed] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-
-  useEffect(() => {
-    checkForUser().then((res) => setIsLoggedIn(res));
-  });
+  const { confirmSignUp, isLoggedIn } = useAuthContext();
+  const navigate = useNavigate();
 
   const initialValues: ConfirmSignUpInput = {
     username: username,
@@ -42,23 +22,7 @@ const SignUpConfirm = () => {
   };
 
   const onSubmit = async (values: ConfirmSignUpInput) => {
-    try {
-      const { isSignUpComplete } = await confirmSignUp({
-        username: username,
-        confirmationCode: values.confirmationCode,
-      });
-
-      setIsSignUpConfirmed(isSignUpComplete);
-    } catch (error) {
-      if (error instanceof AuthError) {
-        setSignUpConfirmError(
-          `There was a problem confirming your sign up: ${error.message}`
-        );
-      } else {
-        setSignUpConfirmError("There was a problem confirming your sign up.");
-      }
-      // console.error("error confirming sign up", error);
-    }
+    await confirmSignUp(values, navigate);
   };
 
   const {
@@ -79,16 +43,6 @@ const SignUpConfirm = () => {
     return (
       <Alert variant="warning">
         <p>You are already signed in. You have no business confirming :-D</p>
-      </Alert>
-    );
-  }
-
-  if (isSignUpConfirmed) {
-    return (
-      <Alert variant="success">
-        <p>
-          Sign up complete. Please <Link to="/signin">sign in</Link>.
-        </p>
       </Alert>
     );
   }
@@ -135,9 +89,6 @@ const SignUpConfirm = () => {
           </Button>
         </div>
       </Form>
-      {signUpConfirmError && (
-        <Alert variant="warning">{signUpConfirmError}</Alert>
-      )}
     </>
   );
 };

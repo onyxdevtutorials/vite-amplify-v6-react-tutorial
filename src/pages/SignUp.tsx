@@ -1,11 +1,9 @@
 import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
-import Alert from "react-bootstrap/Alert";
-import { useState, useEffect } from "react";
 import { useFormik } from "formik";
 import * as yup from "yup";
-import { signUp, AuthError, getCurrentUser } from "aws-amplify/auth";
 import { useNavigate } from "react-router-dom";
+import { useAuthContext } from "../context/AuthContext";
 
 type SignUpType = {
   username: string;
@@ -31,52 +29,13 @@ const validationSchema = yup.object().shape({
     .required("Required"),
 });
 
-const checkForUser = async () => {
-  try {
-    const { username, userId, signInDetails } = await getCurrentUser();
-    console.log(`The username: ${username}`);
-    console.log(`The userId: ${userId}`);
-    console.log(`The signInDetails: ${signInDetails}`);
-    return true;
-  } catch (err) {
-    console.log(err);
-    return false;
-  }
-};
-
 const SignUp: React.FC = () => {
-  const [signUpError, setSignUpError] = useState("");
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const { signUp, isLoggedIn } = useAuthContext();
   const navigate = useNavigate();
-
-  useEffect(() => {
-    checkForUser().then((res) => setIsLoggedIn(res));
-  }, []);
 
   const onSubmit = async (values: SignUpType) => {
     const { username, password, email } = values;
-
-    try {
-      const { nextStep } = await signUp({
-        username: username,
-        password: password,
-        options: {
-          userAttributes: {
-            email: email,
-          },
-          autoSignIn: true,
-        },
-      });
-      console.log("setSignUpStep(nextStep.signUpStep)", nextStep.signUpStep);
-      navigate(`/signupconfirm/${username}`);
-    } catch (error) {
-      console.error("could not sign up", error);
-      if (error instanceof AuthError) {
-        setSignUpError(`There was a problem signing you up: ${error.message}`);
-      } else {
-        setSignUpError("There was a problem signing you up: Unknown error.");
-      }
-    }
+    await signUp({ username, password, email }, navigate);
   };
 
   const {
@@ -184,7 +143,6 @@ const SignUp: React.FC = () => {
           </Button>
         </div>
       </Form>
-      {signUpError && <Alert variant="warning">{signUpError}</Alert>}
     </>
   );
 };
