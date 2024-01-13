@@ -1,14 +1,12 @@
 import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
 import { Alert } from "react-bootstrap";
-import { signIn, SignInInput, AuthError } from "aws-amplify/auth";
-import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { SignInInput } from "aws-amplify/auth";
 import { useFormik } from "formik";
 import * as yup from "yup";
 import { useAuthContext } from "../context/AuthContext";
 import { useSignInContext } from "../context/SignInContext";
-import useIsAdmin from "../hooks/useIsAdmin";
+import { useNavigate } from "react-router-dom";
 
 const initialState = { username: "", password: "" };
 
@@ -18,42 +16,18 @@ const validationSchema = yup.object().shape({
 });
 
 const SignIn = () => {
-  const [signInError, setSignInError] = useState("");
-  const navigate = useNavigate();
   const initialValues: SignInInput = initialState;
-
-  const { setIsLoggedIn, setIsAdmin } = useAuthContext();
-  const { signInStep, setSignInStep } = useSignInContext();
-
-  const { isAdmin: isAdminFromHook } = useIsAdmin();
-  const [isAdmin, setIsAdminFromHook] = useState(isAdminFromHook);
-
-  useEffect(() => {
-    setIsAdminFromHook(isAdminFromHook);
-    setIsAdmin(isAdminFromHook);
-  }, [isAdminFromHook]);
+  const navigate = useNavigate();
+  const { signIn } = useAuthContext();
+  const { signInStep } = useSignInContext();
 
   const onSubmit = async (values: SignInInput) => {
     const { username, password } = values;
 
     try {
-      const { isSignedIn, nextStep } = await signIn({ username, password });
-
-      setSignInStep(nextStep.signInStep);
-      setIsLoggedIn(isSignedIn);
-      if (isSignedIn) {
-        localStorage.setItem("isLoggedIn", "true");
-      }
-      if (nextStep.signInStep === "DONE") {
-        navigate("/");
-      }
+      await signIn({ username, password }, navigate);
+      navigate("/");
     } catch (error) {
-      // NotAuthorizedException: Incorrect username or password.
-      const authError = error as AuthError;
-      setIsLoggedIn(false);
-      setSignInError(
-        `There was a problem signing you in: ${authError.message}`
-      );
       console.error("error signing in", error);
     }
   };
@@ -114,12 +88,6 @@ const SignIn = () => {
             </Button>
           </div>
         </Form>
-
-        {signInError && (
-          <Alert variant="warning">
-            <p>{signInError}</p>
-          </Alert>
-        )}
       </>
     );
   }
@@ -131,5 +99,11 @@ const SignIn = () => {
       </Alert>
     );
   }
+
+  return (
+    <Alert variant="danger">
+      <p>There was a problem signing you in.</p>
+    </Alert>
+  );
 };
 export default SignIn;
