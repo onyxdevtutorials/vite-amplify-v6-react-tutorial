@@ -1,5 +1,3 @@
-import { getCurrentUser } from "aws-amplify/auth";
-import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Navbar from "react-bootstrap/Navbar";
 import Container from "react-bootstrap/Container";
@@ -10,29 +8,9 @@ import { useAuthContext } from "../context/AuthContext";
 import { SignOut } from "../components/";
 
 const Banner = () => {
-  const { isLoggedIn, setIsLoggedIn, isAdmin } = useAuthContext();
+  const { isLoggedIn, isAdmin } = useAuthContext();
 
   const navigate = useNavigate();
-
-  const currentAuthenticatedUser = async () => {
-    try {
-      const currentUser = await getCurrentUser();
-      console.log("currentUser", currentUser);
-      // const { username } = currentUser;
-      // const { userId } = currentUser;
-      // const { signInDetails } = currentUser;
-      // console.log("username", username);
-      // console.log("userId", userId);
-      // console.log("signInDetails", signInDetails);
-      setIsLoggedIn(true);
-    } catch (error) {
-      setIsLoggedIn(false);
-    }
-  };
-
-  useEffect(() => {
-    currentAuthenticatedUser();
-  }, []);
 
   const handleSignUp = () => {
     navigate("/signup");
