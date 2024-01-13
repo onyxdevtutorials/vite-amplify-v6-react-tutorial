@@ -2,13 +2,13 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { generateClient, GraphQLResult } from "aws-amplify/api";
 import useCheckForUser from "../hooks/useCheckForUser";
-import useIsAdmin from "../hooks/useIsAdmin";
 import { Button, Card } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import { archiveProduct, restoreProduct } from "../graphql/customMutations";
 import { getProductWithReviews } from "../graphql/customQueries";
 import { GetProductWithReviewsQuery } from "../API";
 import { toast } from "react-toastify";
+import { useAuthContext } from "../context/AuthContext";
 
 const client = generateClient();
 
@@ -19,7 +19,7 @@ function ProductDetail() {
   >(null);
   const [errorMessage, setErrorMessage] = useState("");
   const [isLoading, setIsLoading] = useState(true);
-  const { isAdmin } = useIsAdmin();
+  const { isAdmin } = useAuthContext();
   const { isLoggedIn, user } = useCheckForUser();
   const navigate = useNavigate();
 

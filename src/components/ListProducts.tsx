@@ -2,19 +2,17 @@ import { generateClient } from "aws-amplify/api";
 import { listProductsWithReviews } from "../graphql/customQueries";
 import { useEffect, useState, useCallback } from "react";
 import { Product as ProductComponent } from "./index";
-import useIsAdmin from "../hooks/useIsAdmin";
-import useCheckForUser from "../hooks/useCheckForUser";
 import { ProductWithReviews } from "../types";
 import { ListProductsWithReviewsQuery } from "../API";
 import { Button } from "react-bootstrap";
+import { useAuthContext } from "../context/AuthContext";
 
 const client = generateClient();
 
 const ListProducts = () => {
   const [products, setProducts] = useState<ProductWithReviews[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const { isAdmin, checkIsAdmin } = useIsAdmin();
-  const { isLoggedIn, checkUser } = useCheckForUser();
+  const { isAdmin, isLoggedIn } = useAuthContext();
   const [sortField, setSortField] = useState<"name" | "price">("name");
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
 
@@ -67,12 +65,12 @@ const ListProducts = () => {
     fetchProducts();
   }, [fetchProducts]);
 
-  useEffect(() => {
-    checkUser();
-    if (isLoggedIn) {
-      checkIsAdmin();
-    }
-  }, [checkUser, isLoggedIn, checkIsAdmin]);
+  // useEffect(() => {
+  //   checkUser();
+  //   if (isLoggedIn) {
+  //     checkIsAdmin();
+  //   }
+  // }, [checkUser, isLoggedIn, checkIsAdmin]);
 
   const sortedProducts = [...products].sort((a, b) => {
     if (sortField === "name") {

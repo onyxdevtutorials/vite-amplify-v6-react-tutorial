@@ -3,16 +3,25 @@ import useCheckForUser from "../hooks/useCheckForUser";
 import {
   signIn as awsSignIn,
   signOut as awsSignOut,
+  signUp as awsSignUp,
   AuthError,
   AuthUser,
   SignInInput,
   fetchAuthSession,
+  confirmSignUp as awsConfirmSignUp,
+  ConfirmSignUpInput,
 } from "aws-amplify/auth";
 import { NavigateFunction } from "react-router-dom";
 import { toast } from "react-toastify";
 
 type AuthContextProviderProps = {
   children: React.ReactNode;
+};
+
+type SignUpType = {
+  username: string;
+  password: string;
+  email: string;
 };
 
 export type AuthContextType = {
@@ -23,6 +32,11 @@ export type AuthContextType = {
   user: AuthUser | null;
   signIn: (values: SignInInput, navigate: NavigateFunction) => Promise<void>;
   signOut: (navigate: NavigateFunction) => Promise<void>;
+  signUp: (values: SignUpType, navigate: NavigateFunction) => Promise<void>;
+  confirmSignUp: (
+    values: ConfirmSignUpInput,
+    navigate: NavigateFunction
+  ) => Promise<void>;
 };
 
 const AuthContext = createContext<AuthContextType | null>(null);
@@ -35,9 +49,7 @@ export const AuthContextProvider: React.FC<AuthContextProviderProps> = ({
   const [isLoggedIn, setIsLoggedIn] = useState(
     localStorage.getItem("isLoggedIn") === "true"
   );
-  const [isAdmin, setIsAdmin] = useState(
-    localStorage.getItem("isAdmin") === "true"
-  );
+  const [isAdmin, setIsAdmin] = useState(false);
 
   const signIn = async (values: SignInInput, navigate: NavigateFunction) => {
     const { username, password } = values;
@@ -51,11 +63,6 @@ export const AuthContextProvider: React.FC<AuthContextProviderProps> = ({
         localStorage.setItem("isLoggedIn", "true");
         const isAdmin = await checkIsAdmin();
         setIsAdmin(isAdmin);
-        if (isAdmin) {
-          localStorage.setItem("isAdmin", "true");
-        } else {
-          localStorage.setItem("isAdmin", "false");
-        }
       }
 
       if (nextStep.signInStep === "DONE") {
@@ -76,7 +83,6 @@ export const AuthContextProvider: React.FC<AuthContextProviderProps> = ({
       setIsLoggedIn(false);
       setIsAdmin(false);
       localStorage.removeItem("isLoggedIn");
-      localStorage.removeItem("isAdmin");
       navigate("/");
     } catch (error) {
       const authError = error as AuthError;
@@ -85,9 +91,60 @@ export const AuthContextProvider: React.FC<AuthContextProviderProps> = ({
     }
   };
 
-  const checkIsAdmin = async () => {
-    let isAdmin = localStorage.getItem("isAdmin") === "true";
+  const signUp = async (values: SignUpType, navigate: NavigateFunction) => {
+    const { username, password, email } = values;
 
+    try {
+      const { nextStep } = await awsSignUp({
+        username: username,
+        password: password,
+        options: {
+          userAttributes: {
+            email: email,
+          },
+          autoSignIn: true,
+        },
+      });
+      console.log("setSignUpStep(nextStep.signUpStep)", nextStep.signUpStep);
+      navigate(`/signupconfirm/${username}`);
+    } catch (error) {
+      console.error("could not sign up", error);
+      if (error instanceof AuthError) {
+        toast.error(`There was a problem signing you up: ${error.message}`);
+      } else {
+        toast.error("There was a problem signing you up: Unknown error.");
+      }
+    }
+  };
+
+  const confirmSignUp = async (
+    values: ConfirmSignUpInput,
+    navigate: NavigateFunction
+  ) => {
+    try {
+      const result = await awsConfirmSignUp({
+        username: values.username,
+        confirmationCode: values.confirmationCode,
+      });
+
+      if (result.isSignUpComplete) {
+        toast.success("Sign up complete!");
+        navigate("/");
+      }
+    } catch (error) {
+      if (error instanceof AuthError) {
+        toast.error(
+          `There was a problem confirming your sign up: ${error.message}`
+        );
+      } else {
+        toast.error("There was a problem confirming your sign up.");
+      }
+      console.error("error confirming sign up", error);
+    }
+  };
+
+  const checkIsAdmin = async () => {
+    let isAdmin = false;
     try {
       const session = await fetchAuthSession();
       const tokens = session.tokens;
@@ -117,6 +174,8 @@ export const AuthContextProvider: React.FC<AuthContextProviderProps> = ({
         user,
         signIn,
         signOut,
+        signUp,
+        confirmSignUp,
       }}
     >
       {children}
