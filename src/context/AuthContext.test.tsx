@@ -96,8 +96,13 @@ const TestComponent: React.FC = () => {
 describe("AuthContext", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    render(
+      <AuthContextProvider>
+        <TestComponent />
+      </AuthContextProvider>
+    );
   });
-  test("should call AWS signIn with correct values for the case where confirmation (password change) is not required", async () => {
+  test("should call AWS signIn with correct values for the case where confirmation (password change) is not required (user is not admin)", async () => {
     const user = userEvent.setup();
 
     vi.mocked(awsAmplifyAuth.signIn).mockResolvedValueOnce({
@@ -107,12 +112,8 @@ describe("AuthContext", () => {
       isSignedIn: true,
     });
 
-    render(
-      <AuthContextProvider>
-        <TestComponent />
-      </AuthContextProvider>
-    );
-
+    const isAdminStatus = screen.getByTestId("isAdmin");
+    const signedInStatus = screen.getByTestId("isLoggedIn");
     const signInButton = screen.getByRole("button", { name: "Sign In" });
     const signOutButton = screen.getByRole("button", { name: "Sign Out" });
     const signUpButton = screen.getByRole("button", { name: "Sign Up" });
@@ -126,6 +127,10 @@ describe("AuthContext", () => {
       name: "setSignInStep",
     });
 
+    expect(signedInStatus).toHaveTextContent("isLoggedIn: false");
+
+    expect(isAdminStatus).toHaveTextContent("isAdmin: false");
+
     expect(signInButton).toBeInTheDocument();
 
     await user.click(signInButton);
@@ -134,6 +139,10 @@ describe("AuthContext", () => {
       username: "testuser",
       password: "testpassword",
     });
+
+    expect(signedInStatus).toHaveTextContent("isLoggedIn: true");
+
+    expect(isAdminStatus).toHaveTextContent("isAdmin: false");
   });
   test("should call AWS confirmSignIn with correct values and navigate to /confirmsignin when signInStep is CONFIRM_SIGN_IN_WITH_NEW_PASSWORD_REQUIRED", async () => {
     const user = userEvent.setup();
@@ -142,7 +151,7 @@ describe("AuthContext", () => {
       nextStep: {
         signInStep: "CONFIRM_SIGN_IN_WITH_NEW_PASSWORD_REQUIRED",
       },
-      isSignedIn: false,
+      isSignedIn: true,
     });
 
     vi.mocked(awsAmplifyAuth.confirmSignIn).mockResolvedValueOnce({
@@ -152,11 +161,11 @@ describe("AuthContext", () => {
       isSignedIn: true,
     });
 
-    render(
-      <AuthContextProvider>
-        <TestComponent />
-      </AuthContextProvider>
-    );
+    const isSignedInStatus = screen.getByTestId("isLoggedIn");
+    const isAdminStatus = screen.getByTestId("isAdmin");
+
+    expect(isSignedInStatus).toHaveTextContent("isLoggedIn: true");
+    expect(isAdminStatus).toHaveTextContent("isAdmin: false");
 
     const confirmSignInButton = screen.getByRole("button", {
       name: "Confirm Sign In",
@@ -165,6 +174,9 @@ describe("AuthContext", () => {
     expect(confirmSignInButton).toBeInTheDocument();
 
     await user.click(confirmSignInButton);
+
+    expect(isSignedInStatus).toHaveTextContent("isLoggedIn: true");
+    expect(isAdminStatus).toHaveTextContent("isAdmin: false");
 
     expect(awsAmplifyAuth.confirmSignIn).toHaveBeenCalledWith({
       challengeResponse: "xyz",
@@ -185,12 +197,6 @@ describe("AuthContext", () => {
       },
       isSignUpComplete: false,
     });
-
-    render(
-      <AuthContextProvider>
-        <TestComponent />
-      </AuthContextProvider>
-    );
 
     const signUpButton = screen.getByRole("button", { name: "Sign Up" });
 
@@ -219,12 +225,6 @@ describe("AuthContext", () => {
       },
     });
 
-    render(
-      <AuthContextProvider>
-        <TestComponent />
-      </AuthContextProvider>
-    );
-
     const confirmSignUpButton = screen.getByRole("button", {
       name: "Confirm Sign Up",
     });
@@ -243,12 +243,6 @@ describe("AuthContext", () => {
     const user = userEvent.setup();
 
     vi.mocked(awsAmplifyAuth.signOut).mockResolvedValueOnce(undefined);
-
-    render(
-      <AuthContextProvider>
-        <TestComponent />
-      </AuthContextProvider>
-    );
 
     const signOutButton = screen.getByRole("button", { name: "Sign Out" });
 
