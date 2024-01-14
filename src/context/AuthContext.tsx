@@ -72,6 +72,8 @@ export const AuthContextProvider: React.FC<AuthContextProviderProps> = ({
         localStorage.setItem("isLoggedIn", "true");
         const isAdmin = await checkIsAdmin();
         setIsAdmin(isAdmin);
+      } else {
+        localStorage.setItem("isLoggedIn", "false");
       }
 
       if (nextStep.signInStep === "DONE") {
