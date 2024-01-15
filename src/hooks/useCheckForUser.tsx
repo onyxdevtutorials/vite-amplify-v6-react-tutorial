@@ -11,12 +11,12 @@ const useCheckForUser = () => {
       const currentUser = await getCurrentUser();
       setIsLoggedIn(true);
       setUser(currentUser);
-      localStorage.setItem("isLoggedIn", "true");
+      // localStorage.setItem("isLoggedIn", "true");
     } catch (err) {
       console.error(err);
       setIsLoggedIn(false);
       setUser(null);
-      localStorage.setItem("isLoggedIn", "false");
+      // localStorage.setItem("isLoggedIn", "false");
     }
   }, []);
 
