@@ -10,6 +10,7 @@ import useGetProduct from "../hooks/useGetProduct";
 import { Card } from "react-bootstrap";
 import useCheckForUser from "../hooks/useCheckForUser";
 import { toast } from "react-toastify";
+import { useAuthContext } from "../context/AuthContext";
 
 const validationSchema = yup.object().shape({
   rating: yup.number().required("Required"),
@@ -21,7 +22,7 @@ const client = generateClient();
 const AddReview = () => {
   const { productId } = useParams<{ productId: string }>();
   const { product, isLoading } = useGetProduct(productId);
-  const { user } = useCheckForUser();
+  const { user } = useAuthContext();
 
   const {
     values,

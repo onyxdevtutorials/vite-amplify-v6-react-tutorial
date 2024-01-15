@@ -20,7 +20,7 @@ function ProductDetail() {
   const [errorMessage, setErrorMessage] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const { isAdmin } = useAuthContext();
-  const { isLoggedIn, user } = useCheckForUser();
+  const { isLoggedIn, user } = useAuthContext();
   const navigate = useNavigate();
 
   useEffect(() => {
