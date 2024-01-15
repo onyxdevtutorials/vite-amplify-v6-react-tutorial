@@ -1,6 +1,8 @@
 import { renderHook, waitFor } from "@testing-library/react";
 import { describe, test, expect, vi, beforeEach } from "vitest";
+import { AuthContextProvider } from "../context/AuthContext";
 import useGetProduct from "./useGetProduct";
+import { ReactNode } from "react";
 
 vi.mock("aws-amplify/auth");
 
@@ -42,8 +44,13 @@ describe("useGetProduct", () => {
       },
     });
 
-    const { result } = renderHook(() =>
-      useGetProduct("372db325-5f72-49fa-ba8c-ab628c0ed470")
+    const wrapper = ({ children }: { children?: ReactNode }) => (
+      <AuthContextProvider>{children}</AuthContextProvider>
+    );
+
+    const { result } = renderHook(
+      () => useGetProduct("372db325-5f72-49fa-ba8c-ab628c0ed470"),
+      { wrapper }
     );
 
     await waitFor(() => result.current.product !== null);
@@ -59,8 +66,13 @@ describe("useGetProduct", () => {
       errors: ["error fetching product"],
     });
 
-    const { result } = renderHook(() =>
-      useGetProduct("372db325-5f72-49fa-ba8c-ab628c0ed470")
+    const wrapper = ({ children }: { children?: ReactNode }) => (
+      <AuthContextProvider>{children}</AuthContextProvider>
+    );
+
+    const { result } = renderHook(
+      () => useGetProduct("372db325-5f72-49fa-ba8c-ab628c0ed470"),
+      { wrapper }
     );
 
     await waitFor(() => result.current.errorMessage !== "");
