@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
 import { getProduct } from "../graphql/queries";
 import { generateClient, GraphQLResult } from "aws-amplify/api";
-import useCheckForUser from "../hooks/useCheckForUser";
 import { GetProductQuery } from "../API";
+import { useAuthContext } from "../context/AuthContext";
 
 const client = generateClient();
 
@@ -10,7 +10,7 @@ const useGetProduct = (productId: string | undefined) => {
   const [product, setProduct] = useState<GetProductQuery["getProduct"]>(null);
   const [errorMessage, setErrorMessage] = useState("");
   const [isLoading, setIsLoading] = useState(true);
-  const { isLoggedIn } = useCheckForUser();
+  const { isLoggedIn } = useAuthContext();
 
   useEffect(() => {
     const fetchProduct = async () => {
