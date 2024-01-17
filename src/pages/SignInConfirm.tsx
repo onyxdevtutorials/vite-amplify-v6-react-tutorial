@@ -16,10 +16,14 @@ const SignInConfirm = () => {
 
   const { confirmSignIn } = useAuthContext();
 
-  const onSubmit = async (values: ConfirmSignInInput) => {
+  const onSubmit = async (
+    values: ConfirmSignInInput,
+    { setSubmitting }: { setSubmitting: (isSubmitting: boolean) => void }
+  ) => {
     const { challengeResponse } = values;
-
+    setSubmitting(true);
     await confirmSignIn({ challengeResponse }, navigate);
+    setSubmitting(false);
   };
 
   const {
@@ -33,7 +37,7 @@ const SignInConfirm = () => {
   } = useFormik({
     initialValues: initialValues,
     validationSchema: validationSchema,
-    onSubmit: onSubmit,
+    onSubmit: (values, formikHelpers) => onSubmit(values, formikHelpers),
   });
 
   return (
