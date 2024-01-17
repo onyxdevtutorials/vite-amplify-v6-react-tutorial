@@ -18,13 +18,19 @@ const SignIn = () => {
   const navigate = useNavigate();
   const { signIn } = useAuthContext();
 
-  const onSubmit = async (values: SignInInput) => {
+  const onSubmit = async (
+    values: SignInInput,
+    { setSubmitting }: { setSubmitting: (isSubmitting: boolean) => void }
+  ) => {
     const { username, password } = values;
 
     try {
+      setSubmitting(true);
       await signIn({ username, password }, navigate);
     } catch (error) {
       console.error("error signing in", error);
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -39,7 +45,7 @@ const SignIn = () => {
   } = useFormik({
     initialValues: initialValues,
     validationSchema: validationSchema,
-    onSubmit: onSubmit,
+    onSubmit: (values, formikHelpers) => onSubmit(values, formikHelpers),
   });
 
   return (
