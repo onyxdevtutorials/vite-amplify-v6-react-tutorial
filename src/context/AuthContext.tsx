@@ -18,6 +18,7 @@ import { toast } from "react-toastify";
 
 type AuthContextProviderProps = {
   children: React.ReactNode;
+  initialAuthState?: AuthContextType;
 };
 
 type SignUpType = {
@@ -43,19 +44,46 @@ export type AuthContextType = {
     values: ConfirmSignInInput,
     navigate: NavigateFunction
   ) => Promise<void>;
+  resetAuthState: () => void;
 };
 
 const AuthContext = createContext<AuthContextType | null>(null);
 
+const defaultAuthState = {
+  isLoggedIn: false,
+  signInStep: "",
+  setSignInStep: () => {},
+  isAdmin: false,
+  user: null,
+  signIn: async () => {},
+  signOut: async () => {},
+  signUp: async () => {},
+  confirmSignUp: async () => {},
+  confirmSignIn: async () => {},
+};
+
 export const AuthContextProvider: React.FC<AuthContextProviderProps> = ({
   children,
+  initialAuthState,
 }) => {
-  const [signInStep, setSignInStep] = useState("");
-  const { user } = useCheckForUser();
+  const defaultState = initialAuthState || defaultAuthState;
+  const checkForUser = useCheckForUser();
+  const user = defaultState.user || checkForUser.user;
+  // const [authState, setAuthState] = useState(defaultAuthState); // might not need this
+  const [signInStep, setSignInStep] = useState(defaultState.signInStep);
   const [isLoggedIn, setIsLoggedIn] = useState(
-    localStorage.getItem("isLoggedIn") === "true"
+    initialAuthState?.isLoggedIn !== undefined
+      ? initialAuthState.isLoggedIn
+      : localStorage.getItem("isLoggedIn") === "true"
   );
-  const [isAdmin, setIsAdmin] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(defaultState.isAdmin);
+
+  const resetAuthState = () => {
+    setSignInStep(defaultState.signInStep);
+    setIsLoggedIn(defaultState.isLoggedIn);
+    setIsAdmin(defaultState.isAdmin);
+    localStorage.removeItem("isLoggedIn");
+  };
 
   const signIn = async (values: SignInInput, navigate: NavigateFunction) => {
     const { username, password } = values;
@@ -99,6 +127,7 @@ export const AuthContextProvider: React.FC<AuthContextProviderProps> = ({
     navigate: NavigateFunction
   ) => {
     const { challengeResponse } = values;
+    console.log("original confirmSignIn called");
 
     try {
       const { isSignedIn, nextStep } = await awsConfirmSignIn({
@@ -225,6 +254,7 @@ export const AuthContextProvider: React.FC<AuthContextProviderProps> = ({
         signUp,
         confirmSignUp,
         confirmSignIn,
+        resetAuthState,
       }}
     >
       {children}
