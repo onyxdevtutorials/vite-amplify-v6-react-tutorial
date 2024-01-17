@@ -8,7 +8,6 @@ import { createReview } from "../graphql/mutations";
 import { useParams } from "react-router-dom";
 import useGetProduct from "../hooks/useGetProduct";
 import { Card } from "react-bootstrap";
-import useCheckForUser from "../hooks/useCheckForUser";
 import { toast } from "react-toastify";
 import { useAuthContext } from "../context/AuthContext";
 
@@ -22,7 +21,7 @@ const client = generateClient();
 const AddReview = () => {
   const { productId } = useParams<{ productId: string }>();
   const { product, isLoading } = useGetProduct(productId);
-  const { user } = useAuthContext();
+  const { user, isLoggedIn } = useAuthContext();
 
   const {
     values,
@@ -66,6 +65,10 @@ const AddReview = () => {
 
   if (isLoading) {
     return <Spinner animation="border" />;
+  }
+
+  if (!isLoggedIn) {
+    return <p>Please sign in to add a review</p>;
   }
 
   return (
