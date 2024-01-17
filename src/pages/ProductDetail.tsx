@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { generateClient, GraphQLResult } from "aws-amplify/api";
-import useCheckForUser from "../hooks/useCheckForUser";
 import { Button, Card } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import { archiveProduct, restoreProduct } from "../graphql/customMutations";
@@ -19,8 +18,7 @@ function ProductDetail() {
   >(null);
   const [errorMessage, setErrorMessage] = useState("");
   const [isLoading, setIsLoading] = useState(true);
-  const { isAdmin } = useAuthContext();
-  const { isLoggedIn, user } = useAuthContext();
+  const { isLoggedIn, user, isAdmin } = useAuthContext();
   const navigate = useNavigate();
 
   useEffect(() => {
