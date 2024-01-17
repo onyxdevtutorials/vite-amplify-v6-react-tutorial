@@ -65,13 +65,6 @@ const ListProducts = () => {
     fetchProducts();
   }, [fetchProducts]);
 
-  // useEffect(() => {
-  //   checkUser();
-  //   if (isLoggedIn) {
-  //     checkIsAdmin();
-  //   }
-  // }, [checkUser, isLoggedIn, checkIsAdmin]);
-
   const sortedProducts = [...products].sort((a, b) => {
     if (sortField === "name") {
       return sortDirection === "asc"
