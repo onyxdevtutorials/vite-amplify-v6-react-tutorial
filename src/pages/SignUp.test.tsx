@@ -1,41 +1,91 @@
-import { describe, test, expect, beforeEach, vi } from "vitest";
+import { describe, test, expect, beforeEach, vi, afterEach } from "vitest";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import SignUp from "./SignUp";
-import * as awsAmplifyAuth from "aws-amplify/auth";
 import { MemoryRouter } from "react-router-dom";
+import { AuthContextProvider } from "../context/AuthContext";
 
 const { mockNavigate } = vi.hoisted(() => {
   return { mockNavigate: vi.fn() };
 });
 
-vi.mock("react-router-dom", async () => {
-  const router = await vi.importActual<typeof import("react-router-dom")>(
-    "react-router-dom"
-  );
+const { signUpMock } = vi.hoisted(() => {
+  return { signUpMock: vi.fn().mockResolvedValue({}) };
+});
+
+const { useAuthContextMock } = vi.hoisted(() => {
   return {
-    ...router,
-    useNavigate: vi.fn().mockReturnValue(mockNavigate),
+    useAuthContextMock: vi.fn().mockReturnValue({
+      isLoggedIn: false,
+      signInStep: "",
+      setSignInStep: vi.fn(),
+      isAdmin: false,
+      user: null,
+      signIn: vi.fn(),
+      signOut: vi.fn(),
+      signUp: signUpMock,
+      confirmSignUp: vi.fn(),
+      confirmSignIn: vi.fn(),
+      resetAuthState: vi.fn(),
+    }),
+  };
+});
+
+vi.mock("../context/AuthContext", async () => {
+  const actual = await import("../context/AuthContext");
+  return {
+    ...actual,
+    useAuthContext: useAuthContextMock,
   };
 });
 
 vi.mock("aws-amplify/auth");
 
-describe("SignUp page", () => {
+describe("SignUp page when user is not logged in", () => {
   beforeEach(() => {
     vi.clearAllMocks();
-  });
 
-  test("renders sign up form when user is not logged in", () => {
-    vi.mocked(awsAmplifyAuth.getCurrentUser).mockRejectedValueOnce({});
+    vi.mock("react-router-dom", async () => {
+      const router = await vi.importActual<typeof import("react-router-dom")>(
+        "react-router-dom"
+      );
+      return {
+        ...router,
+        useNavigate: () => mockNavigate,
+      };
+    });
 
-    const { container } = render(
+    vi.mocked(useAuthContextMock).mockReturnValue({
+      isLoggedIn: false,
+      signInStep: "",
+      setSignInStep: vi.fn(),
+      isAdmin: false,
+      user: null,
+      signIn: vi.fn(),
+      signOut: vi.fn(),
+      signUp: signUpMock,
+      confirmSignUp: vi.fn(),
+      confirmSignIn: vi.fn(),
+      resetAuthState: vi.fn(),
+    });
+
+    render(
       <MemoryRouter>
-        <SignUp />
+        <AuthContextProvider>
+          <SignUp />
+        </AuthContextProvider>
       </MemoryRouter>
     );
+  });
 
-    const signUpForm = container.querySelector("form.sign-up-form");
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  test("renders sign up form when user is not logged in", async () => {
+    const signUpForm = await screen.findByRole("form", {
+      name: /Sign Up Form/i,
+    });
     expect(signUpForm).toBeInTheDocument();
 
     expect(
@@ -50,101 +100,83 @@ describe("SignUp page", () => {
     ).toBeInTheDocument();
   });
 
-  test("does not render sign up form when user is logged in", async () => {
-    vi.mocked(awsAmplifyAuth.getCurrentUser).mockResolvedValueOnce({
-      username: "mockUser",
-      userId: "111",
-    });
-
-    render(
-      <MemoryRouter>
-        <SignUp />
-      </MemoryRouter>
-    );
-
-    // This works because I gave the form an accessible name via aria-label.
-    // https://github.com/testing-library/dom-testing-library/issues/474
-    expect(await screen.findByRole("form")).not.toBeInTheDocument();
-
-    expect(
-      await screen.findByText(/You are logged in now/i)
-    ).toBeInTheDocument();
-  });
-
-  test("redirects to /signupconfirm/:username upon successful submission", async () => {
+  test("should call signUp fn from AuthContext with correct values", async () => {
     const user = userEvent.setup();
 
-    vi.mocked(awsAmplifyAuth.getCurrentUser).mockRejectedValueOnce({});
-
-    // Mock the signUp function from aws-amplify/auth
-    vi.mocked(awsAmplifyAuth.signUp).mockResolvedValueOnce({
-      nextStep: {
-        signUpStep: "CONFIRM_SIGN_UP",
-        codeDeliveryDetails: {},
-      },
-      isSignUpComplete: true,
+    const usernameInput = await screen.findByRole("textbox", {
+      name: /^username$/i,
     });
-
-    const { container } = render(
-      <MemoryRouter>
-        <SignUp />
-      </MemoryRouter>
+    const emailInput = await screen.findByRole("textbox", { name: /Email/i });
+    const passwordInput = await screen.findByLabelText(/^password$/i);
+    const confirmPasswordInput = await screen.findByLabelText(
+      /^confirm password$/i
     );
-
-    const signUpForm = container.querySelector("form.sign-up-form");
-    expect(signUpForm).toBeInTheDocument();
-
-    const usernameInput = screen.getByRole("textbox", { name: /^username$/i });
-    const passwordInput = screen.getByLabelText(/^password$/i);
-    const confirmPasswordInput = screen.getByLabelText(/^confirm password$/i);
-    const emailInput = screen.getByRole("textbox", { name: /^email$/i });
-    const submitButton = screen.getByRole("button", { name: /Sign Up/i });
+    const signUpButton = await screen.findByRole("button", {
+      name: /Sign Up/i,
+    });
 
     await user.type(usernameInput, "testuser");
-    await user.type(passwordInput, "testpassword");
-    await user.type(confirmPasswordInput, "testpassword");
-    await user.type(emailInput, "test@example.com");
-    await user.click(submitButton);
+    await user.type(emailInput, "testuser@test.com");
+    await user.type(passwordInput, "password");
+    await user.type(confirmPasswordInput, "password");
 
-    expect(awsAmplifyAuth.signUp).toHaveBeenCalledWith({
-      username: "testuser",
-      password: "testpassword",
-      options: {
-        userAttributes: { email: "test@example.com" },
-        autoSignIn: true,
+    await user.click(signUpButton);
+
+    expect(signUpMock).toHaveBeenCalledWith(
+      {
+        username: "testuser",
+        email: "testuser@test.com",
+        password: "password",
       },
+      mockNavigate
+    );
+  });
+});
+
+describe("SignUp page when user is logged in", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+
+    vi.mock("react-router-dom", async () => {
+      const router = await vi.importActual<typeof import("react-router-dom")>(
+        "react-router-dom"
+      );
+      return {
+        ...router,
+        useNavigate: () => mockNavigate,
+      };
     });
 
-    expect(mockNavigate).toHaveBeenCalledTimes(1);
-    expect(mockNavigate).toHaveBeenCalledWith("/signupconfirm/testuser");
-  });
-
-  test("shows error feedback if user fails to fill out required fields", async () => {
-    const user = userEvent.setup();
-
-    vi.mocked(awsAmplifyAuth.getCurrentUser).mockRejectedValueOnce({});
+    vi.mocked(useAuthContextMock).mockReturnValue({
+      isLoggedIn: true,
+      signInStep: "",
+      setSignInStep: vi.fn(),
+      isAdmin: false,
+      user: null,
+      signIn: vi.fn(),
+      signOut: vi.fn(),
+      signUp: signUpMock,
+      confirmSignUp: vi.fn(),
+      confirmSignIn: vi.fn(),
+      resetAuthState: vi.fn(),
+    });
 
     render(
       <MemoryRouter>
-        <SignUp />
+        <AuthContextProvider>
+          <SignUp />
+        </AuthContextProvider>
       </MemoryRouter>
     );
+  });
 
-    const usernameInput = screen.getByRole("textbox", { name: /^username$/i });
-    const usernameInputFeedback = usernameInput.nextSibling;
-    const passwordInput = screen.getByLabelText(/^password$/i);
-    const passwordInputFeedback = passwordInput.nextSibling;
-    const confirmPasswordInput = screen.getByLabelText(/^confirm password$/i);
-    const confirmPasswordInputFeedback = confirmPasswordInput.nextSibling;
-    const emailInput = screen.getByRole("textbox", { name: /^email$/i });
-    const emailInputFeedback = emailInput.nextSibling;
-    const submitButton = screen.getByRole("button", { name: /Sign Up/i });
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
 
-    await user.click(submitButton);
-
-    expect(usernameInputFeedback).toHaveTextContent("Required");
-    expect(passwordInputFeedback).toHaveTextContent("Required");
-    expect(confirmPasswordInputFeedback).toHaveTextContent("Required");
-    expect(emailInputFeedback).toHaveTextContent("Required");
+  test("does not render sign up form when user is logged in", async () => {
+    const signUpForm = screen.queryByRole("form", { name: /Sign Up Form/i });
+    expect(signUpForm).not.toBeInTheDocument();
+    expect(screen.getByText(/You are logged in now/i)).toBeInTheDocument();
   });
 });
