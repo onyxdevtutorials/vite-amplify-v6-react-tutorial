@@ -1,10 +1,9 @@
 import { describe, test, vi, expect, beforeEach } from "vitest";
-import { render, screen, waitFor } from "@testing-library/react";
+import { render, screen } from "@testing-library/react";
 import ListProducts from "./ListProducts";
 import { MemoryRouter } from "react-router-dom";
 import { AuthContextProvider } from "../context/AuthContext";
 import { ReactNode } from "react";
-import * as awsAmplifyAuth from "aws-amplify/auth";
 import {
   ProductWithReviews,
   ListProductsQueryWithReviews,
@@ -18,6 +17,32 @@ const renderWithAuthContext = (component: ReactNode) => {
     </MemoryRouter>
   );
 };
+
+const { useAuthContextMock } = vi.hoisted(() => {
+  return {
+    useAuthContextMock: vi.fn().mockReturnValue({
+      isLoggedIn: false,
+      signInStep: "",
+      setSignInStep: vi.fn(),
+      isAdmin: false,
+      user: null,
+      signIn: vi.fn(),
+      signOut: vi.fn(),
+      signUp: vi.fn(),
+      confirmSignUp: vi.fn(),
+      confirmSignIn: vi.fn(),
+      resetAuthState: vi.fn(),
+    }),
+  };
+});
+
+vi.mock("../context/AuthContext", async () => {
+  const actual = await import("../context/AuthContext");
+  return {
+    ...actual,
+    useAuthContext: useAuthContextMock,
+  };
+});
 
 vi.mock("aws-amplify/api", () => {
   return {
@@ -69,9 +94,18 @@ describe("ListProducts", () => {
   });
 
   test("renders products for a signed-in user", async () => {
-    vi.mocked(awsAmplifyAuth.getCurrentUser).mockResolvedValueOnce({
-      username: "mockUser",
-      userId: "111",
+    vi.mocked(useAuthContextMock).mockReturnValueOnce({
+      isLoggedIn: true,
+      signInStep: "",
+      setSignInStep: vi.fn(),
+      isAdmin: false,
+      user: null,
+      signIn: vi.fn(),
+      signOut: vi.fn(),
+      signUp: vi.fn(),
+      confirmSignUp: vi.fn(),
+      confirmSignIn: vi.fn(),
+      resetAuthState: vi.fn(),
     });
 
     renderWithAuthContext(<ListProducts />);
@@ -94,7 +128,19 @@ describe("ListProducts", () => {
   });
 
   test("renders products for a signed-out user", async () => {
-    vi.mocked(awsAmplifyAuth.getCurrentUser).mockRejectedValueOnce({});
+    vi.mocked(useAuthContextMock).mockReturnValueOnce({
+      isLoggedIn: false,
+      signInStep: "",
+      setSignInStep: vi.fn(),
+      isAdmin: false,
+      user: null,
+      signIn: vi.fn(),
+      signOut: vi.fn(),
+      signUp: vi.fn(),
+      confirmSignUp: vi.fn(),
+      confirmSignIn: vi.fn(),
+      resetAuthState: vi.fn(),
+    });
 
     renderWithAuthContext(<ListProducts />);
 
