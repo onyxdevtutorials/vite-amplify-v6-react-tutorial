@@ -33,9 +33,14 @@ const SignUp: React.FC = () => {
   const { signUp, isLoggedIn } = useAuthContext();
   const navigate = useNavigate();
 
-  const onSubmit = async (values: SignUpType) => {
+  const onSubmit = async (
+    values: SignUpType,
+    { setSubmitting }: { setSubmitting: (isSubmitting: boolean) => void }
+  ) => {
     const { username, password, email } = values;
+    setSubmitting(true);
     await signUp({ username, password, email }, navigate);
+    setSubmitting(false);
   };
 
   const {
@@ -49,7 +54,7 @@ const SignUp: React.FC = () => {
   } = useFormik({
     initialValues: initialValues,
     validationSchema: validationSchema,
-    onSubmit: onSubmit,
+    onSubmit: (values, formikHelpers) => onSubmit(values, formikHelpers),
   });
 
   if (isLoggedIn) {
