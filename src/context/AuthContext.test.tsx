@@ -1,9 +1,10 @@
 import { describe, test, expect, vi, beforeEach } from "vitest";
-import React from "react";
-import { render, screen, waitFor } from "@testing-library/react";
+import React, { useEffect } from "react";
+import { render, screen } from "@testing-library/react";
 import { AuthContextProvider, useAuthContext } from "./AuthContext";
 import userEvent from "@testing-library/user-event";
 import * as awsAmplifyAuth from "aws-amplify/auth";
+import { toast } from "react-toastify";
 
 vi.mock("aws-amplify/auth");
 
@@ -21,6 +22,14 @@ vi.mock("react-router-dom", async () => {
   };
 });
 
+vi.mock("react-toastify", () => ({
+  toast: {
+    success: vi.fn(),
+    info: vi.fn(),
+    error: vi.fn(),
+  },
+}));
+
 const TestComponent: React.FC = () => {
   const {
     isLoggedIn,
@@ -33,7 +42,12 @@ const TestComponent: React.FC = () => {
     signUp,
     confirmSignUp,
     confirmSignIn,
+    resetAuthState,
   } = useAuthContext();
+
+  useEffect(() => {
+    resetAuthState();
+  }, []);
 
   return (
     <>
@@ -61,7 +75,7 @@ const TestComponent: React.FC = () => {
               {
                 username: "testuser",
                 password: "testpassword",
-                email: "test@test.com",
+                email: "testuser@test.com",
               },
               mockNavigate
             )
@@ -115,17 +129,6 @@ describe("AuthContext", () => {
     const isAdminStatus = screen.getByTestId("isAdmin");
     const signedInStatus = screen.getByTestId("isLoggedIn");
     const signInButton = screen.getByRole("button", { name: "Sign In" });
-    const signOutButton = screen.getByRole("button", { name: "Sign Out" });
-    const signUpButton = screen.getByRole("button", { name: "Sign Up" });
-    const confirmSignUpButton = screen.getByRole("button", {
-      name: "Confirm Sign Up",
-    });
-    const confirmSignInButton = screen.getByRole("button", {
-      name: "Confirm Sign In",
-    });
-    const setSignInStepButton = screen.getByRole("button", {
-      name: "setSignInStep",
-    });
 
     expect(signedInStatus).toHaveTextContent("isLoggedIn: false");
 
@@ -144,28 +147,69 @@ describe("AuthContext", () => {
 
     expect(isAdminStatus).toHaveTextContent("isAdmin: false");
   });
-  test("should call AWS confirmSignIn with correct values and navigate to /confirmsignin when signInStep is CONFIRM_SIGN_IN_WITH_NEW_PASSWORD_REQUIRED", async () => {
+  test("should call toast with error message if AWS signIn throws an error", async () => {
+    const user = userEvent.setup();
+
+    vi.mocked(awsAmplifyAuth.signIn).mockRejectedValueOnce({
+      message: "Incorrect username or password.",
+    });
+
+    const isAdminStatus = screen.getByTestId("isAdmin");
+    const signedInStatus = screen.getByTestId("isLoggedIn");
+    const signInButton = screen.getByRole("button", { name: "Sign In" });
+
+    expect(signedInStatus).toHaveTextContent("isLoggedIn: false");
+
+    expect(isAdminStatus).toHaveTextContent("isAdmin: false");
+
+    expect(signInButton).toBeInTheDocument();
+
+    await user.click(signInButton);
+
+    expect(awsAmplifyAuth.signIn).toHaveBeenCalledWith({
+      username: "testuser",
+      password: "testpassword",
+    });
+
+    expect(toast.error).toHaveBeenCalledWith(
+      expect.stringMatching(/^There was a problem signing you in:/)
+    );
+  });
+  test("should navigate to /confirmsignin when signIn returns signInStep as CONFIRM_SIGN_IN_WITH_NEW_PASSWORD_REQUIRED", async () => {
     const user = userEvent.setup();
 
     vi.mocked(awsAmplifyAuth.signIn).mockResolvedValueOnce({
       nextStep: {
         signInStep: "CONFIRM_SIGN_IN_WITH_NEW_PASSWORD_REQUIRED",
       },
-      isSignedIn: true,
-    });
-
-    vi.mocked(awsAmplifyAuth.confirmSignIn).mockResolvedValueOnce({
-      nextStep: {
-        signInStep: "DONE",
-      },
-      isSignedIn: true,
+      isSignedIn: false,
     });
 
     const isSignedInStatus = screen.getByTestId("isLoggedIn");
     const isAdminStatus = screen.getByTestId("isAdmin");
 
-    expect(isSignedInStatus).toHaveTextContent("isLoggedIn: true");
+    expect(isSignedInStatus).toHaveTextContent("isLoggedIn: false");
     expect(isAdminStatus).toHaveTextContent("isAdmin: false");
+
+    const signInButton = screen.getByRole("button", { name: "Sign In" });
+    expect(signInButton).toBeInTheDocument();
+
+    await user.click(signInButton);
+
+    expect(isSignedInStatus).toHaveTextContent("isLoggedIn: false");
+    expect(isAdminStatus).toHaveTextContent("isAdmin: false");
+
+    expect(mockNavigate).toHaveBeenCalledWith("/signinconfirm");
+  });
+  test("should call AWS confirmSignIn with correct values and then call navigate with /", async () => {
+    const user = userEvent.setup();
+
+    vi.mocked(awsAmplifyAuth.confirmSignIn).mockResolvedValueOnce({
+      isSignedIn: true,
+      nextStep: {
+        signInStep: "DONE",
+      },
+    });
 
     const confirmSignInButton = screen.getByRole("button", {
       name: "Confirm Sign In",
@@ -174,9 +218,6 @@ describe("AuthContext", () => {
     expect(confirmSignInButton).toBeInTheDocument();
 
     await user.click(confirmSignInButton);
-
-    expect(isSignedInStatus).toHaveTextContent("isLoggedIn: true");
-    expect(isAdminStatus).toHaveTextContent("isAdmin: false");
 
     expect(awsAmplifyAuth.confirmSignIn).toHaveBeenCalledWith({
       challengeResponse: "xyz",
@@ -192,7 +233,7 @@ describe("AuthContext", () => {
         codeDeliveryDetails: {
           attributeName: "email",
           deliveryMedium: "EMAIL",
-          destination: "test@test.com",
+          destination: "testuser@test.com",
         },
       },
       isSignUpComplete: false,
@@ -209,11 +250,39 @@ describe("AuthContext", () => {
       password: "testpassword",
       options: {
         userAttributes: {
-          email: "test@test.com",
+          email: "testuser@test.com",
         },
         autoSignIn: true,
       },
     });
+  });
+  test("should call toast with error message if AWS signUp throws an error", async () => {
+    const user = userEvent.setup();
+
+    vi.mocked(awsAmplifyAuth.signUp).mockRejectedValueOnce({
+      message: "some unknown error.",
+    });
+
+    const signUpButton = screen.getByRole("button", { name: "Sign Up" });
+
+    expect(signUpButton).toBeInTheDocument();
+
+    await user.click(signUpButton);
+
+    expect(awsAmplifyAuth.signUp).toHaveBeenCalledWith({
+      username: "testuser",
+      password: "testpassword",
+      options: {
+        userAttributes: {
+          email: "testuser@test.com",
+        },
+        autoSignIn: true,
+      },
+    });
+
+    expect(toast.error).toHaveBeenCalledWith(
+      expect.stringMatching(/^There was a problem signing you up:/)
+    );
   });
   test("should call AWS confirmSignUp with correct values and then call navigate with /", async () => {
     const user = userEvent.setup();
@@ -239,6 +308,27 @@ describe("AuthContext", () => {
     });
     expect(mockNavigate).toHaveBeenCalledWith("/");
   });
+  test("should call toast with error message if AWS confirmSignUp throws an error", async () => {
+    const user = userEvent.setup();
+
+    vi.mocked(awsAmplifyAuth.confirmSignUp).mockRejectedValueOnce({
+      message: "some unknown error.",
+    });
+
+    const confirmSignUpButton = screen.getByRole("button", {
+      name: "Confirm Sign Up",
+    });
+    await user.click(confirmSignUpButton);
+
+    expect(awsAmplifyAuth.confirmSignUp).toHaveBeenCalledWith({
+      username: "testuser",
+      confirmationCode: "123456",
+    });
+
+    expect(toast.error).toHaveBeenCalledWith(
+      expect.stringMatching(/^There was a problem confirming your sign up/i)
+    );
+  });
   test("should call AWS signOut with correct values and then call navigate with /", async () => {
     const user = userEvent.setup();
 
@@ -252,5 +342,44 @@ describe("AuthContext", () => {
 
     expect(awsAmplifyAuth.signOut).toHaveBeenCalledWith();
     expect(mockNavigate).toHaveBeenCalledWith("/");
+  });
+  test("should call AWS signIn for user as admin, causing isAdmin to be set to true", async () => {
+    const user = userEvent.setup();
+    vi.mocked(awsAmplifyAuth.fetchAuthSession).mockResolvedValueOnce({
+      tokens: {
+        accessToken: {
+          payload: {
+            "cognito:groups": ["admin"],
+          },
+        },
+      },
+    });
+    vi.mocked(awsAmplifyAuth.signIn).mockResolvedValueOnce({
+      nextStep: {
+        signInStep: "DONE",
+      },
+      isSignedIn: true,
+    });
+
+    const isAdminStatus = screen.getByTestId("isAdmin");
+    const signedInStatus = screen.getByTestId("isLoggedIn");
+    const signInButton = screen.getByRole("button", { name: "Sign In" });
+
+    expect(signedInStatus).toHaveTextContent("isLoggedIn: false");
+
+    expect(isAdminStatus).toHaveTextContent("isAdmin: false");
+
+    expect(signInButton).toBeInTheDocument();
+
+    await user.click(signInButton);
+
+    expect(awsAmplifyAuth.signIn).toHaveBeenCalledWith({
+      username: "testuser",
+      password: "testpassword",
+    });
+
+    expect(signedInStatus).toHaveTextContent("isLoggedIn: true");
+
+    expect(isAdminStatus).toHaveTextContent("isAdmin: true");
   });
 });
