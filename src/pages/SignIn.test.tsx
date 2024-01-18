@@ -1,5 +1,5 @@
 import { describe, expect, test, vi, beforeEach } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
 import SignIn from "./SignIn";
 import { AuthContextProvider } from "../context/AuthContext";
 import { MemoryRouter } from "react-router-dom";
@@ -32,32 +32,53 @@ vi.mock("../context/AuthContext", async () => {
 
 vi.mock("aws-amplify/auth");
 
-const renderSignIn = () => {
-  return render(
-    <MemoryRouter>
-      <AuthContextProvider>
-        <SignIn />
-      </AuthContextProvider>
-    </MemoryRouter>
-  );
+const renderSignIn = async () => {
+  await waitFor(() => {
+    render(
+      <MemoryRouter>
+        <AuthContextProvider>
+          <SignIn />
+        </AuthContextProvider>
+      </MemoryRouter>
+    );
+  });
 };
 
 describe("Sign In page", () => {
-  beforeEach(() => {
+  beforeEach(async () => {
     vi.clearAllMocks();
+
+    vi.mocked(useAuthContextMock).mockReturnValueOnce({
+      isLoggedIn: false,
+      signInStep: "",
+      setSignInStep: vi.fn(),
+      isAdmin: false,
+      user: null,
+      signIn: vi.fn(),
+      signOut: vi.fn(),
+      signUp: vi.fn(),
+      confirmSignUp: vi.fn(),
+      confirmSignIn: vi.fn(),
+      resetAuthState: vi.fn(),
+    });
+
+    await renderSignIn();
   });
 
   test("renders the sign in form if user is not already signed in", () => {
-    const { container } = renderSignIn();
-    const signInForm = container.querySelector("form.sign-in-form");
+    const signInForm = screen.getByRole("form", { name: /sign in form/i });
     expect(signInForm).toBeInTheDocument();
 
     expect(
       screen.getByRole("heading", { name: /sign in/i })
     ).toBeInTheDocument();
   });
+});
 
-  test("does not show sign in form if user is already signed in", async () => {
+describe("Sign In page with user already signed in", () => {
+  beforeEach(async () => {
+    vi.resetAllMocks();
+
     vi.mocked(useAuthContextMock).mockReturnValueOnce({
       isLoggedIn: true,
       signInStep: "",
@@ -72,9 +93,13 @@ describe("Sign In page", () => {
       resetAuthState: vi.fn(),
     });
 
-    const { container } = renderSignIn();
+    await renderSignIn();
+  });
 
-    const signInForm = container.querySelector("form.sign-in-form");
+  test("does not show sign in form if user is already signed in", async () => {
+    const signInForm = screen.queryByRole("form", {
+      name: /sign in form/i,
+    });
     expect(signInForm).not.toBeInTheDocument();
 
     expect(screen.getByText(/you are already signed in/i)).toBeInTheDocument();
