@@ -1,4 +1,10 @@
-import React, { useState, useContext, createContext } from "react";
+import React, {
+  useState,
+  useContext,
+  createContext,
+  useCallback,
+  useEffect,
+} from "react";
 import useCheckForUser from "../hooks/useCheckForUser";
 import {
   signUp as awsSignUp,
@@ -6,6 +12,7 @@ import {
   signIn as awsSignIn,
   confirmSignIn as awsConfirmSignIn,
   signOut as awsSignOut,
+  getCurrentUser,
   AuthError,
   AuthUser,
   SignInInput,
@@ -33,6 +40,7 @@ export type AuthContextType = {
   setSignInStep: React.Dispatch<React.SetStateAction<string>>;
   isAdmin: boolean;
   user: AuthUser | null;
+  checkUser: () => Promise<void>;
   signIn: (values: SignInInput, navigate: NavigateFunction) => Promise<void>;
   signOut: (navigate: NavigateFunction) => Promise<void>;
   signUp: (values: SignUpType, navigate: NavigateFunction) => Promise<void>;
@@ -67,9 +75,10 @@ export const AuthContextProvider: React.FC<AuthContextProviderProps> = ({
   initialAuthState,
 }) => {
   const defaultState = initialAuthState || defaultAuthState;
-  const checkForUser = useCheckForUser();
-  const user = defaultState.user || checkForUser.user;
+  // const checkForUser = useCheckForUser();
+  // const user = defaultState.user || checkForUser.user;
   // const [authState, setAuthState] = useState(defaultAuthState); // might not need this
+  const [user, setUser] = useState<AuthUser | null>(defaultState.user);
   const [signInStep, setSignInStep] = useState(defaultState.signInStep);
   const [isLoggedIn, setIsLoggedIn] = useState(
     initialAuthState?.isLoggedIn !== undefined
@@ -77,6 +86,22 @@ export const AuthContextProvider: React.FC<AuthContextProviderProps> = ({
       : localStorage.getItem("isLoggedIn") === "true"
   );
   const [isAdmin, setIsAdmin] = useState(defaultState.isAdmin);
+
+  const checkUser = useCallback(async () => {
+    try {
+      const currentUser = await getCurrentUser();
+      setIsLoggedIn(true);
+      setUser(currentUser);
+    } catch (err) {
+      console.error(err);
+      setIsLoggedIn(false);
+      setUser(null);
+    }
+  }, []);
+
+  useEffect(() => {
+    checkUser();
+  });
 
   const resetAuthState = () => {
     setSignInStep(defaultState.signInStep);
@@ -246,6 +271,7 @@ export const AuthContextProvider: React.FC<AuthContextProviderProps> = ({
         setSignInStep,
         isAdmin,
         user,
+        checkUser,
         signIn,
         signOut,
         signUp,

@@ -5,24 +5,6 @@ import SignUp from "./SignUp";
 import { MemoryRouter } from "react-router-dom";
 import { AuthContextProvider } from "../context/AuthContext";
 
-const useCheckForUserMock = vi.hoisted(() => {
-  return {
-    isLoggedIn: false,
-    user: null,
-    checkUser: vi.fn(),
-  };
-});
-
-vi.mock("../hooks/useCheckForUser", async () => {
-  const actual = await vi.importActual<
-    typeof import("../hooks/useCheckForUser")
-  >("../hooks/useCheckForUser");
-  return {
-    ...actual,
-    useCheckForUser: useCheckForUserMock,
-  };
-});
-
 const { mockNavigate } = vi.hoisted(() => {
   return { mockNavigate: vi.fn() };
 });
@@ -39,6 +21,7 @@ const { useAuthContextMock } = vi.hoisted(() => {
       setSignInStep: vi.fn(),
       isAdmin: false,
       user: null,
+      checkUser: vi.fn(),
       signIn: vi.fn(),
       signOut: vi.fn(),
       signUp: signUpMock,
@@ -79,6 +62,7 @@ describe("SignUp page when user is not logged in", () => {
       setSignInStep: vi.fn(),
       isAdmin: false,
       user: null,
+      checkUser: vi.fn(),
       signIn: vi.fn(),
       signOut: vi.fn(),
       signUp: signUpMock,
@@ -102,7 +86,7 @@ describe("SignUp page when user is not logged in", () => {
     vi.restoreAllMocks();
   });
 
-  test.only("renders sign up form when user is not logged in", async () => {
+  test("renders sign up form when user is not logged in", async () => {
     const signUpForm = await screen.findByRole("form", {
       name: /Sign Up Form/i,
     });
@@ -154,7 +138,7 @@ describe("SignUp page when user is not logged in", () => {
 });
 
 describe("SignUp page when user is logged in", () => {
-  beforeEach(() => {
+  beforeEach(async () => {
     vi.clearAllMocks();
 
     vi.mock("react-router-dom", async () => {
@@ -173,6 +157,7 @@ describe("SignUp page when user is logged in", () => {
       setSignInStep: vi.fn(),
       isAdmin: false,
       user: null,
+      checkUser: vi.fn(),
       signIn: vi.fn(),
       signOut: vi.fn(),
       signUp: signUpMock,
@@ -181,13 +166,15 @@ describe("SignUp page when user is logged in", () => {
       resetAuthState: vi.fn(),
     });
 
-    render(
-      <MemoryRouter>
-        <AuthContextProvider>
-          <SignUp />
-        </AuthContextProvider>
-      </MemoryRouter>
-    );
+    await waitFor(() => {
+      render(
+        <MemoryRouter>
+          <AuthContextProvider>
+            <SignUp />
+          </AuthContextProvider>
+        </MemoryRouter>
+      );
+    });
   });
 
   afterEach(() => {
