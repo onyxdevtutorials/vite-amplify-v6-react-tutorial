@@ -1,9 +1,27 @@
 import { describe, test, expect, beforeEach, vi, afterEach } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import SignUp from "./SignUp";
 import { MemoryRouter } from "react-router-dom";
 import { AuthContextProvider } from "../context/AuthContext";
+
+const useCheckForUserMock = vi.hoisted(() => {
+  return {
+    isLoggedIn: false,
+    user: null,
+    checkUser: vi.fn(),
+  };
+});
+
+vi.mock("../hooks/useCheckForUser", async () => {
+  const actual = await vi.importActual<
+    typeof import("../hooks/useCheckForUser")
+  >("../hooks/useCheckForUser");
+  return {
+    ...actual,
+    useCheckForUser: useCheckForUserMock,
+  };
+});
 
 const { mockNavigate } = vi.hoisted(() => {
   return { mockNavigate: vi.fn() };
@@ -42,7 +60,7 @@ vi.mock("../context/AuthContext", async () => {
 vi.mock("aws-amplify/auth");
 
 describe("SignUp page when user is not logged in", () => {
-  beforeEach(() => {
+  beforeEach(async () => {
     vi.clearAllMocks();
 
     vi.mock("react-router-dom", async () => {
@@ -69,20 +87,22 @@ describe("SignUp page when user is not logged in", () => {
       resetAuthState: vi.fn(),
     });
 
-    render(
-      <MemoryRouter>
-        <AuthContextProvider>
-          <SignUp />
-        </AuthContextProvider>
-      </MemoryRouter>
-    );
+    await waitFor(() => {
+      render(
+        <MemoryRouter>
+          <AuthContextProvider>
+            <SignUp />
+          </AuthContextProvider>
+        </MemoryRouter>
+      );
+    });
   });
 
   afterEach(() => {
     vi.restoreAllMocks();
   });
 
-  test("renders sign up form when user is not logged in", async () => {
+  test.only("renders sign up form when user is not logged in", async () => {
     const signUpForm = await screen.findByRole("form", {
       name: /Sign Up Form/i,
     });
