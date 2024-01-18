@@ -97,7 +97,7 @@ export const AuthContextProvider: React.FC<AuthContextProviderProps> = ({
 
   useEffect(() => {
     checkUser();
-  });
+  }, [checkUser]);
 
   const resetAuthState = () => {
     setSignInStep(defaultState.signInStep);
