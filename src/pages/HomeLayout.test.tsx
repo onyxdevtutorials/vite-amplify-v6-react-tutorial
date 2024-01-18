@@ -1,16 +1,18 @@
-import { describe, test, expect } from "vitest";
+import { describe, test, expect, vi } from "vitest";
 import { screen, render } from "@testing-library/react";
 import HomeLayout from "./HomeLayout";
 import { AuthContextProvider } from "../context/AuthContext";
 import { MemoryRouter } from "react-router-dom";
 
+vi.mock("aws-amplify/auth");
+
 const renderComponent = () => {
   render(
-    <AuthContextProvider>
-      <MemoryRouter>
+    <MemoryRouter>
+      <AuthContextProvider>
         <HomeLayout />
-      </MemoryRouter>
-    </AuthContextProvider>
+      </AuthContextProvider>
+    </MemoryRouter>
   );
 };
 
