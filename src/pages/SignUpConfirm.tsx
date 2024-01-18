@@ -21,8 +21,13 @@ const SignUpConfirm = () => {
     confirmationCode: "",
   };
 
-  const onSubmit = async (values: ConfirmSignUpInput) => {
+  const onSubmit = async (
+    values: ConfirmSignUpInput,
+    { setSubmitting }: { setSubmitting: (isSubmitting: boolean) => void }
+  ) => {
+    setSubmitting(true);
     await confirmSignUp(values, navigate);
+    setSubmitting(false);
   };
 
   const {
@@ -36,7 +41,7 @@ const SignUpConfirm = () => {
   } = useFormik({
     initialValues: initialValues,
     validationSchema: validationSchema,
-    onSubmit: onSubmit,
+    onSubmit: (values, formikHelpers) => onSubmit(values, formikHelpers),
   });
 
   if (isLoggedIn) {
@@ -84,7 +89,11 @@ const SignUpConfirm = () => {
           </Form.Control.Feedback>
         </Form.Group>
         <div>
-          <Button type="submit" variant="primary" disabled={isSubmitting}>
+          <Button
+            type="submit"
+            variant="primary"
+            disabled={isSubmitting || Object.keys(errors).length > 0}
+          >
             Submit
           </Button>
         </div>
