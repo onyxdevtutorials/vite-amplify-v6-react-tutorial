@@ -5,7 +5,6 @@ import React, {
   useCallback,
   useEffect,
 } from "react";
-import useCheckForUser from "../hooks/useCheckForUser";
 import {
   signUp as awsSignUp,
   confirmSignUp as awsConfirmSignUp,
@@ -75,9 +74,6 @@ export const AuthContextProvider: React.FC<AuthContextProviderProps> = ({
   initialAuthState,
 }) => {
   const defaultState = initialAuthState || defaultAuthState;
-  // const checkForUser = useCheckForUser();
-  // const user = defaultState.user || checkForUser.user;
-  // const [authState, setAuthState] = useState(defaultAuthState); // might not need this
   const [user, setUser] = useState<AuthUser | null>(defaultState.user);
   const [signInStep, setSignInStep] = useState(defaultState.signInStep);
   const [isLoggedIn, setIsLoggedIn] = useState(
