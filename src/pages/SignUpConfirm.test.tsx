@@ -1,5 +1,5 @@
 import { describe, expect, test, vi, beforeEach } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import SignUpConfirm from "./SignUpConfirm";
 import userEvent from "@testing-library/user-event";
@@ -13,6 +13,7 @@ const { useAuthContextMock } = vi.hoisted(() => {
       setSignInStep: vi.fn(),
       isAdmin: true,
       user: null,
+      checkUser: vi.fn(),
       signIn: vi.fn(),
       signOut: vi.fn(),
       signUp: vi.fn(),
@@ -48,95 +49,123 @@ vi.mock("react-router-dom", async () => {
   };
 });
 
-const renderSignUpConfirm = () => {
-  render(
-    <MemoryRouter>
-      <AuthContextProvider>
-        <SignUpConfirm />
-      </AuthContextProvider>
-    </MemoryRouter>
-  );
-};
-
 describe("SignUpConfirm page", () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
-  });
+  describe("when user is not signed in", () => {
+    beforeEach(async () => {
+      vi.clearAllMocks();
 
-  test("renders sign up confirmation form", () => {
-    renderSignUpConfirm();
+      vi.mocked(useAuthContextMock).mockReturnValue({
+        isLoggedIn: false,
+        signInStep: "",
+        setSignInStep: vi.fn(),
+        isAdmin: false,
+        user: null,
+        checkUser: vi.fn(),
+        signIn: vi.fn(),
+        signOut: vi.fn(),
+        signUp: vi.fn(),
+        confirmSignUp: vi.fn(),
+        confirmSignIn: vi.fn(),
+        resetAuthState: vi.fn(),
+      });
 
-    const usernameInput = screen.getByRole("textbox", { name: /^username$/i });
-    const confirmationCodeInput = screen.getByRole("textbox", {
-      name: /^confirmation Code$/i,
-    });
-    const submitButton = screen.getByRole("button", { name: /^submit$/i });
-
-    expect(usernameInput).toBeInTheDocument();
-    expect(confirmationCodeInput).toBeInTheDocument();
-
-    expect(usernameInput).toHaveValue("testuser");
-    expect(submitButton).toBeInTheDocument();
-  });
-
-  test("displays warning message when user is already signed in", async () => {
-    vi.mocked(useAuthContextMock).mockReturnValue({
-      isLoggedIn: true,
-      signInStep: "",
-      setSignInStep: vi.fn(),
-      isAdmin: false,
-      user: null,
-      signIn: vi.fn(),
-      signOut: vi.fn(),
-      signUp: vi.fn(),
-      confirmSignUp: vi.fn(),
-      confirmSignIn: vi.fn(),
-      resetAuthState: vi.fn(),
+      await waitFor(() => {
+        render(
+          <MemoryRouter>
+            <AuthContextProvider>
+              <SignUpConfirm />
+            </AuthContextProvider>
+          </MemoryRouter>
+        );
+      });
     });
 
-    renderSignUpConfirm();
+    test("renders sign up confirmation form", async () => {
+      const usernameInput = screen.getByRole("textbox", {
+        name: /^username$/i,
+      });
+      const confirmationCodeInput = screen.getByRole("textbox", {
+        name: /^confirmation Code$/i,
+      });
+      const submitButton = screen.getByRole("button", { name: /^submit$/i });
 
-    expect(
-      await screen.findByText(
-        "You are already signed in. You have no business confirming :-D"
-      )
-    ).toBeInTheDocument();
+      expect(usernameInput).toBeInTheDocument();
+      expect(confirmationCodeInput).toBeInTheDocument();
+
+      expect(usernameInput).toHaveValue("testuser");
+      expect(submitButton).toBeInTheDocument();
+    });
+
+    test("calls confirmSignUp() with username, confirmation code and navigate fn", async () => {
+      const user = userEvent.setup();
+
+      const confirmationCodeInput = screen.getByRole("textbox", {
+        name: /^confirmation Code$/i,
+      });
+      const submitButton = screen.getByRole("button", { name: /^submit$/i });
+
+      await user.type(confirmationCodeInput, "123456");
+      await user.click(submitButton);
+
+      expect(useAuthContextMock().confirmSignUp).toHaveBeenCalledWith(
+        { username: "testuser", confirmationCode: "123456" },
+        mockNavigate
+      );
+    });
+
+    test("displays error message when user does not enter confirmation code, and submit button is disabled", async () => {
+      const user = userEvent.setup();
+
+      const confirmationCodeInput = screen.getByRole("textbox", {
+        name: /^confirmation Code$/i,
+      });
+      await user.type(confirmationCodeInput, "123456");
+      await user.clear(confirmationCodeInput);
+
+      const submitButton = screen.getByRole("button", { name: /^submit$/i });
+      expect(submitButton).toBeDisabled();
+      await user.click(submitButton);
+      const confirmationCodeInputFeedback = confirmationCodeInput.nextSibling;
+      expect(confirmationCodeInputFeedback).toHaveTextContent(/required/i);
+    });
   });
 
-  test.only("calls confirmSignUp() with username, confirmation code and navigate fn", async () => {
-    const user = userEvent.setup();
+  describe("when user is signed in", () => {
+    beforeEach(async () => {
+      vi.clearAllMocks();
 
-    renderSignUpConfirm();
+      vi.mocked(useAuthContextMock).mockReturnValue({
+        isLoggedIn: true,
+        signInStep: "",
+        setSignInStep: vi.fn(),
+        isAdmin: false,
+        user: null,
+        checkUser: vi.fn(),
+        signIn: vi.fn(),
+        signOut: vi.fn(),
+        signUp: vi.fn(),
+        confirmSignUp: vi.fn(),
+        confirmSignIn: vi.fn(),
+        resetAuthState: vi.fn(),
+      });
 
-    const confirmationCodeInput = screen.getByRole("textbox", {
-      name: /^confirmation Code$/i,
+      await waitFor(() => {
+        render(
+          <MemoryRouter>
+            <AuthContextProvider>
+              <SignUpConfirm />
+            </AuthContextProvider>
+          </MemoryRouter>
+        );
+      });
     });
-    const submitButton = screen.getByRole("button", { name: /^submit$/i });
 
-    await user.type(confirmationCodeInput, "123456");
-    await user.click(submitButton);
-
-    expect(useAuthContextMock().confirmSignUp).toHaveBeenCalledWith(
-      { username: "testuser", confirmationCode: "123456" },
-      mockNavigate
-    );
-  });
-
-  test("displays error message when user does not enter confirmation code, and submit button is disabled", async () => {
-    const user = userEvent.setup();
-
-    renderSignUpConfirm();
-
-    const confirmationCodeInput = screen.getByRole("textbox", {
-      name: /^confirmation Code$/i,
+    test("displays warning message when user is already signed in", async () => {
+      expect(
+        await screen.findByText(
+          "You are already signed in. You have no business confirming :-D"
+        )
+      ).toBeInTheDocument();
     });
-    await user.type(confirmationCodeInput, "123456");
-    await user.clear(confirmationCodeInput);
-
-    const submitButton = screen.getByRole("button", { name: /^submit$/i });
-    expect(submitButton).toBeDisabled();
-    await user.click(submitButton);
-    const confirmationCodeInputFeedback = confirmationCodeInput.nextSibling;
-    expect(confirmationCodeInputFeedback).toHaveTextContent(/required/i);
   });
 });
