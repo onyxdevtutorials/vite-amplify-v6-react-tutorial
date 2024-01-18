@@ -92,7 +92,6 @@ export const AuthContextProvider: React.FC<AuthContextProviderProps> = ({
       const result = await awsSignIn({ username, password });
       const isSignedIn = result.isSignedIn;
       const nextStep = result.nextStep;
-      console.log("nextStep", nextStep);
 
       setSignInStep(nextStep.signInStep);
       setIsLoggedIn(isSignedIn);
@@ -111,7 +110,7 @@ export const AuthContextProvider: React.FC<AuthContextProviderProps> = ({
         nextStep.signInStep === "CONFIRM_SIGN_IN_WITH_NEW_PASSWORD_REQUIRED"
       ) {
         toast.success("Please set a new password.");
-        navigate("/signinconfirm"); // signinconfirm
+        navigate("/signinconfirm");
       }
     } catch (error) {
       // NotAuthorizedException: Incorrect username or password.
@@ -127,7 +126,6 @@ export const AuthContextProvider: React.FC<AuthContextProviderProps> = ({
     navigate: NavigateFunction
   ) => {
     const { challengeResponse } = values;
-    console.log("original confirmSignIn called");
 
     try {
       const { isSignedIn, nextStep } = await awsConfirmSignIn({
@@ -172,7 +170,7 @@ export const AuthContextProvider: React.FC<AuthContextProviderProps> = ({
     const { username, password, email } = values;
 
     try {
-      const { nextStep } = await awsSignUp({
+      await awsSignUp({
         username: username,
         password: password,
         options: {
@@ -182,7 +180,6 @@ export const AuthContextProvider: React.FC<AuthContextProviderProps> = ({
           autoSignIn: true,
         },
       });
-      console.log("setSignUpStep(nextStep.signUpStep)", nextStep.signUpStep);
       navigate(`/signupconfirm/${username}`);
     } catch (error) {
       console.error("could not sign up", error);
