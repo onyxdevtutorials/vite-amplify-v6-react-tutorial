@@ -50,7 +50,12 @@ const SignIn = () => {
 
   return (
     <>
-      <Form onSubmit={handleSubmit} noValidate className="sign-in-form">
+      <Form
+        onSubmit={handleSubmit}
+        noValidate
+        className="sign-in-form"
+        aria-label="sign in form"
+      >
         <Form.Group className="mb-3" controlId="username">
           <Form.Label>Username</Form.Label>
           <Form.Control
