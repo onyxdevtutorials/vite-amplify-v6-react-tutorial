@@ -80,7 +80,6 @@ const EditReview = () => {
         })) as GraphQLResult<GetReviewQuery>;
 
         const reviewData = result.data?.getReview;
-        console.log("reviewData: ", reviewData);
         if (!reviewData || result.errors) {
           console.error("error fetching review: ", result.errors);
           return;
