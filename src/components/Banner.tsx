@@ -40,7 +40,7 @@ const Banner = () => {
           {isLoggedIn && (
             <>
               {isAdmin && (
-                <Nav.Link as={Link} to="/add">
+                <Nav.Link as={Link} to="/products/new">
                   Add Product
                 </Nav.Link>
               )}
