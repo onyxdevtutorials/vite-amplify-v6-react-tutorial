@@ -1,17 +1,18 @@
 import { describe, test, expect, vi, beforeEach } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
 import Landing from "./Landing";
 import { MemoryRouter } from "react-router-dom";
 import { AuthContextProvider, useAuthContext } from "../context/AuthContext";
 import { ReactNode } from "react";
-import * as awsAmplifyAuth from "aws-amplify/auth";
 
-const renderWithAuthContext = (component: ReactNode) => {
-  return render(
-    <MemoryRouter>
-      <AuthContextProvider>{component}</AuthContextProvider>
-    </MemoryRouter>
-  );
+const renderWithAuthContext = async (component: ReactNode) => {
+  await waitFor(() => {
+    render(
+      <MemoryRouter>
+        <AuthContextProvider>{component}</AuthContextProvider>
+      </MemoryRouter>
+    );
+  });
 };
 
 vi.mock("aws-amplify/api", () => {
@@ -43,107 +44,100 @@ vi.mock("aws-amplify/api", () => {
 
 vi.mock("aws-amplify/auth");
 
+const { useAuthContextMock } = vi.hoisted(() => {
+  return {
+    useAuthContextMock: vi.fn().mockReturnValue({
+      isLoggedIn: false,
+      signInStep: "",
+      setSignInStep: vi.fn(),
+      isAdmin: false,
+      user: null,
+      checkUser: vi.fn(),
+      signIn: vi.fn(),
+      signOut: vi.fn(),
+      signUp: vi.fn(),
+      confirmSignUp: vi.fn(),
+      confirmSignIn: vi.fn(),
+      resetAuthState: vi.fn(),
+    }),
+  };
+});
+
 vi.mock("../context/AuthContext", async () => {
   const actual = await import("../context/AuthContext");
   return {
     ...actual,
-    useAuthContext: vi.fn(() => ({
-      setIsLoggedIn: vi.fn(),
-      setIsAdmin: vi.fn(),
-      isLoggedIn: true,
-      signInStep: "",
-      setSignInStep: vi.fn(),
-      isAdmin: false,
-    })),
+    useAuthContext: useAuthContextMock,
   };
 });
 
 describe("Landing", () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
+  describe("when user is logged in", () => {
+    beforeEach(async () => {
+      vi.clearAllMocks();
+
+      vi.mocked(useAuthContext).mockReturnValueOnce({
+        isLoggedIn: true,
+        signInStep: "",
+        setSignInStep: vi.fn(),
+        isAdmin: false,
+        user: null,
+        checkUser: vi.fn(),
+        signIn: vi.fn(),
+        signOut: vi.fn(),
+        signUp: vi.fn(),
+        confirmSignUp: vi.fn(),
+        confirmSignIn: vi.fn(),
+        resetAuthState: vi.fn(),
+      });
+
+      await renderWithAuthContext(<Landing />);
+    });
+
+    test("renders 'Is logged in: yes' when user is logged in", async () => {
+      const isLoggedInText = await screen.findByText(/Is logged in: yes/i);
+      expect(isLoggedInText).toBeInTheDocument();
+    });
+    test("renders the ListProducts component when user is logged in", async () => {
+      expect(
+        await screen.findByRole("heading", { level: 1, name: /list products/i })
+      ).toBeInTheDocument();
+      const listProductsElement = screen.getByRole("list");
+      expect(listProductsElement).toBeInTheDocument();
+    });
   });
 
-  test("renders 'Is logged in: yes' when user is logged in", async () => {
-    vi.mocked(awsAmplifyAuth.getCurrentUser).mockResolvedValueOnce({
-      username: "mockUser",
-      userId: "111",
+  describe("when user is not logged in", () => {
+    beforeEach(async () => {
+      vi.clearAllMocks();
+
+      vi.mocked(useAuthContext).mockReturnValueOnce({
+        isLoggedIn: false,
+        signInStep: "",
+        setSignInStep: vi.fn(),
+        isAdmin: false,
+        user: null,
+        checkUser: vi.fn(),
+        signIn: vi.fn(),
+        signOut: vi.fn(),
+        signUp: vi.fn(),
+        confirmSignUp: vi.fn(),
+        confirmSignIn: vi.fn(),
+        resetAuthState: vi.fn(),
+      });
+
+      await renderWithAuthContext(<Landing />);
     });
-
-    vi.mocked(useAuthContext).mockReturnValueOnce({
-      setIsLoggedIn: vi.fn(),
-      setIsAdmin: vi.fn(),
-      isLoggedIn: true,
-      signInStep: "",
-      setSignInStep: vi.fn(),
-      isAdmin: false,
+    test("renders 'Is logged in: no' when user is not logged in", () => {
+      const isLoggedInText = screen.getByText(/Is logged in: no/i);
+      expect(isLoggedInText).toBeInTheDocument();
     });
-
-    renderWithAuthContext(<Landing />);
-
-    const isLoggedInText = await screen.findByText(/Is logged in: yes/i);
-    expect(isLoggedInText).toBeInTheDocument();
-  });
-
-  test("renders 'Is logged in: no' when user is not logged in", () => {
-    vi.mocked(awsAmplifyAuth.getCurrentUser).mockRejectedValueOnce({});
-
-    vi.mocked(useAuthContext).mockReturnValue({
-      setIsLoggedIn: vi.fn(),
-      setIsAdmin: vi.fn(),
-      isLoggedIn: false,
-      signInStep: "",
-      setSignInStep: vi.fn(),
-      isAdmin: false,
+    test("renders the ListProducts component when user is not logged in", async () => {
+      expect(
+        await screen.findByRole("heading", { level: 1, name: /list products/i })
+      ).toBeInTheDocument();
+      const listProductsElement = screen.getByRole("list");
+      expect(listProductsElement).toBeInTheDocument();
     });
-
-    renderWithAuthContext(<Landing />);
-
-    const isLoggedInText = screen.getByText(/Is logged in: no/i);
-    expect(isLoggedInText).toBeInTheDocument();
-  });
-
-  test("renders the ListProducts component when user is logged in", async () => {
-    vi.mocked(awsAmplifyAuth.getCurrentUser).mockResolvedValueOnce({
-      username: "mockUser",
-      userId: "111",
-    });
-
-    vi.mocked(useAuthContext).mockReturnValueOnce({
-      setIsLoggedIn: vi.fn(),
-      setIsAdmin: vi.fn(),
-      isLoggedIn: true,
-      signInStep: "",
-      setSignInStep: vi.fn(),
-      isAdmin: false,
-    });
-
-    renderWithAuthContext(<Landing />);
-
-    expect(
-      await screen.findByRole("heading", { level: 1, name: /list products/i })
-    ).toBeInTheDocument();
-    const listProductsElement = screen.getByRole("list");
-    expect(listProductsElement).toBeInTheDocument();
-  });
-
-  test("renders the ListProducts component when user is not logged in", async () => {
-    vi.mocked(awsAmplifyAuth.getCurrentUser).mockRejectedValueOnce({});
-
-    vi.mocked(useAuthContext).mockReturnValueOnce({
-      setIsLoggedIn: vi.fn(),
-      setIsAdmin: vi.fn(),
-      isLoggedIn: false,
-      signInStep: "",
-      setSignInStep: vi.fn(),
-      isAdmin: false,
-    });
-
-    renderWithAuthContext(<Landing />);
-
-    expect(
-      await screen.findByRole("heading", { level: 1, name: /list products/i })
-    ).toBeInTheDocument();
-    const listProductsElement = screen.getByRole("list");
-    expect(listProductsElement).toBeInTheDocument();
   });
 });
