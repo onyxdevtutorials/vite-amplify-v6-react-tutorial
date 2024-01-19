@@ -6,6 +6,7 @@ import { updateProduct } from "../graphql/mutations";
 import EditProduct from "./EditProduct";
 import useGetProduct from "../hooks/useGetProduct";
 import { toast } from "react-toastify";
+import { AuthContextProvider } from "../context/AuthContext";
 
 vi.mock("react-router-dom", async () => {
   const router = await vi.importActual<typeof import("react-router-dom")>(
@@ -41,7 +42,7 @@ vi.mock("../hooks/useGetProduct", () => {
 
 const { graphqlMock } = vi.hoisted(() => {
   return {
-    graphqlMock: vi.fn().mockImplementation((query, variables) => {
+    graphqlMock: vi.fn().mockImplementation((query) => {
       if (query === updateProduct) {
         return Promise.resolve({
           data: {
@@ -111,39 +112,27 @@ const fillInForm = async (
   await user.type(priceInput, price);
 };
 
-const renderEditProduct = () => {
-  render(
-    <MemoryRouter>
-      <EditProduct />
-    </MemoryRouter>
-  );
+const renderEditProduct = async () => {
+  await waitFor(() => {
+    render(
+      <MemoryRouter>
+        <AuthContextProvider>
+          <EditProduct />
+        </AuthContextProvider>
+      </MemoryRouter>
+    );
+  });
 };
 
 describe("EditProduct", () => {
   beforeEach(() => {
     vi.clearAllMocks();
-  });
 
-  test("renders EditProduct page, showing form containing test data", async () => {
-    vi.mocked(useParams).mockReturnValueOnce({
+    vi.mocked(useParams).mockReturnValue({
       productId: mockProduct.id,
     });
 
-    renderEditProduct();
-
-    await waitFor(async () => {
-      expect(
-        await screen.findByRole("form", { name: /product form/i })
-      ).toBeInTheDocument();
-    });
-
-    expect(useGetProduct).toHaveBeenCalledWith(mockProduct.id);
-  });
-
-  test("calls graphql() with updated product data when form is submitted", async () => {
-    const user = userEvent.setup();
-
-    vi.mocked(useGetProduct).mockReturnValueOnce({
+    vi.mocked(useGetProduct).mockReturnValue({
       product: {
         __typename: "Product",
         id: "some-id",
@@ -178,6 +167,20 @@ describe("EditProduct", () => {
     });
 
     renderEditProduct();
+  });
+
+  test("renders EditProduct page, showing form containing test data", async () => {
+    await waitFor(async () => {
+      expect(
+        await screen.findByRole("form", { name: /product form/i })
+      ).toBeInTheDocument();
+    });
+
+    expect(useGetProduct).toHaveBeenCalledWith(mockProduct.id);
+  });
+
+  test("calls graphql() with updated product data when form is submitted", async () => {
+    const user = userEvent.setup();
 
     const form = await screen.findByRole("form", {
       name: /^product form$/i,
@@ -203,25 +206,57 @@ describe("EditProduct", () => {
       });
     });
   });
+});
 
-  test("displays an alert message if getting the product fails, e.g., the product doesn't exist", async () => {
+describe("EditProduct error handling: can't get product", () => {
+  beforeEach(async () => {
+    vi.clearAllMocks();
+
+    vi.mocked(useParams).mockReturnValue({
+      productId: mockProduct.id,
+    });
+
     vi.mocked(useGetProduct).mockReturnValueOnce({
       product: null,
       errorMessage: "Error getting product",
       isLoading: false,
     });
 
-    renderEditProduct();
+    graphqlMock.mockImplementationOnce(({ query }) => {
+      if (query === updateProduct) {
+        return Promise.resolve({
+          data: {
+            updateProduct: {
+              name: "Test Product",
+              description: "New Test Description",
+              price: "10.99",
+              id: "372db325-5f72-49fa-ba8c-ab628c0ed470",
+              image: "chucknorris.jpg",
+            },
+          },
+        });
+      }
+    });
 
+    renderEditProduct();
+  });
+
+  test("displays an alert message if getting the product fails, e.g., the product doesn't exist", async () => {
     await waitFor(() => {
       expect(toast.error).toHaveBeenCalledWith(
         expect.stringMatching(/error getting product/i)
       );
     });
   });
+});
 
-  test("displays an alert message if updating the product fails", async () => {
-    const user = userEvent.setup();
+describe("EditProduct error handling: can't update product", () => {
+  beforeEach(async () => {
+    vi.clearAllMocks();
+
+    vi.mocked(useParams).mockReturnValue({
+      productId: mockProduct.id,
+    });
 
     vi.mocked(useGetProduct).mockReturnValueOnce({
       product: {
@@ -241,13 +276,17 @@ describe("EditProduct", () => {
       isLoading: false,
     });
 
-    graphqlMock.mockImplementationOnce(({ query }) => {
+    graphqlMock.mockReset().mockImplementation(({ query }) => {
       if (query === updateProduct) {
         return Promise.reject(new Error("Error updating product"));
       }
     });
 
     renderEditProduct();
+  });
+
+  test("displays an alert message if updating the product fails", async () => {
+    const user = userEvent.setup();
 
     const form = await screen.findByRole("form", {
       name: /^product form$/i,
@@ -264,6 +303,7 @@ describe("EditProduct", () => {
       expect(toast.error).toHaveBeenCalledWith(
         expect.stringMatching(/error updating product/i)
       );
+      expect(toast.error).toHaveBeenCalledTimes(1);
     });
   });
 });
