@@ -1,10 +1,11 @@
 import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
-import { ConfirmSignInInput } from "aws-amplify/auth";
+import { ConfirmSignInInput, AuthError } from "aws-amplify/auth";
 import { useNavigate } from "react-router-dom";
 import { useFormik } from "formik";
 import * as yup from "yup";
 import { useAuthContext } from "../context/AuthContext";
+import { toast } from "react-toastify";
 
 const validationSchema = yup.object().shape({
   challengeResponse: yup.string().required("Required"),
@@ -14,7 +15,7 @@ const SignInConfirm = () => {
   const navigate = useNavigate();
   const initialValues: ConfirmSignInInput = { challengeResponse: "" };
 
-  const { confirmSignIn } = useAuthContext();
+  const { confirmSignIn, isLoggedIn } = useAuthContext();
 
   const onSubmit = async (
     values: ConfirmSignInInput,
@@ -22,8 +23,17 @@ const SignInConfirm = () => {
   ) => {
     const { challengeResponse } = values;
     setSubmitting(true);
-    await confirmSignIn({ challengeResponse }, navigate);
-    setSubmitting(false);
+    try {
+      await confirmSignIn({ challengeResponse }, navigate);
+      toast.success("Successfully signed in.");
+      navigate("/");
+    } catch (error) {
+      const authError = error as AuthError;
+      console.error(`Error confirming sign in: ${authError.message}`);
+      toast.error(`Error confirming sign in: ${authError.message}`);
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   const {
@@ -43,6 +53,7 @@ const SignInConfirm = () => {
   return (
     <>
       <h2>Please Set a New Password</h2>
+      {isLoggedIn && <p>you are logged in</p>}
       <Form onSubmit={handleSubmit} noValidate className="sign-in-confirm-form">
         <Form.Group className="mb-3" controlId="formBasicPassword">
           <Form.Label>Password</Form.Label>
