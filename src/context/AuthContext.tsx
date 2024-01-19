@@ -90,10 +90,14 @@ export const AuthContextProvider: React.FC<AuthContextProviderProps> = ({
       const currentUser = await getCurrentUser();
       setIsLoggedIn(true);
       setUser(currentUser);
+
+      const isAdmin = await checkIsAdmin();
+      setIsAdmin(isAdmin);
     } catch (err) {
       console.error(err);
       setIsLoggedIn(false);
       setUser(null);
+      setIsAdmin(false);
     }
   }, []);
 
