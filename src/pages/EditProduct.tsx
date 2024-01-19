@@ -23,7 +23,6 @@ const EditProduct = () => {
     }
   }, [getProductErrorMessage]);
 
-  console.log("Edit Product page productId: ", product);
   const initialFormValues = {
     name: product?.name || "",
     description: product?.description || "",
