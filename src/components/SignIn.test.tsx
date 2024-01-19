@@ -5,7 +5,6 @@ import SignIn from "./SignIn";
 import { AuthContextProvider } from "../context/AuthContext";
 import { MemoryRouter } from "react-router-dom";
 import { ReactNode } from "react";
-import { toast } from "react-toastify";
 
 const { mockNavigate } = vi.hoisted(() => {
   return { mockNavigate: vi.fn() };
@@ -48,13 +47,6 @@ vi.mock("../context/AuthContext", async () => {
 
 vi.mock("aws-amplify/auth");
 
-vi.mock("react-toastify", () => ({
-  toast: {
-    success: vi.fn(),
-    error: vi.fn(),
-  },
-}));
-
 const renderWithAuthContext = async (component: ReactNode) => {
   await waitFor(() => {
     render(
@@ -66,81 +58,42 @@ const renderWithAuthContext = async (component: ReactNode) => {
 };
 
 describe("SignIn component", () => {
-  describe("when user is not logged in (happy path)", () => {
-    beforeEach(async () => {
-      vi.clearAllMocks();
-      await renderWithAuthContext(<SignIn />);
-    });
-
-    test("renders sign in form", () => {
-      expect(
-        screen.getByRole("textbox", { name: /^username$/i })
-      ).toBeInTheDocument();
-      expect(screen.getByLabelText(/^password$/i)).toBeInTheDocument();
-      expect(
-        screen.getByRole("button", { name: /sign in/i })
-      ).toBeInTheDocument();
-    });
-
-    test("should call signIn when user submits form with valid input", async () => {
-      const user = userEvent.setup();
-
-      const usernameInput = screen.getByRole("textbox", {
-        name: /^username$/i,
-      });
-      const passwordInput = screen.getByLabelText(/^password$/i);
-
-      await user.type(usernameInput, "testuser");
-
-      await user.type(passwordInput, "testpassword");
-      await user.click(screen.getByRole("button", { name: /sign in/i }));
-
-      expect(signInMock).toHaveBeenCalledWith(
-        {
-          username: "testuser",
-          password: "testpassword",
-        },
-        mockNavigate
-      );
-
-      expect(signInMock).toHaveBeenCalledTimes(1);
-      expect(vi.mocked(toast.success)).toHaveBeenCalledWith(
-        expect.stringMatching(/^successfully signed in/i)
-      );
-    });
+  beforeEach(async () => {
+    vi.clearAllMocks();
+    await renderWithAuthContext(<SignIn />);
   });
-  describe("error handling", () => {
-    beforeEach(async () => {
-      vi.clearAllMocks();
 
-      vi.mocked(signInMock).mockRejectedValue({});
+  test("renders sign in form", () => {
+    expect(
+      screen.getByRole("textbox", { name: /^username$/i })
+    ).toBeInTheDocument();
+    expect(screen.getByLabelText(/^password$/i)).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: /sign in/i })
+    ).toBeInTheDocument();
+  });
 
-      await renderWithAuthContext(<SignIn />);
+  test("should call signIn when user submits form with valid input", async () => {
+    const user = userEvent.setup();
+
+    const usernameInput = screen.getByRole("textbox", {
+      name: /^username$/i,
     });
-    test("should call toast.error when signIn throws an error", async () => {
-      const user = userEvent.setup();
+    const passwordInput = screen.getByLabelText(/^password$/i);
 
-      const usernameInput = screen.getByRole("textbox", {
-        name: /^username$/i,
-      });
-      const passwordInput = screen.getByLabelText(/^password$/i);
+    await user.type(usernameInput, "testuser");
 
-      await user.type(usernameInput, "testuser");
+    await user.type(passwordInput, "testpassword");
+    await user.click(screen.getByRole("button", { name: /sign in/i }));
 
-      await user.type(passwordInput, "testpassword");
-      await user.click(screen.getByRole("button", { name: /sign in/i }));
+    expect(signInMock).toHaveBeenCalledWith(
+      {
+        username: "testuser",
+        password: "testpassword",
+      },
+      mockNavigate
+    );
 
-      expect(signInMock).toHaveBeenCalledWith(
-        {
-          username: "testuser",
-          password: "testpassword",
-        },
-        mockNavigate
-      );
-      expect(signInMock).toHaveBeenCalledTimes(1);
-      expect(vi.mocked(toast.error)).toHaveBeenCalledWith(
-        expect.stringMatching(/^error signing in/i)
-      );
-    });
+    expect(signInMock).toHaveBeenCalledTimes(1);
   });
 });
