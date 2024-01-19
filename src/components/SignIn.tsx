@@ -1,11 +1,10 @@
 import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
-import { SignInInput, AuthError } from "aws-amplify/auth";
+import { SignInInput } from "aws-amplify/auth";
 import { useFormik } from "formik";
 import * as yup from "yup";
 import { useAuthContext } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
-import { toast } from "react-toastify";
 
 const initialState = { username: "", password: "" };
 
@@ -25,17 +24,9 @@ const SignIn = () => {
   ) => {
     const { username, password } = values;
 
-    try {
-      setSubmitting(true);
-      await signIn({ username, password }, navigate);
-      toast.success("Successfully signed in!");
-    } catch (error) {
-      const authError = error as AuthError;
-      toast.error(`Error signing in: ${authError.message}`);
-      console.error(`Error signing in: ${authError.message}`);
-    } finally {
-      setSubmitting(false);
-    }
+    setSubmitting(true);
+    await signIn({ username, password }, navigate);
+    setSubmitting(false);
   };
 
   const {
