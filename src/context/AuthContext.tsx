@@ -62,11 +62,13 @@ const defaultAuthState = {
   setSignInStep: () => {},
   isAdmin: false,
   user: null,
+  checkUser: async () => {},
   signIn: async () => {},
   signOut: async () => {},
   signUp: async () => {},
   confirmSignUp: async () => {},
   confirmSignIn: async () => {},
+  resetAuthState: () => {},
 };
 
 export const AuthContextProvider: React.FC<AuthContextProviderProps> = ({
