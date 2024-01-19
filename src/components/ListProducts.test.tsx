@@ -1,5 +1,5 @@
 import { describe, test, vi, expect, beforeEach } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
 import ListProducts from "./ListProducts";
 import { MemoryRouter } from "react-router-dom";
 import { AuthContextProvider } from "../context/AuthContext";
@@ -10,12 +10,14 @@ import {
   Review,
 } from "../types";
 
-const renderWithAuthContext = (component: ReactNode) => {
-  return render(
-    <MemoryRouter>
-      <AuthContextProvider>{component}</AuthContextProvider>
-    </MemoryRouter>
-  );
+const renderWithAuthContext = async (component: ReactNode) => {
+  await waitFor(() => {
+    render(
+      <MemoryRouter>
+        <AuthContextProvider>{component}</AuthContextProvider>
+      </MemoryRouter>
+    );
+  });
 };
 
 const { useAuthContextMock } = vi.hoisted(() => {
@@ -26,6 +28,7 @@ const { useAuthContextMock } = vi.hoisted(() => {
       setSignInStep: vi.fn(),
       isAdmin: false,
       user: null,
+      checkUser: vi.fn(),
       signIn: vi.fn(),
       signOut: vi.fn(),
       signUp: vi.fn(),
@@ -89,75 +92,85 @@ vi.mock("aws-amplify/api", () => {
 vi.mock("aws-amplify/auth");
 
 describe("ListProducts", () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
+  describe("when the user is signed in", () => {
+    beforeEach(async () => {
+      vi.clearAllMocks();
+
+      vi.mocked(useAuthContextMock).mockReturnValueOnce({
+        isLoggedIn: true,
+        signInStep: "",
+        setSignInStep: vi.fn(),
+        isAdmin: false,
+        user: null,
+        checkUser: vi.fn(),
+        signIn: vi.fn(),
+        signOut: vi.fn(),
+        signUp: vi.fn(),
+        confirmSignUp: vi.fn(),
+        confirmSignIn: vi.fn(),
+        resetAuthState: vi.fn(),
+      });
+
+      await renderWithAuthContext(<ListProducts />);
+    });
+
+    test("renders products for a signed-in user", async () => {
+      const headings = await screen.findAllByRole("generic", {
+        name: (_, element) => element?.classList.contains("product-name"),
+      });
+
+      expect(headings).toHaveLength(2);
+
+      const productName = await screen.findByText("Product 1");
+      const productDescription = await screen.findByText("Description 1");
+      const productPrice = await screen.findByText("10");
+      const reviewCount = await screen.findByText(/5 reviews/i);
+
+      expect(productName).toBeInTheDocument();
+      expect(productDescription).toBeInTheDocument();
+      expect(productPrice).toBeInTheDocument();
+      expect(reviewCount).toBeInTheDocument();
+    });
   });
 
-  test("renders products for a signed-in user", async () => {
-    vi.mocked(useAuthContextMock).mockReturnValueOnce({
-      isLoggedIn: true,
-      signInStep: "",
-      setSignInStep: vi.fn(),
-      isAdmin: false,
-      user: null,
-      signIn: vi.fn(),
-      signOut: vi.fn(),
-      signUp: vi.fn(),
-      confirmSignUp: vi.fn(),
-      confirmSignIn: vi.fn(),
-      resetAuthState: vi.fn(),
+  describe("when the user is signed out", () => {
+    beforeEach(async () => {
+      vi.clearAllMocks();
+
+      vi.mocked(useAuthContextMock).mockReturnValueOnce({
+        isLoggedIn: false,
+        signInStep: "",
+        setSignInStep: vi.fn(),
+        isAdmin: false,
+        user: null,
+        checkUser: vi.fn(),
+        signIn: vi.fn(),
+        signOut: vi.fn(),
+        signUp: vi.fn(),
+        confirmSignUp: vi.fn(),
+        confirmSignIn: vi.fn(),
+        resetAuthState: vi.fn(),
+      });
+
+      await renderWithAuthContext(<ListProducts />);
     });
 
-    renderWithAuthContext(<ListProducts />);
+    test("renders products for a signed-out user", async () => {
+      const headings = await screen.findAllByRole("generic", {
+        name: (_, element) => element?.classList.contains("product-name"),
+      });
 
-    const headings = await screen.findAllByRole("generic", {
-      name: (_, element) => element?.classList.contains("product-name"),
+      expect(headings).toHaveLength(2);
+
+      const productName = await screen.findByText("Product 1");
+      const productDescription = await screen.findByText("Description 1");
+      const productPrice = await screen.findByText("10");
+      const reviewCount = await screen.findByText(/5 reviews/i);
+
+      expect(productName).toBeInTheDocument();
+      expect(productDescription).toBeInTheDocument();
+      expect(productPrice).toBeInTheDocument();
+      expect(reviewCount).toBeInTheDocument();
     });
-
-    expect(headings).toHaveLength(2);
-
-    const productName = await screen.findByText("Product 1");
-    const productDescription = await screen.findByText("Description 1");
-    const productPrice = await screen.findByText("10");
-    const reviewCount = await screen.findByText(/5 reviews/i);
-
-    expect(productName).toBeInTheDocument();
-    expect(productDescription).toBeInTheDocument();
-    expect(productPrice).toBeInTheDocument();
-    expect(reviewCount).toBeInTheDocument();
-  });
-
-  test("renders products for a signed-out user", async () => {
-    vi.mocked(useAuthContextMock).mockReturnValueOnce({
-      isLoggedIn: false,
-      signInStep: "",
-      setSignInStep: vi.fn(),
-      isAdmin: false,
-      user: null,
-      signIn: vi.fn(),
-      signOut: vi.fn(),
-      signUp: vi.fn(),
-      confirmSignUp: vi.fn(),
-      confirmSignIn: vi.fn(),
-      resetAuthState: vi.fn(),
-    });
-
-    renderWithAuthContext(<ListProducts />);
-
-    const headings = await screen.findAllByRole("generic", {
-      name: (_, element) => element?.classList.contains("product-name"),
-    });
-
-    expect(headings).toHaveLength(2);
-
-    const productName = await screen.findByText("Product 1");
-    const productDescription = await screen.findByText("Description 1");
-    const productPrice = await screen.findByText("10");
-    const reviewCount = await screen.findByText(/5 reviews/i);
-
-    expect(productName).toBeInTheDocument();
-    expect(productDescription).toBeInTheDocument();
-    expect(productPrice).toBeInTheDocument();
-    expect(reviewCount).toBeInTheDocument();
   });
 });
