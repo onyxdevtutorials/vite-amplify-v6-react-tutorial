@@ -1,5 +1,5 @@
 import { describe, test, expect, vi, beforeEach } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import SignInConfirm from "./SignInConfirm";
 import { AuthContextProvider } from "../context/AuthContext";
@@ -32,6 +32,7 @@ const { useAuthContextMock } = vi.hoisted(() => {
       setSignInStep: vi.fn(),
       isAdmin: false,
       user: null,
+      checkUser: vi.fn(),
       signIn: vi.fn(),
       signOut: vi.fn(),
       signUp: vi.fn(),
@@ -52,45 +53,83 @@ vi.mock("../context/AuthContext", async () => {
 
 vi.mock("aws-amplify/auth");
 
-const renderWithAuthContext = (component: ReactNode) => {
-  return render(
-    <MemoryRouter>
-      <AuthContextProvider>{component}</AuthContextProvider>
-    </MemoryRouter>
-  );
+const renderWithAuthContext = async (component: ReactNode) => {
+  await waitFor(() => {
+    render(
+      <MemoryRouter>
+        <AuthContextProvider>{component}</AuthContextProvider>
+      </MemoryRouter>
+    );
+  });
 };
 
 describe("SignInConfirm", () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
-    renderWithAuthContext(<SignInConfirm />);
-  });
+  describe("Success path", () => {
+    beforeEach(async () => {
+      vi.clearAllMocks();
 
-  test("renders the sign in confirm form", () => {
-    expect(
-      screen.getByRole("heading", { name: /please set a new password/i })
-    ).toBeInTheDocument();
+      vi.mocked(confirmSignInMock).mockResolvedValue(undefined);
 
-    expect(screen.getByLabelText(/^password$/i)).toBeInTheDocument();
-  });
-
-  test("user fills out and successfully submits the confirm sign in form", async () => {
-    const user = userEvent.setup();
-
-    const passwordInput = screen.getByLabelText(/^password$/i);
-    const submitButton = screen.getByRole("button", {
-      name: /change password/i,
+      await renderWithAuthContext(<SignInConfirm />);
     });
 
-    await user.type(passwordInput, "newpassword");
-    await user.click(submitButton);
+    test("renders the sign in confirm form", () => {
+      expect(
+        screen.getByRole("heading", { name: /please set a new password/i })
+      ).toBeInTheDocument();
 
-    expect(confirmSignInMock).toHaveBeenCalled();
-    expect(confirmSignInMock).toHaveBeenCalledWith(
-      {
-        challengeResponse: "newpassword",
-      },
-      mockNavigate
-    );
+      expect(screen.getByLabelText(/^password$/i)).toBeInTheDocument();
+    });
+
+    test("user fills out and successfully submits the confirm sign in form", async () => {
+      const user = userEvent.setup();
+
+      const passwordInput = screen.getByLabelText(/^password$/i);
+      const submitButton = screen.getByRole("button", {
+        name: /change password/i,
+      });
+
+      await user.type(passwordInput, "newpassword");
+      await user.click(submitButton);
+
+      expect(confirmSignInMock).toHaveBeenCalledTimes(1);
+      expect(confirmSignInMock).toHaveBeenCalledWith(
+        {
+          challengeResponse: "newpassword",
+        },
+        mockNavigate
+      );
+    });
+  });
+
+  describe("Failure path", () => {
+    beforeEach(async () => {
+      vi.clearAllMocks();
+
+      vi.mocked(confirmSignInMock).mockRejectedValue({
+        message: "error",
+      });
+
+      await renderWithAuthContext(<SignInConfirm />);
+    });
+    test("user fills out and unsuccessfully submits the confirm sign in form", async () => {
+      const user = userEvent.setup();
+
+      const passwordInput = screen.getByLabelText(/^password$/i);
+      const submitButton = screen.getByRole("button", {
+        name: /change password/i,
+      });
+
+      await user.type(passwordInput, "newpassword");
+      await user.click(submitButton);
+
+      expect(confirmSignInMock).toHaveBeenCalledTimes(1);
+      expect(confirmSignInMock).toHaveBeenCalledWith(
+        {
+          challengeResponse: "newpassword",
+        },
+        mockNavigate
+      );
+    });
   });
 });
