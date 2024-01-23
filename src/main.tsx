@@ -3,7 +3,7 @@ import ReactDOM from "react-dom/client";
 import App from "./App.tsx";
 import { Amplify } from "aws-amplify";
 import amplifyconfig from "./amplifyconfiguration.json";
-import "bootstrap/dist/css/bootstrap.min.css";
+import "bootswatch/dist/slate/bootstrap.min.css";
 
 Amplify.configure(amplifyconfig);
 
