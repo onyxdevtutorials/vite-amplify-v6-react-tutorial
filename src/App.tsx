@@ -129,10 +129,10 @@ const App = () => {
   return (
     <React.StrictMode>
       <AuthContextProvider>
-        <Container className="p-3">
+        <>
           <RouterProvider router={router} />
           <ToastContainer />
-        </Container>
+        </>
       </AuthContextProvider>
     </React.StrictMode>
   );

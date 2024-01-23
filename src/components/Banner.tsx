@@ -8,7 +8,7 @@ import { useAuthContext } from "../context/AuthContext";
 import { SignOut } from "../components/";
 
 const Banner = () => {
-  const { isLoggedIn, isAdmin } = useAuthContext();
+  const { isLoggedIn, isAdmin, user } = useAuthContext();
 
   const navigate = useNavigate();
 
@@ -21,8 +21,8 @@ const Banner = () => {
   };
 
   return (
-    <Navbar>
-      <Container>
+    <Navbar bg="dark" variant="dark" fixed="top">
+      <Container fluid>
         <Navbar.Brand>Site Name</Navbar.Brand>
         <Navbar.Toggle aria-controls="basic-navbar-nav" />
         <Navbar.Collapse id="basic-navbar-nav" className="justify-content-end">
@@ -44,6 +44,7 @@ const Banner = () => {
                   Add Product
                 </Nav.Link>
               )}
+              {user && <span>Logged in as {user.username}</span>}
               <SignOut />
             </>
           )}
