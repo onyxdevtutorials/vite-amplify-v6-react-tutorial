@@ -9,7 +9,7 @@ const initialValues = {
   name: "",
   description: "",
   price: "",
-  image: null,
+  image: undefined,
 };
 
 const client = generateClient();
