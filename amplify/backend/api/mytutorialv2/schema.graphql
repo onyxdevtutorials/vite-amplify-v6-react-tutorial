@@ -40,13 +40,19 @@ type User
   @auth(
     rules: [
       { allow: owner }
-      { allow: private, provider: userPools, operations: [read] }
+      {
+        allow: private
+        provider: userPools
+        operations: [create, read, update]
+      }
       { allow: public, provider: iam, operations: [read] }
       { allow: groups, groups: ["admin"] }
     ]
   ) {
   id: ID!
   username: String!
+  firstName: String
+  lastName: String
   isArchived: Boolean
   reviews: [Review] @hasMany
 }
