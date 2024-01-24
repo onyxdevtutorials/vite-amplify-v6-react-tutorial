@@ -30,7 +30,8 @@
       "UnauthRoleName": "amplify-mytutorialv2-myenv-203201-unauthRole",
       "StackName": "amplify-mytutorialv2-myenv-203201",
       "StackId": "arn:aws:cloudformation:us-east-1:909500381447:stack/amplify-mytutorialv2-myenv-203201/4000bf90-89b9-11ee-9f8c-0a239003dd67",
-      "AmplifyAppId": "d1orozue7xcs1n"
+      "AmplifyAppId": "d1orozue7xcs1n",
+      "AuthTriggerTemplateURL": "https://s3.amazonaws.com/amplify-mytutorialv2-myenv-203201-deployment/amplify-cfn-templates/auth/auth-trigger-cloudformation-template.json"
     },
     "categories": {
       "auth": {
@@ -41,6 +42,12 @@
       },
       "storage": {
         "productimages": {}
+      },
+      "function": {
+        "authservicesPostConfirmation": {
+          "deploymentBucketName": "amplify-mytutorialv2-myenv-203201-deployment",
+          "s3Key": "amplify-builds/authservicesPostConfirmation-32566579314c366a3344-build.zip"
+        }
       }
     }
   }
