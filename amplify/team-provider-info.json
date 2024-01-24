@@ -46,7 +46,7 @@
       "function": {
         "authservicesPostConfirmation": {
           "deploymentBucketName": "amplify-mytutorialv2-myenv-203201-deployment",
-          "s3Key": "amplify-builds/authservicesPostConfirmation-32566579314c366a3344-build.zip"
+          "s3Key": "amplify-builds/authservicesPostConfirmation-667569394b4b36554c46-build.zip"
         }
       }
     }
