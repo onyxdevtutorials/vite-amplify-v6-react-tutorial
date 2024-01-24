@@ -1,7 +1,8 @@
-const aws = require("aws-sdk");
-const ddb = new aws.DynamoDB();
+import { DynamoDBClient, PutItemCommand } from "@aws-sdk/client-dynamodb";
 
-exports.handler = async (event, context) => {
+const ddbClient = new DynamoDBClient({ region: "us-east-1" });
+
+export async function handler(event, context) {
   let date = new Date();
 
   if (event.request.userAttributes.sub) {
@@ -19,14 +20,14 @@ exports.handler = async (event, context) => {
 
     // Call DynamoDB
     try {
-      await ddb.putItem(params).promise();
+      await ddbClient.send(new PutItemCommand(params));
       console.log("Success");
     } catch (err) {
       console.log("Error", err);
     }
     context.done(null, event);
   } else {
-    console.log("Error: Nothing was writtedn to DynamoDB");
+    console.log("Error: Nothing was written to DynamoDB");
     context.done(null, event);
   }
-};
+}
