@@ -77,6 +77,8 @@ export const getReview = /* GraphQL */ `query GetReview($id: ID!) {
     user {
       id
       username
+      firstName
+      lastName
       isArchived
       createdAt
       updatedAt
@@ -122,6 +124,8 @@ export const getUser = /* GraphQL */ `query GetUser($id: ID!) {
   getUser(id: $id) {
     id
     username
+    firstName
+    lastName
     isArchived
     reviews {
       nextToken
@@ -143,6 +147,8 @@ export const listUsers = /* GraphQL */ `query ListUsers(
     items {
       id
       username
+      firstName
+      lastName
       isArchived
       createdAt
       updatedAt

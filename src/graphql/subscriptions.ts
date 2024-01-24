@@ -107,6 +107,8 @@ export const onCreateReview = /* GraphQL */ `subscription OnCreateReview(
     user {
       id
       username
+      firstName
+      lastName
       isArchived
       createdAt
       updatedAt
@@ -149,6 +151,8 @@ export const onUpdateReview = /* GraphQL */ `subscription OnUpdateReview(
     user {
       id
       username
+      firstName
+      lastName
       isArchived
       createdAt
       updatedAt
@@ -191,6 +195,8 @@ export const onDeleteReview = /* GraphQL */ `subscription OnDeleteReview(
     user {
       id
       username
+      firstName
+      lastName
       isArchived
       createdAt
       updatedAt
@@ -216,6 +222,8 @@ export const onCreateUser = /* GraphQL */ `subscription OnCreateUser(
   onCreateUser(filter: $filter, owner: $owner) {
     id
     username
+    firstName
+    lastName
     isArchived
     reviews {
       nextToken
@@ -238,6 +246,8 @@ export const onUpdateUser = /* GraphQL */ `subscription OnUpdateUser(
   onUpdateUser(filter: $filter, owner: $owner) {
     id
     username
+    firstName
+    lastName
     isArchived
     reviews {
       nextToken
@@ -260,6 +270,8 @@ export const onDeleteUser = /* GraphQL */ `subscription OnDeleteUser(
   onDeleteUser(filter: $filter, owner: $owner) {
     id
     username
+    firstName
+    lastName
     isArchived
     reviews {
       nextToken
