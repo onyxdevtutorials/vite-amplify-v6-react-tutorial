@@ -107,6 +107,8 @@ export const createReview = /* GraphQL */ `mutation CreateReview(
     user {
       id
       username
+      firstName
+      lastName
       isArchived
       createdAt
       updatedAt
@@ -149,6 +151,8 @@ export const updateReview = /* GraphQL */ `mutation UpdateReview(
     user {
       id
       username
+      firstName
+      lastName
       isArchived
       createdAt
       updatedAt
@@ -191,6 +195,8 @@ export const deleteReview = /* GraphQL */ `mutation DeleteReview(
     user {
       id
       username
+      firstName
+      lastName
       isArchived
       createdAt
       updatedAt
@@ -216,6 +222,8 @@ export const createUser = /* GraphQL */ `mutation CreateUser(
   createUser(input: $input, condition: $condition) {
     id
     username
+    firstName
+    lastName
     isArchived
     reviews {
       nextToken
@@ -238,6 +246,8 @@ export const updateUser = /* GraphQL */ `mutation UpdateUser(
   updateUser(input: $input, condition: $condition) {
     id
     username
+    firstName
+    lastName
     isArchived
     reviews {
       nextToken
@@ -260,6 +270,8 @@ export const deleteUser = /* GraphQL */ `mutation DeleteUser(
   deleteUser(input: $input, condition: $condition) {
     id
     username
+    firstName
+    lastName
     isArchived
     reviews {
       nextToken

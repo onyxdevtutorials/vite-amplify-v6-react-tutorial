@@ -30,18 +30,26 @@ export default function UserCreateForm(props) {
   } = props;
   const initialValues = {
     username: "",
+    firstName: "",
+    lastName: "",
     isArchived: false,
   };
   const [username, setUsername] = React.useState(initialValues.username);
+  const [firstName, setFirstName] = React.useState(initialValues.firstName);
+  const [lastName, setLastName] = React.useState(initialValues.lastName);
   const [isArchived, setIsArchived] = React.useState(initialValues.isArchived);
   const [errors, setErrors] = React.useState({});
   const resetStateValues = () => {
     setUsername(initialValues.username);
+    setFirstName(initialValues.firstName);
+    setLastName(initialValues.lastName);
     setIsArchived(initialValues.isArchived);
     setErrors({});
   };
   const validations = {
     username: [{ type: "Required" }],
+    firstName: [],
+    lastName: [],
     isArchived: [],
   };
   const runValidationTasks = async (
@@ -71,6 +79,8 @@ export default function UserCreateForm(props) {
         event.preventDefault();
         let modelFields = {
           username,
+          firstName,
+          lastName,
           isArchived,
         };
         const validationResponses = await Promise.all(
@@ -135,6 +145,8 @@ export default function UserCreateForm(props) {
           if (onChange) {
             const modelFields = {
               username: value,
+              firstName,
+              lastName,
               isArchived,
             };
             const result = onChange(modelFields);
@@ -150,6 +162,60 @@ export default function UserCreateForm(props) {
         hasError={errors.username?.hasError}
         {...getOverrideProps(overrides, "username")}
       ></TextField>
+      <TextField
+        label="First name"
+        isRequired={false}
+        isReadOnly={false}
+        value={firstName}
+        onChange={(e) => {
+          let { value } = e.target;
+          if (onChange) {
+            const modelFields = {
+              username,
+              firstName: value,
+              lastName,
+              isArchived,
+            };
+            const result = onChange(modelFields);
+            value = result?.firstName ?? value;
+          }
+          if (errors.firstName?.hasError) {
+            runValidationTasks("firstName", value);
+          }
+          setFirstName(value);
+        }}
+        onBlur={() => runValidationTasks("firstName", firstName)}
+        errorMessage={errors.firstName?.errorMessage}
+        hasError={errors.firstName?.hasError}
+        {...getOverrideProps(overrides, "firstName")}
+      ></TextField>
+      <TextField
+        label="Last name"
+        isRequired={false}
+        isReadOnly={false}
+        value={lastName}
+        onChange={(e) => {
+          let { value } = e.target;
+          if (onChange) {
+            const modelFields = {
+              username,
+              firstName,
+              lastName: value,
+              isArchived,
+            };
+            const result = onChange(modelFields);
+            value = result?.lastName ?? value;
+          }
+          if (errors.lastName?.hasError) {
+            runValidationTasks("lastName", value);
+          }
+          setLastName(value);
+        }}
+        onBlur={() => runValidationTasks("lastName", lastName)}
+        errorMessage={errors.lastName?.errorMessage}
+        hasError={errors.lastName?.hasError}
+        {...getOverrideProps(overrides, "lastName")}
+      ></TextField>
       <SwitchField
         label="Is archived"
         defaultChecked={false}
@@ -160,6 +226,8 @@ export default function UserCreateForm(props) {
           if (onChange) {
             const modelFields = {
               username,
+              firstName,
+              lastName,
               isArchived: value,
             };
             const result = onChange(modelFields);
