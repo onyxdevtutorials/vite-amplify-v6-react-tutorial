@@ -5,6 +5,7 @@ import { Product as ProductType } from "../types";
 import { archiveProduct, restoreProduct } from "../graphql/customMutations";
 import { generateClient } from "aws-amplify/api";
 import { Button } from "react-bootstrap";
+import { useAuthContext } from "../context/AuthContext";
 
 interface ProductProps {
   product: ProductType;
@@ -16,6 +17,7 @@ const client = generateClient();
 const Product: React.FC<ProductProps> = ({ product, isAdmin }) => {
   const navigate = useNavigate();
   const [isArchived, setIsArchived] = useState(product.isArchived);
+  const { isLoggedIn } = useAuthContext();
 
   const handleEdit = () => {
     navigate(`/products/${product.id}/edit`);
@@ -40,6 +42,10 @@ const Product: React.FC<ProductProps> = ({ product, isAdmin }) => {
     }
   };
 
+  const handleRateAndReview = () => {
+    navigate(`/products/${product.id}/reviews/new`);
+  };
+
   return (
     <Card role="listitem">
       <Card.Body>
@@ -62,6 +68,9 @@ const Product: React.FC<ProductProps> = ({ product, isAdmin }) => {
         <Card.Text>{product.price}</Card.Text>
         <Card.Text>{product.reviews?.items?.length || 0} reviews</Card.Text>
         <div>
+          {isLoggedIn && (
+            <Button onClick={handleRateAndReview}>Rate and Review</Button>
+          )}
           {isAdmin && (
             <>
               <Button onClick={handleEdit}>Edit</Button>
