@@ -1,4 +1,4 @@
-const { DynamoDBClient, PutItemCommand } = require("@aws-sdk/client-dynamodb");
+import { DynamoDBClient, PutItemCommand } from "@aws-sdk/client-dynamodb";
 
 const ddbClient = new DynamoDBClient({ region: "us-east-1" });
 
@@ -14,6 +14,7 @@ export async function handler(event, context) {
         email: { S: event.request.userAttributes.email },
         createdAt: { S: date.toISOString() },
         updatedAt: { S: date.toISOString() },
+        owner: { S: event.request.userAttributes.sub },
       },
       TableName: process.env.USERTABLE,
     };
