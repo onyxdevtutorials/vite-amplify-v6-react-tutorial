@@ -9,12 +9,13 @@
  * The names of modules to load are stored as a comma-delimited string in the
  * `MODULES` env var.
  */
-const moduleNames = process.env.MODULES.split(',');
+const moduleNames = process.env.MODULES.split(",");
 /**
  * The array of imported modules.
  */
-const modules = moduleNames.map((name) => require(`./${name}`));
-
+const modules = await Promise.all(
+  moduleNames.map((name) => import(`./${name}`))
+);
 /**
  * This async handler iterates over the given modules and awaits them.
  *
@@ -22,7 +23,8 @@ const modules = moduleNames.map((name) => require(`./${name}`));
  * @type {import('@types/aws-lambda').APIGatewayProxyHandler}
  *
  */
-exports.handler = async (event, context) => {
+// exports.handler = async (event, context) => {
+export async function handler(event, context) {
   /**
    * Instead of naively iterating over all handlers, run them concurrently with
    * `await Promise.all(...)`. This would otherwise just be determined by the
@@ -30,4 +32,4 @@ exports.handler = async (event, context) => {
    */
   await Promise.all(modules.map((module) => module.handler(event, context)));
   return event;
-};
+}
