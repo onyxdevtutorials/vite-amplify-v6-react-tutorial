@@ -80,6 +80,24 @@
       "service": "Lambda"
     }
   },
+  "parameters": {
+    "AMPLIFY_function_authservicesPostConfirmation_deploymentBucketName": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "authservicesPostConfirmation"
+        }
+      ]
+    },
+    "AMPLIFY_function_authservicesPostConfirmation_s3Key": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "authservicesPostConfirmation"
+        }
+      ]
+    }
+  },
   "storage": {
     "productimages": {
       "dependsOn": [],
