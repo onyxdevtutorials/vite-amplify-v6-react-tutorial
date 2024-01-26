@@ -9,15 +9,14 @@ import { useAuthContext } from "../context/AuthContext";
 
 interface ProductProps {
   product: ProductType;
-  isAdmin: boolean;
 }
 
 const client = generateClient();
 
-const Product: React.FC<ProductProps> = ({ product, isAdmin }) => {
+const Product: React.FC<ProductProps> = ({ product }) => {
   const navigate = useNavigate();
   const [isArchived, setIsArchived] = useState(product.isArchived);
-  const { isLoggedIn } = useAuthContext();
+  const { isLoggedIn, isAdmin } = useAuthContext();
 
   const handleEdit = () => {
     navigate(`/products/${product.id}/edit`);

@@ -12,7 +12,7 @@ const client = generateClient();
 const ListProducts = () => {
   const [products, setProducts] = useState<ProductWithReviews[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const { isAdmin, isLoggedIn } = useAuthContext();
+  const { isLoggedIn } = useAuthContext();
   const [sortField, setSortField] = useState<"name" | "price">("name");
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
 
@@ -99,11 +99,7 @@ const ListProducts = () => {
           ) : (
             <div role="list">
               {sortedProducts.map((product) => (
-                <ProductComponent
-                  key={product.id}
-                  product={product}
-                  isAdmin={isAdmin}
-                />
+                <ProductComponent key={product.id} product={product} />
               ))}
             </div>
           )}
