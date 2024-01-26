@@ -13,15 +13,15 @@ import {
   SignInConfirm,
   ChangePassword,
   ProductDetail,
-  ProductDelete,
   ReviewDetail,
-  DeleteReview,
+  UserProfile,
+  EditUserProfile,
 } from "./pages";
-import { Authenticator } from "@aws-amplify/ui-react";
 import "@aws-amplify/ui-react/styles.css";
 import { AuthContextProvider } from "./context/AuthContext";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { ProtectedRoute } from "./components";
 
 const router = createBrowserRouter([
   {
@@ -35,9 +35,9 @@ const router = createBrowserRouter([
       {
         path: "products/new",
         element: (
-          <Authenticator>
+          <ProtectedRoute role="admin">
             <AddProduct />
-          </Authenticator>
+          </ProtectedRoute>
         ),
       },
       {
@@ -47,59 +47,31 @@ const router = createBrowserRouter([
       {
         path: "products/:productId/edit",
         element: (
-          <Authenticator>
+          <ProtectedRoute role="admin">
             <EditProduct />
-          </Authenticator>
-        ),
-      },
-      {
-        path: "products/:productId/delete",
-        element: (
-          <Authenticator>
-            <ProductDelete />
-          </Authenticator>
+          </ProtectedRoute>
         ),
       },
       {
         path: "products/:productId/reviews/new",
         element: (
-          <Authenticator>
+          <ProtectedRoute role="admin">
             <AddReview />
-          </Authenticator>
+          </ProtectedRoute>
         ),
       },
       {
         path: "reviews/:reviewId",
-        element: (
-          <Authenticator>
-            <ReviewDetail />
-          </Authenticator>
-        ),
+        element: <ReviewDetail />,
       },
       {
         path: "reviews/:reviewId/edit",
         element: (
-          <Authenticator>
+          <ProtectedRoute>
             <EditReview />
-          </Authenticator>
+          </ProtectedRoute>
         ),
       },
-      {
-        path: "reviews/:reviewId/delete",
-        element: (
-          <Authenticator>
-            <DeleteReview />
-          </Authenticator>
-        ),
-      },
-      // {
-      //   path: "edit/:id",
-      //   element: (
-      //     <Authenticator>
-      //       <EditProduct />
-      //     </Authenticator>
-      //   ),
-      // },
       {
         path: "signup",
         element: <SignUp />,
@@ -114,11 +86,27 @@ const router = createBrowserRouter([
       },
       {
         path: "changepassword",
-        element: <ChangePassword />,
+        element: (
+          <ProtectedRoute>
+            <ChangePassword />
+          </ProtectedRoute>
+        ),
       },
       {
         path: "signupconfirm/:username?",
         element: <SignUpConfirm />,
+      },
+      {
+        path: "users/:userId",
+        element: <UserProfile />,
+      },
+      {
+        path: "users/:userId/edit",
+        element: (
+          <ProtectedRoute>
+            <EditUserProfile />
+          </ProtectedRoute>
+        ),
       },
     ],
   },
