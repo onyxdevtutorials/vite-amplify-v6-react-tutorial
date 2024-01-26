@@ -13,3 +13,4 @@ export { default as ReviewDetail } from "./ReviewDetail";
 export { default as EditReview } from "./EditReview";
 export { default as UserProfile } from "./UserProfile";
 export { default as EditUserProfile } from "./EditUserProfile";
+export { default as NotAuthorized } from "./NotAuthorized";

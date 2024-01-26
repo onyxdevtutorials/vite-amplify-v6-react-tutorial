@@ -12,9 +12,12 @@ const ProtectedRoute = ({ children, role = "user" }: ProtectedRouterProps) => {
 
   useEffect(() => {
     if (isLoggedIn === null) return;
-    if (!isLoggedIn || (role === "admin" && !isAdmin)) {
+
+    if (!isLoggedIn) {
       setIntendedPath(location.pathname);
       navigate("/signin");
+    } else if (role === "admin" && !isAdmin) {
+      navigate("/not-authorized");
     }
   }, [navigate, isLoggedIn, isAdmin, role, setIntendedPath]);
 

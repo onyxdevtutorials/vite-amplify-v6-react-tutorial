@@ -16,6 +16,7 @@ import {
   ReviewDetail,
   UserProfile,
   EditUserProfile,
+  NotAuthorized,
 } from "./pages";
 import "@aws-amplify/ui-react/styles.css";
 import { AuthContextProvider } from "./context/AuthContext";
@@ -107,6 +108,10 @@ const router = createBrowserRouter([
             <EditUserProfile />
           </ProtectedRoute>
         ),
+      },
+      {
+        path: "/not-authorized",
+        element: <NotAuthorized />,
       },
     ],
   },
