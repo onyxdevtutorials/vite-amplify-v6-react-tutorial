@@ -152,8 +152,37 @@ describe("Banner", () => {
       const addProductLink = screen.getByRole("link", { name: /add product/i });
       expect(addProductLink).toBeInTheDocument();
     });
+  });
 
-    test("renders Sign Out button when logged in but not Sign In or Sign Up buttons", () => {
+  describe("Logged in as user", () => {
+    beforeEach(async () => {
+      vi.clearAllMocks();
+
+      vi.mocked(useAuthContextMock).mockReturnValueOnce({
+        isLoggedIn: true,
+        signInStep: "",
+        setSignInStep: vi.fn(),
+        isAdmin: false,
+        user: {
+          username: "testuser",
+        },
+        checkUser: vi.fn(),
+        signIn: vi.fn(),
+        signOut: vi.fn(),
+        signUp: vi.fn(),
+        confirmSignUp: vi.fn(),
+        confirmSignIn: vi.fn(),
+        resetAuthState: vi.fn(),
+      });
+
+      await renderWithAuthContext(<Banner />);
+    });
+    test("renders Sign Out button when logged in but not Sign In or Sign Up buttons", async () => {
+      const user = userEvent.setup();
+
+      const dropdownToggle = screen.getByRole("button", { name: /testuser/i });
+      await user.click(dropdownToggle);
+
       const signOutButton = screen.getByRole("button", { name: /sign out/i });
       expect(signOutButton).toBeInTheDocument();
 

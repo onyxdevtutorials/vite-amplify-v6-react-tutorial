@@ -3,12 +3,12 @@ import Navbar from "react-bootstrap/Navbar";
 import Container from "react-bootstrap/Container";
 import Nav from "react-bootstrap/Nav";
 import Button from "react-bootstrap/Button";
+import Dropdown from "react-bootstrap/Dropdown";
 import { Link } from "react-router-dom";
 import { useAuthContext } from "../context/AuthContext";
-import { SignOut } from "../components/";
 
 const Banner = () => {
-  const { isLoggedIn, isAdmin, user } = useAuthContext();
+  const { isLoggedIn, isAdmin, user, signOut } = useAuthContext();
 
   const navigate = useNavigate();
 
@@ -18,6 +18,10 @@ const Banner = () => {
 
   const handleSignIn = () => {
     navigate("/signin");
+  };
+
+  const handleSignOut = async () => {
+    await signOut(navigate);
   };
 
   return (
@@ -44,8 +48,24 @@ const Banner = () => {
                   Add Product
                 </Nav.Link>
               )}
-              {user && <span>Logged in as {user.username}</span>}
-              <SignOut />
+              {user && (
+                <Dropdown>
+                  <Dropdown.Toggle variant="dark" id="dropdown-basic">
+                    {user.username}
+                  </Dropdown.Toggle>
+                  <Dropdown.Menu>
+                    <Dropdown.Item as={Link} to={`/users/${user.username}`}>
+                      Profile
+                    </Dropdown.Item>
+                    <Dropdown.Item as={Link} to="/changepassword">
+                      Change Password
+                    </Dropdown.Item>
+                    <Dropdown.Item as={Button} onClick={handleSignOut}>
+                      Sign Out
+                    </Dropdown.Item>
+                  </Dropdown.Menu>
+                </Dropdown>
+              )}
             </>
           )}
         </Navbar.Collapse>
