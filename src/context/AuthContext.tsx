@@ -52,6 +52,8 @@ export type AuthContextType = {
     navigate: NavigateFunction
   ) => Promise<void>;
   resetAuthState: () => void;
+  intendedPath?: string | null;
+  setIntendedPath: React.Dispatch<React.SetStateAction<string | null>>;
 };
 
 const AuthContext = createContext<AuthContextType | null>(null);
@@ -69,6 +71,8 @@ const defaultAuthState = {
   confirmSignUp: async () => {},
   confirmSignIn: async () => {},
   resetAuthState: () => {},
+  intendedPath: null,
+  setIntendedPath: () => {},
 };
 
 export const AuthContextProvider: React.FC<AuthContextProviderProps> = ({
@@ -84,6 +88,9 @@ export const AuthContextProvider: React.FC<AuthContextProviderProps> = ({
       : localStorage.getItem("isLoggedIn") === "true"
   );
   const [isAdmin, setIsAdmin] = useState(defaultState.isAdmin);
+  const [intendedPath, setIntendedPath] = useState<string | null>(
+    defaultState.intendedPath || null
+  );
 
   const checkUser = useCallback(async () => {
     try {
@@ -280,6 +287,8 @@ export const AuthContextProvider: React.FC<AuthContextProviderProps> = ({
         confirmSignUp,
         confirmSignIn,
         resetAuthState,
+        intendedPath,
+        setIntendedPath,
       }}
     >
       {children}
