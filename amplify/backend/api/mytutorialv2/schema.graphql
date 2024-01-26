@@ -2,10 +2,10 @@ type Product
   @model
   @auth(
     rules: [
-      { allow: owner }
+      { allow: owner, operations: [read, create, update] }
       { allow: private, provider: userPools, operations: [read] }
       { allow: public, provider: iam, operations: [read] }
-      { allow: groups, groups: ["admin"] }
+      { allow: groups, groups: ["admin"], operations: [read, create, update] }
     ]
   ) {
   id: ID!
@@ -21,10 +21,10 @@ type Review
   @model
   @auth(
     rules: [
-      { allow: owner }
+      { allow: owner, operations: [read, create, update] }
       { allow: private, provider: userPools, operations: [read] }
       { allow: public, provider: iam, operations: [read] }
-      { allow: groups, groups: ["admin"] }
+      { allow: groups, groups: ["admin"], operations: [read, create, update] }
     ]
   ) {
   id: ID!
@@ -39,14 +39,14 @@ type User
   @model
   @auth(
     rules: [
-      { allow: owner }
+      { allow: owner, operations: [read, create, update] }
       {
         allow: private
         provider: userPools
         operations: [create, read, update]
       }
       { allow: public, provider: iam, operations: [read] }
-      { allow: groups, groups: ["admin"] }
+      { allow: groups, groups: ["admin"], operations: [read, create, update] }
     ]
   ) {
   id: ID!
