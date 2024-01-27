@@ -30,6 +30,10 @@ const { useAuthContextMock } = vi.hoisted(() => {
 });
 
 describe("ProtectedRoute", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
   test("redirects to /signin when not logged in", async () => {
     useAuthContextMock.mockReturnValue({
       isLoggedIn: false,
