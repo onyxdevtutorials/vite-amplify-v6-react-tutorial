@@ -1,4 +1,4 @@
-import { render, waitFor } from "@testing-library/react";
+import { render, waitFor, screen } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import { AuthContextProvider } from "../context/AuthContext";
 import ProtectedRoute from "./ProtectedRoute";
@@ -70,23 +70,25 @@ describe("ProtectedRoute", () => {
     expect(mockNavigate).toHaveBeenCalledWith("/not-authorized");
   });
 
-  test.only("renders children when user is logged in and has correct role", async () => {
+  test("renders children when user is logged in and has correct role", async () => {
     useAuthContextMock.mockReturnValue({
       isLoggedIn: true,
       isAdmin: true,
       setIntendedPath: vi.fn(),
     });
 
-    const { getByText } = render(
-      <MemoryRouter>
-        <AuthContextProvider>
-          <ProtectedRoute role="admin">
-            <div>Protected content</div>
-          </ProtectedRoute>
-        </AuthContextProvider>
-      </MemoryRouter>
-    );
+    await waitFor(() => {
+      render(
+        <MemoryRouter>
+          <AuthContextProvider>
+            <ProtectedRoute role="admin">
+              <div>Protected content</div>
+            </ProtectedRoute>
+          </AuthContextProvider>
+        </MemoryRouter>
+      );
+    });
 
-    expect(getByText("Protected content")).toBeInTheDocument();
+    expect(screen.getByText("Protected content")).toBeInTheDocument();
   });
 });
