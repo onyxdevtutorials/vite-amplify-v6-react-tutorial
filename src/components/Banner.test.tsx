@@ -106,6 +106,7 @@ describe("Banner", () => {
       expect(signUpButton).toBeInTheDocument();
       expect(signOutButton).not.toBeInTheDocument();
     });
+
     test("navigates to /signin when Sign In button is clicked", async () => {
       const user = userEvent.setup();
 
@@ -148,9 +149,16 @@ describe("Banner", () => {
 
       await renderWithAuthContext(<Banner />);
     });
+
     test("renders Add Product link when logged in as admin", () => {
       const addProductLink = screen.getByRole("link", { name: /add product/i });
       expect(addProductLink).toBeInTheDocument();
+    });
+
+    test("should have an Add Product link", () => {
+      const addProductLink = screen.getByRole("link", { name: /add product/i });
+      expect(addProductLink).toBeInTheDocument();
+      expect(addProductLink).toHaveAttribute("href", "/products/new");
     });
   });
 
@@ -158,7 +166,7 @@ describe("Banner", () => {
     beforeEach(async () => {
       vi.clearAllMocks();
 
-      vi.mocked(useAuthContextMock).mockReturnValueOnce({
+      vi.mocked(useAuthContextMock).mockReturnValue({
         isLoggedIn: true,
         signInStep: "",
         setSignInStep: vi.fn(),
@@ -177,6 +185,7 @@ describe("Banner", () => {
 
       await renderWithAuthContext(<Banner />);
     });
+
     test("renders Sign Out button when logged in but not Sign In or Sign Up buttons", async () => {
       const user = userEvent.setup();
 
@@ -191,6 +200,51 @@ describe("Banner", () => {
 
       expect(signInButton).not.toBeInTheDocument();
       expect(signUpButton).not.toBeInTheDocument();
+    });
+
+    test("should contain a link to the user's profile", async () => {
+      const user = userEvent.setup();
+
+      const dropdownToggle = screen.getByRole("button", {
+        name: /testuser/i,
+      });
+      await user.click(dropdownToggle);
+
+      const profileLink = screen.getByRole("link", { name: /profile/i });
+      expect(profileLink).toBeInTheDocument();
+      expect(profileLink).toHaveAttribute("href", "/users/testuser");
+    });
+
+    test("should contain a link to Change Password", async () => {
+      const user = userEvent.setup();
+
+      const dropdownToggle = screen.getByRole("button", {
+        name: /testuser/i,
+      });
+      await user.click(dropdownToggle);
+
+      const changePasswordLink = screen.getByRole("link", {
+        name: /change password/i,
+      });
+      expect(changePasswordLink).toBeInTheDocument();
+      expect(changePasswordLink).toHaveAttribute("href", "/changepassword");
+    });
+
+    test("calls signOut when Sign Out button is clicked and navigates to /signin", async () => {
+      const user = userEvent.setup();
+
+      const dropdownToggle = screen.getByRole("button", {
+        name: /testuser/i,
+      });
+      await user.click(dropdownToggle);
+
+      const signOutButton = screen.getByRole("button", {
+        name: /sign out/i,
+      });
+      expect(signOutButton).toBeInTheDocument();
+      await user.click(signOutButton);
+
+      expect(useAuthContextMock().signOut).toHaveBeenCalledTimes(1);
     });
   });
 });
