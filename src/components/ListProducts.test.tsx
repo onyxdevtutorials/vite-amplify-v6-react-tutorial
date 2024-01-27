@@ -8,6 +8,7 @@ import {
   ListProductsQueryWithReviews,
   Review,
 } from "../types";
+import userEvent from "@testing-library/user-event";
 
 const renderWithAuthContext = async (component: ReactNode) => {
   await waitFor(() => {
@@ -130,6 +131,22 @@ describe("ListProducts", () => {
       expect(productPrice).toBeInTheDocument();
       expect(reviewCount).toBeInTheDocument();
     });
+
+    test.todo("should be able to sort by name", async () => {
+      const user = userEvent.setup();
+
+      const sortButton = await screen.findByRole("button", {
+        name: /sort by name/i,
+      });
+
+      expect(sortButton).toBeInTheDocument();
+
+      await user.click(sortButton);
+    });
+
+    test.todo("should be able to sort by price", async () => {});
+
+    test.todo("should be able to toggle sort direction", async () => {});
   });
 
   describe("when the user is signed out", () => {
