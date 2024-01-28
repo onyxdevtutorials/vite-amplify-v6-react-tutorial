@@ -8,6 +8,7 @@ import { getProductWithReviews } from "../graphql/customQueries";
 import { GetProductWithReviewsQuery } from "../API";
 import { toast } from "react-toastify";
 import { useAuthContext } from "../context/AuthContext";
+import { Review } from "../components";
 
 const client = generateClient();
 
@@ -85,16 +86,6 @@ function ProductDetail() {
     }
   };
 
-  const handleEditReview = (reviewId: string | undefined) => {
-    if (!reviewId) return;
-
-    navigate(`/reviews/${reviewId}/edit`);
-  };
-
-  const handleDeleteReview = async () => {
-    toast.warn("delete review not yet implemented");
-  };
-
   if (isLoading) {
     return <div>Loading...</div>;
   }
@@ -141,21 +132,7 @@ function ProductDetail() {
       {product?.reviews?.items
         ?.filter((review) => !review?.isArchived)
         .map((review) => (
-          <Card key={review?.id}>
-            <Card.Body>
-              <Card.Title>{review?.owner}</Card.Title>
-              <Card.Text>{review?.content}</Card.Text>
-              <Card.Text>Rating: {review?.rating}</Card.Text>
-              {user?.username === review?.owner && (
-                <div>
-                  <Button onClick={() => handleEditReview(review?.id)}>
-                    Edit
-                  </Button>
-                  <Button onClick={handleDeleteReview}>Delete</Button>
-                </div>
-              )}
-            </Card.Body>
-          </Card>
+          <Review reviewId={review?.id} />
         ))}
     </>
   );
