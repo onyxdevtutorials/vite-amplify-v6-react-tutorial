@@ -56,7 +56,7 @@ const router = createBrowserRouter([
       {
         path: "products/:productId/reviews/new",
         element: (
-          <ProtectedRoute role="admin">
+          <ProtectedRoute role="user">
             <AddReview />
           </ProtectedRoute>
         ),
@@ -68,7 +68,7 @@ const router = createBrowserRouter([
       {
         path: "reviews/:reviewId/edit",
         element: (
-          <ProtectedRoute>
+          <ProtectedRoute role="user">
             <EditReview />
           </ProtectedRoute>
         ),
