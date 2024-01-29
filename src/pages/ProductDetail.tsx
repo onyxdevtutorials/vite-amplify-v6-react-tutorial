@@ -6,7 +6,6 @@ import { useNavigate } from "react-router-dom";
 import { archiveProduct, restoreProduct } from "../graphql/customMutations";
 import { getProductWithReviews } from "../graphql/customQueries";
 import { GetProductWithReviewsQuery } from "../API";
-import { toast } from "react-toastify";
 import { useAuthContext } from "../context/AuthContext";
 import { Review } from "../components";
 
@@ -19,7 +18,7 @@ function ProductDetail() {
   >(null);
   const [errorMessage, setErrorMessage] = useState("");
   const [isLoading, setIsLoading] = useState(true);
-  const { isLoggedIn, user, isAdmin } = useAuthContext();
+  const { isLoggedIn, isAdmin } = useAuthContext();
   const navigate = useNavigate();
 
   useEffect(() => {

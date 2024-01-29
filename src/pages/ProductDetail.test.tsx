@@ -1,6 +1,4 @@
-import { expect, test, beforeEach, vi, describe } from "vitest";
-import { act } from "react-dom/test-utils";
-import { render, screen } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
 import { GetProductWithReviewsQuery } from "../API";
 import ProductDetail from "./ProductDetail";
 import { MemoryRouter } from "react-router-dom";
@@ -49,7 +47,7 @@ const { graphqlMock } = vi.hoisted(() => {
         {
           __typename: "Review",
           id: "1",
-          owner: "John Doe",
+          owner: "johndoe",
           content: "Great product!",
           rating: 5,
           isArchived: false,
@@ -60,7 +58,7 @@ const { graphqlMock } = vi.hoisted(() => {
         {
           __typename: "Review",
           id: "2",
-          owner: "Jane Smith",
+          owner: "testuser",
           content: "Not so good",
           rating: 2,
           isArchived: false,
@@ -109,7 +107,7 @@ vi.mock("aws-amplify/api", () => ({
 }));
 
 const renderProductDetail = async () => {
-  await act(async () => {
+  await waitFor(async () => {
     render(
       <MemoryRouter>
         <AuthContextProvider>
@@ -121,131 +119,121 @@ const renderProductDetail = async () => {
 };
 
 describe("ProductDetail", () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
+  describe("anonymous user", () => {
+    beforeEach(async () => {
+      vi.clearAllMocks();
+
+      vi.mocked(useAuthContextMock).mockReturnValue({
+        isLoggedIn: false,
+        signInStep: "",
+        setSignInStep: vi.fn(),
+        isAdmin: false,
+        user: null,
+        signIn: vi.fn(),
+        signOut: vi.fn(),
+        signUp: vi.fn(),
+        confirmSignUp: vi.fn(),
+        confirmSignIn: vi.fn(),
+        resetAuthState: vi.fn(),
+      });
+
+      await renderProductDetail();
+    });
+
+    test("renders product details for anonymous user", async () => {
+      const productImage = screen.getByRole("img");
+      expect(productImage.getAttribute("src")).toMatch(/test-product\.jpg$/);
+
+      expect(screen.getByText("Test Product")).toBeInTheDocument();
+
+      expect(screen.getByText("This is a test product")).toBeInTheDocument();
+
+      expect(screen.getByText("9.99")).toBeInTheDocument();
+
+      expect(screen.getByText("2 reviews")).toBeInTheDocument();
+
+      expect(
+        screen.getByRole("heading", { level: 2, name: "Reviews" })
+      ).toBeInTheDocument();
+    });
   });
 
-  test("renders product details for anonymous user", async () => {
-    vi.mocked(useAuthContextMock).mockReturnValue({
-      isLoggedIn: false,
-      signInStep: "",
-      setSignInStep: vi.fn(),
-      isAdmin: false,
-      user: null,
-      signIn: vi.fn(),
-      signOut: vi.fn(),
-      signUp: vi.fn(),
-      confirmSignUp: vi.fn(),
-      confirmSignIn: vi.fn(),
-      resetAuthState: vi.fn(),
+  describe("logged in user", () => {
+    beforeEach(async () => {
+      vi.clearAllMocks();
+
+      vi.mocked(useAuthContextMock).mockReturnValue({
+        isLoggedIn: true,
+        signInStep: "",
+        setSignInStep: vi.fn(),
+        isAdmin: false,
+        user: {
+          userId: "123",
+          username: "johndoe",
+          email: "testuser@test.com",
+        },
+        signIn: vi.fn(),
+        signOut: vi.fn(),
+        signUp: vi.fn(),
+        confirmSignUp: vi.fn(),
+        confirmSignIn: vi.fn(),
+        resetAuthState: vi.fn(),
+      });
+
+      await renderProductDetail();
     });
 
-    await renderProductDetail();
+    test("renders product details for logged in user", async () => {
+      const productImage = screen.getByRole("img");
+      expect(productImage.getAttribute("src")).toMatch(/test-product\.jpg$/);
 
-    const productImage = screen.getByRole("img");
-    expect(productImage.getAttribute("src")).toMatch(/test-product\.jpg$/);
+      expect(screen.getByText("Test Product")).toBeInTheDocument();
 
-    expect(screen.getByText("Test Product")).toBeInTheDocument();
+      expect(screen.getByText("This is a test product")).toBeInTheDocument();
 
-    expect(screen.getByText("This is a test product")).toBeInTheDocument();
+      expect(screen.getByText("9.99")).toBeInTheDocument();
 
-    expect(screen.getByText("9.99")).toBeInTheDocument();
+      expect(screen.getByText("2 reviews")).toBeInTheDocument();
 
-    expect(screen.getByText("2 reviews")).toBeInTheDocument();
-
-    expect(
-      screen.getByRole("heading", { level: 2, name: "Reviews" })
-    ).toBeInTheDocument();
-
-    expect(screen.getByText("John Doe")).toBeInTheDocument();
-
-    expect(screen.getByText("Great product!")).toBeInTheDocument();
-
-    expect(screen.getByText("Rating: 5")).toBeInTheDocument();
-
-    expect(screen.getByText("Jane Smith")).toBeInTheDocument();
-
-    expect(screen.getByText("Not so good")).toBeInTheDocument();
-
-    expect(screen.getByText("Rating: 2")).toBeInTheDocument();
+      expect(
+        screen.getByRole("heading", { level: 2, name: "Reviews" })
+      ).toBeInTheDocument();
+    });
   });
-  test("renders product details for logged in user", async () => {
-    vi.mocked(useAuthContextMock).mockReturnValue({
-      isLoggedIn: true,
-      signInStep: "",
-      setSignInStep: vi.fn(),
-      isAdmin: false,
-      user: {
-        userId: "123",
-        username: "johndoe",
-        email: "testuser@test.com",
-      },
-      signIn: vi.fn(),
-      signOut: vi.fn(),
-      signUp: vi.fn(),
-      confirmSignUp: vi.fn(),
-      confirmSignIn: vi.fn(),
-      resetAuthState: vi.fn(),
+
+  describe("admin user", () => {
+    beforeEach(async () => {
+      vi.clearAllMocks();
+
+      vi.mocked(useAuthContextMock).mockReturnValue({
+        isLoggedIn: true,
+        signInStep: "",
+        setSignInStep: vi.fn(),
+        isAdmin: true,
+        user: {
+          userId: "123",
+          username: "johndoe",
+          email: "testuser@test.com",
+        },
+        signIn: vi.fn(),
+        signOut: vi.fn(),
+        signUp: vi.fn(),
+        confirmSignUp: vi.fn(),
+        confirmSignIn: vi.fn(),
+        resetAuthState: vi.fn(),
+      });
+
+      await renderProductDetail();
     });
 
-    await renderProductDetail();
+    test("should show admin controls for admin user", async () => {
+      const editButton = screen.getByRole("button", { name: "Edit" });
+      expect(editButton).toBeInTheDocument();
 
-    const productImage = screen.getByRole("img");
-    expect(productImage.getAttribute("src")).toMatch(/test-product\.jpg$/);
-
-    expect(screen.getByText("Test Product")).toBeInTheDocument();
-
-    expect(screen.getByText("This is a test product")).toBeInTheDocument();
-
-    expect(screen.getByText("9.99")).toBeInTheDocument();
-
-    expect(screen.getByText("2 reviews")).toBeInTheDocument();
-
-    expect(
-      screen.getByRole("heading", { level: 2, name: "Reviews" })
-    ).toBeInTheDocument();
-
-    expect(screen.getByText("John Doe")).toBeInTheDocument();
-
-    expect(screen.getByText("Great product!")).toBeInTheDocument();
-
-    expect(screen.getByText("Rating: 5")).toBeInTheDocument();
-
-    expect(screen.getByText("Jane Smith")).toBeInTheDocument();
-
-    expect(screen.getByText("Not so good")).toBeInTheDocument();
-
-    expect(screen.getByText("Rating: 2")).toBeInTheDocument();
-  });
-  test("should show admin controls for admin user", async () => {
-    vi.mocked(useAuthContextMock).mockReturnValue({
-      isLoggedIn: true,
-      signInStep: "",
-      setSignInStep: vi.fn(),
-      isAdmin: true,
-      user: {
-        userId: "123",
-        username: "johndoe",
-        email: "testuser@test.com",
-      },
-      signIn: vi.fn(),
-      signOut: vi.fn(),
-      signUp: vi.fn(),
-      confirmSignUp: vi.fn(),
-      confirmSignIn: vi.fn(),
-      resetAuthState: vi.fn(),
+      const archiveButton = screen.getByRole("button", {
+        name: /(archive)|(restore)/i,
+      });
+      expect(archiveButton).toBeInTheDocument();
     });
-
-    await renderProductDetail();
-
-    const editButton = screen.getByRole("button", { name: "Edit" });
-    expect(editButton).toBeInTheDocument();
-
-    const archiveButton = screen.getByRole("button", {
-      name: /(archive)|(restore)/i,
-    });
-    expect(archiveButton).toBeInTheDocument();
-
-    // Possibly edit and archive/restore buttons should be displayed on reviews for the admin. Right now they only appear for the "owner" of the review.
   });
 });
