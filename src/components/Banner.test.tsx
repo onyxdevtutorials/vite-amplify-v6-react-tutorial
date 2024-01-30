@@ -173,6 +173,7 @@ describe("Banner", () => {
         isAdmin: false,
         user: {
           username: "testuser",
+          userId: "testuserid",
         },
         checkUser: vi.fn(),
         signIn: vi.fn(),
@@ -212,7 +213,7 @@ describe("Banner", () => {
 
       const profileLink = screen.getByRole("link", { name: /profile/i });
       expect(profileLink).toBeInTheDocument();
-      expect(profileLink).toHaveAttribute("href", "/users/testuser");
+      expect(profileLink).toHaveAttribute("href", "/users/testuserid");
     });
 
     test("should contain a link to Change Password", async () => {
