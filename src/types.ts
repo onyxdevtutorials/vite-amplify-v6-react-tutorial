@@ -1,4 +1,4 @@
-import { Product } from "./API";
+import { Product, User, Review } from "./API";
 
 export type { Product, Review, GetProductQuery } from "./API";
 
@@ -13,5 +13,11 @@ export type ListProductsQueryWithReviews = {
   listProducts: {
     items: Product[];
     nextToken: string;
+  };
+};
+
+export type UserWithReviews = User & {
+  reviews?: {
+    items: Review[];
   };
 };
