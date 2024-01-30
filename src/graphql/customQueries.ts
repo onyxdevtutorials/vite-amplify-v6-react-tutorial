@@ -67,3 +67,35 @@ export const getProductWithReviews = /* GraphQL */ `
     }
   }
 `;
+
+export const getUserWithReviews = /* GraphQL */ `
+  query GetUserWithReviews($id: ID!) {
+    getUser(id: $id) {
+      id
+      username
+      firstName
+      lastName
+      isArchived
+      createdAt
+      updatedAt
+      owner
+      reviews {
+        items {
+          id
+          rating
+          content
+          isArchived
+          createdAt
+          updatedAt
+          productReviewsId
+          userReviewsId
+          owner
+          __typename
+        }
+        nextToken
+        __typename
+      }
+      __typename
+    }
+  }
+`;
