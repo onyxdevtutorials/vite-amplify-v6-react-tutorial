@@ -27,7 +27,9 @@ const Banner = () => {
   return (
     <Navbar bg="dark" variant="dark" fixed="top">
       <Container fluid>
-        <Navbar.Brand>Site Name</Navbar.Brand>
+        <Navbar.Brand as={Link} to="/">
+          Site Name
+        </Navbar.Brand>
         <Navbar.Toggle aria-controls="basic-navbar-nav" />
         <Navbar.Collapse id="basic-navbar-nav" className="justify-content-end">
           {!isLoggedIn && (
@@ -54,7 +56,7 @@ const Banner = () => {
                     {user.username}
                   </Dropdown.Toggle>
                   <Dropdown.Menu>
-                    <Dropdown.Item as={Link} to={`/users/${user.username}`}>
+                    <Dropdown.Item as={Link} to={`/users/${user.userId}`}>
                       Profile
                     </Dropdown.Item>
                     <Dropdown.Item as={Link} to="/changepassword">
