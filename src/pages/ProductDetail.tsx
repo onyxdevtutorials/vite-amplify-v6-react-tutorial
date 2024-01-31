@@ -131,7 +131,7 @@ function ProductDetail() {
       {product?.reviews?.items
         ?.filter((review) => !review?.isArchived)
         .map((review) => (
-          <Review reviewId={review?.id} />
+          <Review reviewId={review?.id} key={review?.id} />
         ))}
     </>
   );
