@@ -50,27 +50,19 @@ export type User = {
   owner?: string | null,
 };
 
-export type CreateProductInput = {
-  id?: string | null,
-  name: string,
-  description?: string | null,
-  price?: string | null,
-  isArchived?: boolean | null,
-  image?: string | null,
-};
-
-export type ModelProductConditionInput = {
+export type ModelProductFilterInput = {
+  id?: ModelIDInput | null,
   name?: ModelStringInput | null,
   description?: ModelStringInput | null,
   price?: ModelStringInput | null,
   isArchived?: ModelBooleanInput | null,
   image?: ModelStringInput | null,
-  and?: Array< ModelProductConditionInput | null > | null,
-  or?: Array< ModelProductConditionInput | null > | null,
-  not?: ModelProductConditionInput | null,
+  and?: Array< ModelProductFilterInput | null > | null,
+  or?: Array< ModelProductFilterInput | null > | null,
+  not?: ModelProductFilterInput | null,
 };
 
-export type ModelStringInput = {
+export type ModelIDInput = {
   ne?: string | null,
   eq?: string | null,
   le?: string | null,
@@ -110,11 +102,53 @@ export type ModelSizeInput = {
   between?: Array< number | null > | null,
 };
 
+export type ModelStringInput = {
+  ne?: string | null,
+  eq?: string | null,
+  le?: string | null,
+  lt?: string | null,
+  ge?: string | null,
+  gt?: string | null,
+  contains?: string | null,
+  notContains?: string | null,
+  between?: Array< string | null > | null,
+  beginsWith?: string | null,
+  attributeExists?: boolean | null,
+  attributeType?: ModelAttributeTypes | null,
+  size?: ModelSizeInput | null,
+};
+
 export type ModelBooleanInput = {
   ne?: boolean | null,
   eq?: boolean | null,
   attributeExists?: boolean | null,
   attributeType?: ModelAttributeTypes | null,
+};
+
+export type ModelProductConnection = {
+  __typename: "ModelProductConnection",
+  items:  Array<Product | null >,
+  nextToken?: string | null,
+};
+
+export type CreateProductInput = {
+  id?: string | null,
+  name: string,
+  description?: string | null,
+  price?: string | null,
+  isArchived?: boolean | null,
+  image?: string | null,
+};
+
+export type ModelProductConditionInput = {
+  name?: ModelStringInput | null,
+  description?: ModelStringInput | null,
+  price?: ModelStringInput | null,
+  isArchived?: ModelBooleanInput | null,
+  image?: ModelStringInput | null,
+  and?: Array< ModelProductConditionInput | null > | null,
+  or?: Array< ModelProductConditionInput | null > | null,
+  not?: ModelProductConditionInput | null,
 };
 
 export type UpdateProductInput = {
@@ -162,22 +196,6 @@ export type ModelIntInput = {
   attributeType?: ModelAttributeTypes | null,
 };
 
-export type ModelIDInput = {
-  ne?: string | null,
-  eq?: string | null,
-  le?: string | null,
-  lt?: string | null,
-  ge?: string | null,
-  gt?: string | null,
-  contains?: string | null,
-  notContains?: string | null,
-  between?: Array< string | null > | null,
-  beginsWith?: string | null,
-  attributeExists?: boolean | null,
-  attributeType?: ModelAttributeTypes | null,
-  size?: ModelSizeInput | null,
-};
-
 export type UpdateReviewInput = {
   id: string,
   rating?: number | null,
@@ -219,24 +237,6 @@ export type UpdateUserInput = {
 
 export type DeleteUserInput = {
   id: string,
-};
-
-export type ModelProductFilterInput = {
-  id?: ModelIDInput | null,
-  name?: ModelStringInput | null,
-  description?: ModelStringInput | null,
-  price?: ModelStringInput | null,
-  isArchived?: ModelBooleanInput | null,
-  image?: ModelStringInput | null,
-  and?: Array< ModelProductFilterInput | null > | null,
-  or?: Array< ModelProductFilterInput | null > | null,
-  not?: ModelProductFilterInput | null,
-};
-
-export type ModelProductConnection = {
-  __typename: "ModelProductConnection",
-  items:  Array<Product | null >,
-  nextToken?: string | null,
 };
 
 export type ModelReviewFilterInput = {
@@ -366,6 +366,48 @@ export type RestoreProductMutation = {
     __typename: "Product",
     id: string,
     isArchived?: boolean | null,
+  } | null,
+};
+
+export type ListProductsWithReviewsQueryVariables = {
+  filter?: ModelProductFilterInput | null,
+  limit?: number | null,
+  nextToken?: string | null,
+};
+
+export type ListProductsWithReviewsQuery = {
+  listProducts?:  {
+    __typename: "ModelProductConnection",
+    items:  Array< {
+      __typename: "Product",
+      id: string,
+      name: string,
+      description?: string | null,
+      price?: string | null,
+      createdAt: string,
+      updatedAt: string,
+      owner?: string | null,
+      isArchived?: boolean | null,
+      image?: string | null,
+      reviews?:  {
+        __typename: "ModelReviewConnection",
+        items:  Array< {
+          __typename: "Review",
+          id: string,
+          rating?: number | null,
+          content?: string | null,
+          isArchived?: boolean | null,
+          user?:  {
+            __typename: "User",
+            id: string,
+            username: string,
+            isArchived?: boolean | null,
+          } | null,
+        } | null >,
+        nextToken?: string | null,
+      } | null,
+    } | null >,
+    nextToken?: string | null,
   } | null,
 };
 
