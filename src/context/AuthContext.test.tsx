@@ -1,4 +1,3 @@
-import { describe, test, expect, vi, beforeEach } from "vitest";
 import React, { useEffect } from "react";
 import { render, screen, waitFor } from "@testing-library/react";
 import { AuthContextProvider, useAuthContext } from "./AuthContext";
@@ -492,45 +491,5 @@ describe("AuthContext", () => {
         expect(isAdminStatus).toHaveTextContent("isAdmin: true");
       });
     });
-  });
-
-  describe("resetAuthState", () => {
-    beforeEach(async () => {
-      vi.clearAllMocks();
-
-      vi.mocked(awsAmplifyAuth.getCurrentUser).mockRejectedValue({});
-
-      vi.mocked(awsAmplifyAuth.fetchAuthSession).mockResolvedValue({
-        tokens: {
-          accessToken: {
-            payload: {
-              "cognito:groups": ["admin"],
-            },
-          },
-        },
-      });
-
-      vi.mocked(awsAmplifyAuth.signIn).mockResolvedValue({
-        nextStep: {
-          signInStep: "DONE",
-        },
-        isSignedIn: true,
-      });
-
-      await waitFor(() => {
-        render(
-          <AuthContextProvider>
-            <TestComponent />
-          </AuthContextProvider>
-        );
-      });
-    });
-
-    test.todo(
-      "should set isLoggedIn, isAdmin and signInStep to default values, and isLoggedIn local storage should be removed",
-      async () => {
-        // We don't actually use resetAuthState anywhere in the app, so this test is not needed.
-      }
-    );
   });
 });
