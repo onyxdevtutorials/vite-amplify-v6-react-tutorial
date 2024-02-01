@@ -89,6 +89,7 @@ describe("Landing", () => {
         confirmSignUp: vi.fn(),
         confirmSignIn: vi.fn(),
         resetAuthState: vi.fn(),
+        setIntendedPath: vi.fn(),
       });
 
       await renderWithAuthContext(<Landing />);
@@ -124,6 +125,7 @@ describe("Landing", () => {
         confirmSignUp: vi.fn(),
         confirmSignIn: vi.fn(),
         resetAuthState: vi.fn(),
+        setIntendedPath: vi.fn(),
       });
 
       await renderWithAuthContext(<Landing />);
