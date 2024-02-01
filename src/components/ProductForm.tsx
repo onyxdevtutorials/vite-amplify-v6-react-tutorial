@@ -4,7 +4,8 @@ import * as yup from "yup";
 import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
 import { toast, Id } from "react-toastify";
-// import { useState } from "react";
+import { ImageUpload } from "./";
+import { useState } from "react";
 
 interface OnFormSubmitValues {
   name: string;
@@ -43,9 +44,9 @@ const ProductForm: React.FC<ProductFormProps> = ({
   initialImageKey,
   onRemoveImage,
 }) => {
-  // console.log("ProductForm initialImageKey: ", initialImageKey);
-  // const [imageKey, setImageKey] = useState<string>(initialImageKey || "");
   let loadingToastId: Id | null = null;
+
+  const [imageKey, setImageKey] = useState<string>(initialImageKey || "");
 
   const handleSubmitWithImageKey: React.FormEventHandler<HTMLFormElement> = (
     e
@@ -93,18 +94,8 @@ const ProductForm: React.FC<ProductFormProps> = ({
     }
   };
 
-  const handleFileSelect: React.ChangeEventHandler<HTMLInputElement> = async (
-    event: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    if (event?.target?.files && event.target.files.length > 0) {
-      const file = event.target.files[0];
-      const validImageTypes = ["image/jpg", "image/jpeg", "image/png"];
-
-      if (!validImageTypes.includes(file.type)) {
-        toast.error("Unsupported file type");
-        return;
-      }
-
+  const handleFileSelect = async (file: File) => {
+    if (file) {
       loadingToastId = toast.info(`Upload progress: 0%`, {
         progress: 0,
         autoClose: false,
@@ -122,7 +113,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
 
         const result = await uploadOutput.result;
         console.log("upload result: ", result);
-        // setImageKey(result.key);
+        setImageKey(result.key);
         setFieldValue("image", result.key);
         toast.success("Image uploaded successfully");
         console.log("upload succeeded: ", result);
@@ -188,17 +179,10 @@ const ProductForm: React.FC<ProductFormProps> = ({
       </Form.Group>
       <Form.Group controlId="productImage">
         <Form.Label>Image</Form.Label>
-        <Form.Control
-          type="file"
-          name="image"
-          onChange={(event) =>
-            handleFileSelect(event as React.ChangeEvent<HTMLInputElement>)
-          }
-          onBlur={handleBlur}
-        />
-        {initialImageKey && (
+        <ImageUpload onFileSelect={handleFileSelect} />
+        {imageKey && (
           <div>
-            <strong>{initialImageKey}</strong>
+            <strong>{imageKey}</strong>
             <Button
               variant="danger"
               onClick={onRemoveImage}
