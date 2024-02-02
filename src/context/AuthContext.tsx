@@ -211,7 +211,7 @@ export const AuthContextProvider: React.FC<AuthContextProviderProps> = ({
           userAttributes: {
             email: email,
           },
-          autoSignIn: true,
+          autoSignIn: false,
         },
       });
       navigate(`/signupconfirm/${username}`);
@@ -219,8 +219,6 @@ export const AuthContextProvider: React.FC<AuthContextProviderProps> = ({
       console.error("could not sign up", error);
       if (error instanceof AuthError) {
         toast.error(`There was a problem signing you up: ${error.message}`);
-      } else {
-        toast.error("There was a problem signing you up: Unknown error.");
       }
     }
   };
@@ -244,8 +242,6 @@ export const AuthContextProvider: React.FC<AuthContextProviderProps> = ({
         toast.error(
           `There was a problem confirming your sign up: ${error.message}`
         );
-      } else {
-        toast.error("There was a problem confirming your sign up.");
       }
       console.error("error confirming sign up", error);
     }
