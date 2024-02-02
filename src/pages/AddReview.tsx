@@ -10,6 +10,7 @@ import useGetProduct from "../hooks/useGetProduct";
 import { Card } from "react-bootstrap";
 import { toast } from "react-toastify";
 import { useAuthContext } from "../context/AuthContext";
+import { S3_URL } from "../constants";
 
 const validationSchema = yup.object().shape({
   rating: yup.number().required("Required"),
@@ -76,6 +77,18 @@ const AddReview = () => {
       <Card>
         <Card.Body>
           <Card.Title>Product</Card.Title>
+          {product?.image && (
+            <Card.Img
+              src={
+                product.image.startsWith("http://") ||
+                product.image.startsWith("https://")
+                  ? product.image
+                  : `${S3_URL}${product.image}`
+              }
+              alt={product.name}
+              className="product-image"
+            />
+          )}
           <Card.Text>{product?.name}</Card.Text>
           <Card.Text>{product?.description}</Card.Text>
           <Card.Text>{product?.price}</Card.Text>
