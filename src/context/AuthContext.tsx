@@ -237,7 +237,7 @@ export const AuthContextProvider: React.FC<AuthContextProviderProps> = ({
 
       if (result.isSignUpComplete) {
         toast.success("Sign up complete!");
-        navigate("/");
+        navigate("/signin");
       }
     } catch (error) {
       if (error instanceof AuthError) {
