@@ -308,7 +308,7 @@ describe("AuthContext", () => {
           userAttributes: {
             email: "testuser@test.com",
           },
-          autoSignIn: true,
+          autoSignIn: false,
         },
       });
     });
@@ -333,7 +333,7 @@ describe("AuthContext", () => {
           userAttributes: {
             email: "testuser@test.com",
           },
-          autoSignIn: true,
+          autoSignIn: false,
         },
       });
 
