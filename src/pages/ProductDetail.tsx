@@ -8,6 +8,7 @@ import { getProductWithReviews } from "../graphql/customQueries";
 import { GetProductWithReviewsQuery } from "../API";
 import { useAuthContext } from "../context/AuthContext";
 import { Review } from "../components";
+import { S3_URL } from "../constants";
 
 const client = generateClient();
 
@@ -103,7 +104,7 @@ function ProductDetail() {
                 product.image.startsWith("http://") ||
                 product.image.startsWith("https://")
                   ? product.image
-                  : `https://productimagesbucket203201-myenv.s3.amazonaws.com/public/${product.image}`
+                  : `${S3_URL}${product.image}`
               }
               alt={product.name}
               className="product-image"

@@ -6,6 +6,7 @@ import { archiveProduct, restoreProduct } from "../graphql/customMutations";
 import { generateClient } from "aws-amplify/api";
 import { Button } from "react-bootstrap";
 import { useAuthContext } from "../context/AuthContext";
+import { S3_URL } from "../constants";
 
 interface ProductProps {
   product: ProductType;
@@ -54,7 +55,7 @@ const Product: React.FC<ProductProps> = ({ product }) => {
               product.image.startsWith("http://") ||
               product.image.startsWith("https://")
                 ? product.image
-                : `https://productimagesbucket203201-myenv.s3.amazonaws.com/public/${product.image}`
+                : `${S3_URL}${product.image}`
             }
             alt={product.name}
             className="product-image"
