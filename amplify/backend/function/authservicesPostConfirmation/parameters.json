@@ -1,4 +1,4 @@
 {
-  "modules": "custom",
+  "modules": "add-to-group,custom",
   "resourceName": "authservicesPostConfirmation"
 }

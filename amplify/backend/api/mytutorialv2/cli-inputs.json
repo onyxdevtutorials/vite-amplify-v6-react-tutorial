@@ -5,15 +5,9 @@
     "serviceName": "AppSync",
     "defaultAuthType": {
       "mode": "AMAZON_COGNITO_USER_POOLS",
-      "cognitoUserPoolId": "authauthservices"
+      "cognitoUserPoolId": "authmyTutorialV2Auth"
     },
     "additionalAuthTypes": [
-      {
-        "mode": "API_KEY",
-        "expirationTime": 7,
-        "apiKeyExpirationDate": "2023-11-30T04:57:24.322Z",
-        "keyDescription": "myapikey"
-      },
       {
         "mode": "AWS_IAM"
       }

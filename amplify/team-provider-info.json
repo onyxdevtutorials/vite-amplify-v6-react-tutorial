@@ -34,20 +34,27 @@
       "AuthTriggerTemplateURL": "https://s3.amazonaws.com/amplify-mytutorialv2-myenv-203201-deployment/amplify-cfn-templates/auth/auth-trigger-cloudformation-template.json"
     },
     "categories": {
-      "auth": {
-        "authservices": {}
-      },
-      "api": {
-        "mytutorialv2": {}
+      "function": {
+        "authservicesPostConfirmation": {
+          "deploymentBucketName": "amplify-mytutorialv2-myenv-203201-deployment",
+          "s3Key": "amplify-builds/authservicesPostConfirmation-734c755265356367646a-build.zip",
+          "GROUP": "myTutorialV2Users"
+        },
+        "myTutorialV2AuthPostConfirmation": {
+          "GROUP": "myTutorialV2RegularUsers",
+          "deploymentBucketName": "amplify-mytutorialv2-myenv-203201-deployment",
+          "s3Key": "amplify-builds/myTutorialV2AuthPostConfirmation-30486d326f597566586e-build.zip"
+        }
       },
       "storage": {
         "productimages": {}
       },
-      "function": {
-        "authservicesPostConfirmation": {
-          "deploymentBucketName": "amplify-mytutorialv2-myenv-203201-deployment",
-          "s3Key": "amplify-builds/authservicesPostConfirmation-707a75454d53416b3158-build.zip"
-        }
+      "auth": {
+        "myTutorialV2Auth": {},
+        "userPoolGroups": {}
+      },
+      "api": {
+        "mytutorialv2": {}
       }
     }
   }

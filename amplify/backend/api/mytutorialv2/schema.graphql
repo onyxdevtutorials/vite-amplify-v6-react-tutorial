@@ -2,7 +2,7 @@ type Product
   @model
   @auth(
     rules: [
-      { allow: owner, operations: [read, create, update] }
+      { allow: owner, operations: [read] }
       { allow: private, provider: userPools, operations: [read] }
       { allow: public, provider: iam, operations: [read] }
       { allow: groups, groups: ["admin"], operations: [read, create, update] }
