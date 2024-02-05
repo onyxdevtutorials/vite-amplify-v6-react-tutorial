@@ -7,20 +7,12 @@
             "UserPoolId"
           ],
           "category": "auth",
-          "resourceName": "authservices"
+          "resourceName": "myTutorialV2Auth"
         }
       ],
       "output": {
         "authConfig": {
           "additionalAuthenticationProviders": [
-            {
-              "apiKeyConfig": {
-                "apiKeyExpirationDate": "2023-11-30T04:57:24.322Z",
-                "apiKeyExpirationDays": 7,
-                "description": "myapikey"
-              },
-              "authenticationType": "API_KEY"
-            },
             {
               "authenticationType": "AWS_IAM"
             }
@@ -28,7 +20,7 @@
           "defaultAuthentication": {
             "authenticationType": "AMAZON_COGNITO_USER_POOLS",
             "userPoolConfig": {
-              "userPoolId": "authauthservices"
+              "userPoolId": "authmyTutorialV2Auth"
             }
           }
         }
@@ -38,7 +30,7 @@
     }
   },
   "auth": {
-    "authservices": {
+    "myTutorialV2Auth": {
       "customAuth": false,
       "dependsOn": [
         {
@@ -47,7 +39,7 @@
             "Name"
           ],
           "category": "function",
-          "resourceName": "authservicesPostConfirmation",
+          "resourceName": "myTutorialV2AuthPostConfirmation",
           "triggerProvider": "Cognito"
         }
       ],
@@ -71,6 +63,22 @@
       },
       "providerPlugin": "awscloudformation",
       "service": "Cognito"
+    },
+    "userPoolGroups": {
+      "dependsOn": [
+        {
+          "attributes": [
+            "UserPoolId",
+            "AppClientIDWeb",
+            "AppClientID",
+            "IdentityPoolId"
+          ],
+          "category": "auth",
+          "resourceName": "myTutorialV2Auth"
+        }
+      ],
+      "providerPlugin": "awscloudformation",
+      "service": "Cognito-UserPool-Groups"
     }
   },
   "function": {
@@ -78,9 +86,22 @@
       "build": true,
       "providerPlugin": "awscloudformation",
       "service": "Lambda"
+    },
+    "myTutorialV2AuthPostConfirmation": {
+      "build": true,
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda"
     }
   },
   "parameters": {
+    "AMPLIFY_function_authservicesPostConfirmation_GROUP": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "authservicesPostConfirmation"
+        }
+      ]
+    },
     "AMPLIFY_function_authservicesPostConfirmation_deploymentBucketName": {
       "usedBy": [
         {
@@ -94,6 +115,30 @@
         {
           "category": "function",
           "resourceName": "authservicesPostConfirmation"
+        }
+      ]
+    },
+    "AMPLIFY_function_myTutorialV2AuthPostConfirmation_GROUP": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "myTutorialV2AuthPostConfirmation"
+        }
+      ]
+    },
+    "AMPLIFY_function_myTutorialV2AuthPostConfirmation_deploymentBucketName": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "myTutorialV2AuthPostConfirmation"
+        }
+      ]
+    },
+    "AMPLIFY_function_myTutorialV2AuthPostConfirmation_s3Key": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "myTutorialV2AuthPostConfirmation"
         }
       ]
     }
