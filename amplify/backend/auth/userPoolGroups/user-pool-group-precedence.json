@@ -1,10 +1,10 @@
 [
   {
-    "groupName": "myTutorialV2AdminUsers",
+    "groupName": "adminUsers",
     "precedence": 1
   },
   {
-    "groupName": "myTutorialV2RegularUsers",
+    "groupName": "allUsers",
     "precedence": 2
   }
 ]

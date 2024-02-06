@@ -41,7 +41,7 @@
           "GROUP": "myTutorialV2Users"
         },
         "myTutorialV2AuthPostConfirmation": {
-          "GROUP": "myTutorialV2RegularUsers",
+          "GROUP": "regularUsers",
           "deploymentBucketName": "amplify-mytutorialv2-myenv-203201-deployment",
           "s3Key": "amplify-builds/myTutorialV2AuthPostConfirmation-30486d326f597566586e-build.zip"
         }
@@ -55,6 +55,45 @@
       },
       "api": {
         "mytutorialv2": {}
+      }
+    }
+  },
+  "envamb": {
+    "awscloudformation": {
+      "AuthRoleName": "amplify-mytutorialv2-envamb-153649-authRole",
+      "UnauthRoleArn": "arn:aws:iam::909500381447:role/amplify-mytutorialv2-envamb-153649-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::909500381447:role/amplify-mytutorialv2-envamb-153649-authRole",
+      "Region": "us-east-1",
+      "DeploymentBucketName": "amplify-mytutorialv2-envamb-153649-deployment",
+      "UnauthRoleName": "amplify-mytutorialv2-envamb-153649-unauthRole",
+      "StackName": "amplify-mytutorialv2-envamb-153649",
+      "StackId": "arn:aws:cloudformation:us-east-1:909500381447:stack/amplify-mytutorialv2-envamb-153649/6fe1e530-c47f-11ee-8304-121aa4ed3df5",
+      "AmplifyAppId": "d1orozue7xcs1n",
+      "AuthTriggerTemplateURL": "https://s3.amazonaws.com/amplify-mytutorialv2-envamb-153649-deployment/amplify-cfn-templates/auth/auth-trigger-cloudformation-template.json"
+    },
+    "categories": {
+      "auth": {
+        "myTutorialV2Auth": {},
+        "userPoolGroups": {},
+        "authservices": {}
+      },
+      "function": {
+        "authservicesPostConfirmation": {
+          "GROUP": "myTutorialV2Users",
+          "deploymentBucketName": "amplify-mytutorialv2-envamb-153649-deployment",
+          "s3Key": "amplify-builds/authservicesPostConfirmation-734c755265356367646a-build.zip"
+        },
+        "myTutorialV2AuthPostConfirmation": {
+          "GROUP": "regularUsers",
+          "deploymentBucketName": "amplify-mytutorialv2-envamb-153649-deployment",
+          "s3Key": "amplify-builds/myTutorialV2AuthPostConfirmation-4536754f745537564e79-build.zip"
+        }
+      },
+      "api": {
+        "mytutorialv2": {}
+      },
+      "storage": {
+        "productimages": {}
       }
     }
   }
