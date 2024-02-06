@@ -254,7 +254,7 @@ export const AuthContextProvider: React.FC<AuthContextProviderProps> = ({
       const tokens = session.tokens;
       if (tokens && Object.keys(tokens).length > 0) {
         const groups = tokens.accessToken.payload["cognito:groups"];
-        if (groups && Array.isArray(groups) && groups.includes("admin")) {
+        if (groups && Array.isArray(groups) && groups.includes("adminUsers")) {
           isAdmin = true;
         } else {
           isAdmin = false;

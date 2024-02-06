@@ -443,7 +443,7 @@ describe("AuthContext", () => {
         tokens: {
           accessToken: {
             payload: {
-              "cognito:groups": ["admin"],
+              "cognito:groups": ["adminUsers"],
             },
           },
         },

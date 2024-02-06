@@ -7,9 +7,16 @@
     "READ"
   ],
   "authAccess": [
-    "CREATE_AND_UPDATE",
-    "READ",
-    "DELETE"
+    "READ"
   ],
-  "groupAccess": {}
+  "groupAccess": {
+    "adminUsers": [
+      "CREATE_AND_UPDATE",
+      "READ",
+      "DELETE"
+    ],
+    "allUsers": [
+      "READ"
+    ]
+  }
 }

@@ -5,7 +5,11 @@ type Product
       { allow: owner, operations: [read] }
       { allow: private, provider: userPools, operations: [read] }
       { allow: public, provider: iam, operations: [read] }
-      { allow: groups, groups: ["admin"], operations: [read, create, update] }
+      {
+        allow: groups
+        groups: ["adminUsers"]
+        operations: [read, create, update]
+      }
     ]
   ) {
   id: ID!
@@ -24,7 +28,11 @@ type Review
       { allow: owner, operations: [read, create, update] }
       { allow: private, provider: userPools, operations: [read] }
       { allow: public, provider: iam, operations: [read] }
-      { allow: groups, groups: ["admin"], operations: [read, create, update] }
+      {
+        allow: groups
+        groups: ["adminUsers"]
+        operations: [read, create, update]
+      }
     ]
   ) {
   id: ID!
@@ -46,7 +54,11 @@ type User
         operations: [create, read, update]
       }
       { allow: public, provider: iam, operations: [read] }
-      { allow: groups, groups: ["admin"], operations: [read, create, update] }
+      {
+        allow: groups
+        groups: ["adminUsers"]
+        operations: [read, create, update]
+      }
     ]
   ) {
   id: ID!
