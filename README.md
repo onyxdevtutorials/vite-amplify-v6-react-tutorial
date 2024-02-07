@@ -1,1 +1,1 @@
-This repo is cloned from my-tutorial-v2
+This app uses React, TypeScript, and AWS Amplify v6.
