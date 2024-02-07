@@ -25,6 +25,9 @@ coverage/
 *.sln
 *.sw?
 
+#extra amplify files not to be committed
+amplify/team-provider-info.json
+
 #amplify-do-not-edit-begin
 amplify/\#current-cloud-backend
 amplify/.config/local-*
