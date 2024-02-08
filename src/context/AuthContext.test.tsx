@@ -4,6 +4,7 @@ import { AuthContextProvider, useAuthContext } from "./AuthContext";
 import userEvent from "@testing-library/user-event";
 import * as awsAmplifyAuth from "aws-amplify/auth";
 import { toast } from "react-toastify";
+import { AuthError } from "aws-amplify/auth";
 
 vi.mock("aws-amplify/auth");
 
@@ -316,9 +317,12 @@ describe("AuthContext", () => {
     test("should call toast with error message if AWS signUp throws an error", async () => {
       const user = userEvent.setup();
 
-      vi.mocked(awsAmplifyAuth.signUp).mockRejectedValueOnce({
+      const authError = new AuthError({
+        name: "some error",
         message: "some unknown error.",
       });
+
+      vi.mocked(awsAmplifyAuth.signUp).mockRejectedValueOnce(authError);
 
       const signUpButton = screen.getByRole("button", { name: "Sign Up" });
 
@@ -356,7 +360,7 @@ describe("AuthContext", () => {
       });
     });
 
-    test("should call AWS confirmSignUp with correct values and then call navigate with /", async () => {
+    test("should call AWS confirmSignUp with correct values and then call navigate with /signin", async () => {
       const user = userEvent.setup();
 
       vi.mocked(awsAmplifyAuth.confirmSignUp).mockResolvedValueOnce({
@@ -378,15 +382,18 @@ describe("AuthContext", () => {
         username: "testuser",
         confirmationCode: "123456",
       });
-      expect(mockNavigate).toHaveBeenCalledWith("/");
+      expect(mockNavigate).toHaveBeenCalledWith("/signin");
     });
 
     test("should call toast with error message if AWS confirmSignUp throws an error", async () => {
       const user = userEvent.setup();
 
-      vi.mocked(awsAmplifyAuth.confirmSignUp).mockRejectedValueOnce({
+      const authError = new AuthError({
+        name: "some error",
         message: "some unknown error.",
       });
+
+      vi.mocked(awsAmplifyAuth.confirmSignUp).mockRejectedValueOnce(authError);
 
       const confirmSignUpButton = screen.getByRole("button", {
         name: "Confirm Sign Up",
