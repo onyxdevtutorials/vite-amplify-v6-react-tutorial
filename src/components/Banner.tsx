@@ -28,7 +28,7 @@ const Banner = () => {
     <Navbar bg="dark" variant="dark" fixed="top">
       <Container fluid>
         <Navbar.Brand as={Link} to="/">
-          Site Name
+          Onyx Store
         </Navbar.Brand>
         <Navbar.Toggle aria-controls="basic-navbar-nav" />
         <Navbar.Collapse id="basic-navbar-nav" className="justify-content-end">
