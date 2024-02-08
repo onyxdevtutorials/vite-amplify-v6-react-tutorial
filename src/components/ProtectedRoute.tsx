@@ -11,7 +11,7 @@ const ProtectedRoute = ({ children, role = "user" }: ProtectedRouterProps) => {
   const { isLoggedIn, isAdmin, setIntendedPath } = useAuthContext();
 
   useEffect(() => {
-    if (isLoggedIn === null) return;
+    if (isLoggedIn === null || location.pathname === "/signin") return;
 
     if (!isLoggedIn) {
       setIntendedPath(location.pathname);
