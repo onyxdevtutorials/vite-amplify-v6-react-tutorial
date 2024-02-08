@@ -86,7 +86,7 @@ describe("Banner", () => {
       const navElement = screen.getByRole("navigation");
       const withinNavElement = within(navElement);
 
-      const siteNameElement = withinNavElement.getByText("Site Name");
+      const siteNameElement = withinNavElement.getByText("Onyx Store");
       expect(siteNameElement).toBeInTheDocument();
     });
 
