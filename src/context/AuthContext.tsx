@@ -133,6 +133,8 @@ export const AuthContextProvider: React.FC<AuthContextProviderProps> = ({
         localStorage.setItem("isLoggedIn", "true");
         const isAdmin = await checkIsAdmin();
         setIsAdmin(isAdmin);
+
+        await checkUser();
       } else {
         localStorage.setItem("isLoggedIn", "false");
       }
@@ -194,6 +196,8 @@ export const AuthContextProvider: React.FC<AuthContextProviderProps> = ({
       setIsAdmin(false);
       localStorage.removeItem("isLoggedIn");
       navigate("/");
+
+      await checkUser();
     } catch (error) {
       const authError = error as AuthError;
       toast.error(`There was a problem signing you out: ${authError.message}`);
