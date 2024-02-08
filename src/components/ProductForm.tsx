@@ -179,7 +179,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
       </Form.Group>
       <Form.Group controlId="productImage">
         <Form.Label>Image</Form.Label>
-        <ImageUpload onFileSelect={handleFileSelect} />
+        <ImageUpload onFileSelect={handleFileSelect} id="productImage" />
         {imageKey && (
           <div>
             <strong>{imageKey}</strong>

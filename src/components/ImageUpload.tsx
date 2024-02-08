@@ -3,6 +3,7 @@ import { useDropzone } from "react-dropzone";
 
 type ImageUploadProps = {
   onFileSelect: (file: File) => void;
+  id: string;
 };
 
 const baseStyle: React.CSSProperties = {
@@ -33,7 +34,7 @@ const rejectStyle = {
   borderColor: "#ff1744",
 };
 
-const ImageUpload: React.FC<ImageUploadProps> = ({ onFileSelect }) => {
+const ImageUpload: React.FC<ImageUploadProps> = ({ onFileSelect, id }) => {
   const onDrop = useCallback((acceptedFiles: File[]) => {
     if (acceptedFiles.length > 1) {
       console.error("Only one file can be uploaded at a time");
@@ -69,7 +70,7 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ onFileSelect }) => {
 
   return (
     <div {...getRootProps({ style })}>
-      <input {...getInputProps()} />
+      <input {...getInputProps()} id={id} />
       {isDragActive ? (
         <p>Drop the files here ...</p>
       ) : (
