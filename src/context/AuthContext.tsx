@@ -139,7 +139,8 @@ export const AuthContextProvider: React.FC<AuthContextProviderProps> = ({
 
       if (nextStep.signInStep === "DONE") {
         toast.success("Sign in complete!");
-        navigate("/");
+        navigate(intendedPath || "/");
+        setIntendedPath(null);
       } else if (
         nextStep.signInStep === "CONFIRM_SIGN_IN_WITH_NEW_PASSWORD_REQUIRED"
       ) {
