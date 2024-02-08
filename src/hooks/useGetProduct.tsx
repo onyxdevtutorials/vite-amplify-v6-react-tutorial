@@ -28,9 +28,7 @@ const useGetProduct = (productId: string | undefined) => {
           variables: { id: productId },
           authMode: isLoggedIn ? "userPool" : "iam",
         })) as GraphQLResult<GetProductQuery>;
-        // console.log("result: ", result);
         const productData = result.data?.getProduct;
-        // console.log("productData: ", productData);
         if (!productData || result.errors) {
           setErrorMessage("Error fetching product with ID: " + productId);
           return;
