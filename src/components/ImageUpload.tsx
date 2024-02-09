@@ -70,7 +70,7 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ onFileSelect, id }) => {
 
   return (
     <div {...getRootProps({ style })}>
-      <input {...getInputProps()} id={id} />
+      <input {...getInputProps()} id={id} data-testid={id} />
       {isDragActive ? (
         <p>Drop the files here ...</p>
       ) : (
