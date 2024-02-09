@@ -30,7 +30,6 @@ const useGetUserWithReviews = (userId: string | undefined) => {
         })) as GraphQLResult<GetUserWithReviewsQuery>;
 
         const userWithReviewsData = result.data?.getUser;
-        console.log("userWithReviewsData: ", userWithReviewsData);
         if (!userWithReviewsData || result.errors) {
           setErrorMessage("Could not get user with ID: " + userId);
           return;
