@@ -3,6 +3,7 @@ import type { User, GetUserQuery } from "../API";
 import { generateClient, GraphQLResult } from "aws-amplify/api";
 import { getUser } from "../graphql/queries";
 import { useAuthContext } from "../context/AuthContext";
+import { GraphQLError } from "graphql";
 
 const client = generateClient();
 
@@ -37,8 +38,11 @@ const useGetUser = (userId: string | undefined) => {
         }
         setUser(userData);
       } catch (err) {
-        console.error("error fetching user: ", err);
-        setErrorMessage("Error fetching user with ID: " + userId);
+        const graphQLError = err as GraphQLError;
+        console.error("error fetching user: ", graphQLError.message);
+        setErrorMessage(
+          `Error fetching user with ID ${userId}: ${graphQLError.message}`
+        );
       } finally {
         setIsLoading(false);
       }
