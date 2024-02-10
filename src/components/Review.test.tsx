@@ -135,7 +135,6 @@ describe("Review", () => {
         "/reviews/fc3c6ac8-8c05-4ea8-9f35-24dde415480e/edit"
       );
     });
-    test.todo("should call toast.warn when delete button is clicked");
   });
 
   describe("when user is logged in and is not owner of the review", () => {

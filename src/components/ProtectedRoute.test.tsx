@@ -96,5 +96,5 @@ describe("ProtectedRoute", () => {
     expect(screen.getByText("Protected content")).toBeInTheDocument();
   });
 
-  test.todo("redirects to intended path after sign in");
+  test.todo("should redirect to intended path after sign in");
 });

@@ -132,7 +132,7 @@ describe("ListProducts", () => {
       expect(reviewCount).toBeInTheDocument();
     });
 
-    test.todo("should be able to sort by name", async () => {
+    test.todo("should sort products by name", async () => {
       const user = userEvent.setup();
 
       const sortButton = await screen.findByRole("button", {
@@ -144,7 +144,7 @@ describe("ListProducts", () => {
       await user.click(sortButton);
     });
 
-    test.todo("should be able to sort by price", async () => {});
+    test.todo("should sort products by price", async () => {});
 
     test.todo("should be able to toggle sort direction", async () => {});
   });
