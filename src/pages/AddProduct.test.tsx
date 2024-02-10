@@ -7,6 +7,9 @@ import { toast } from "react-toastify";
 import { AuthContextProvider } from "../context/AuthContext";
 
 vi.mock("aws-amplify/auth");
+vi.mock("aws-amplify/storage", () => ({
+  uploadData: vi.fn().mockResolvedValue({ result: { key: "chucknorris.png" } }),
+}));
 
 const { useAuthContextMock } = vi.hoisted(() => {
   return {
@@ -60,13 +63,21 @@ vi.mock("react-toastify", () => ({
 const fillInForm = async (
   productName: string,
   description: string,
-  price: string
+  price: string,
+  image?: File
 ) => {
   const user = userEvent.setup();
+  const fileInput = screen.getByTestId("productImage");
 
   await user.type(screen.getByLabelText(/name/i), productName);
   await user.type(screen.getByLabelText(/description/i), description);
   await user.type(screen.getByLabelText(/price/i), price);
+  if (image) {
+    await user.upload(fileInput, image);
+    await waitFor(() => {
+      expect(screen.getByText("chucknorris.png")).toBeInTheDocument();
+    });
+  }
 };
 
 const renderAddProduct = async () => {
@@ -106,8 +117,11 @@ describe("AddProduct", () => {
 
   test("should call createProduct mutation with the product values", async () => {
     const user = userEvent.setup();
+    const file = new File(["(⌐□_□)"], "chucknorris.png", {
+      type: "image/png",
+    });
 
-    await fillInForm("Test Product", "Test Description", "10.99");
+    await fillInForm("Test Product", "Test Description", "10.99", file);
 
     await user.click(screen.getByRole("button", { name: /submit/i }));
 
@@ -119,7 +133,7 @@ describe("AddProduct", () => {
             name: "Test Product",
             description: "Test Description",
             price: "10.99",
-            image: "",
+            image: "chucknorris.png",
           },
         },
       });
