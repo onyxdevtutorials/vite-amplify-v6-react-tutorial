@@ -112,11 +112,9 @@ const ProductForm: React.FC<ProductFormProps> = ({
         });
 
         const result = await uploadOutput.result;
-        console.log("upload result: ", result);
         setImageKey(result.key);
         setFieldValue("image", result.key);
         toast.success("Image uploaded successfully");
-        console.log("upload succeeded: ", result);
       } catch (err) {
         console.error("error uploading image:", err);
         toast.error("Error uploading image");
