@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import Card from "react-bootstrap/Card";
 import { useNavigate } from "react-router-dom";
-import { Product as ProductType } from "../types";
+import { Product as ProductType } from "../API";
 import { archiveProduct, restoreProduct } from "../graphql/customMutations";
 import { generateClient } from "aws-amplify/api";
 import { Button } from "react-bootstrap";

@@ -3,11 +3,8 @@ import ListProducts from "./ListProducts";
 import { MemoryRouter } from "react-router-dom";
 import { AuthContextProvider } from "../context/AuthContext";
 import { ReactNode } from "react";
-import {
-  ProductWithReviews,
-  ListProductsQueryWithReviews,
-  Review,
-} from "../types";
+import { ProductWithReviews, ListProductsQueryWithReviews } from "../types";
+import { Review } from "../API";
 import userEvent from "@testing-library/user-event";
 
 const renderWithAuthContext = async (component: ReactNode) => {

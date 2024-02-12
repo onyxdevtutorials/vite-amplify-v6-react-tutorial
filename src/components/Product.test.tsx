@@ -3,7 +3,7 @@ import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { MemoryRouter } from "react-router-dom";
 import Product from "./Product";
-import { Product as ProductType, Review } from "../types";
+import { Product as ProductType, Review } from "../API";
 import { archiveProduct, restoreProduct } from "../graphql/customMutations";
 import { AuthContextProvider } from "../context/AuthContext";
 import { ReactNode } from "react";
