@@ -8,3 +8,5 @@ This app uses React, TypeScript, and AWS Amplify v6. It's an exercise for trying
 At the moment there is no payment processing (even in a demo form) but Stripe may be added later.
 
 The amplify directory is there for reference. If you actually want to build and run the project, you'll have to go through AWS Amplify set up.
+
+Let's see if we can trigger a new deployment, now that I have updated the repo settings in amplify.
